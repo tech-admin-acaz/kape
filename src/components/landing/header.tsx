@@ -1,0 +1,31 @@
+"use client";
+
+import Link from 'next/link';
+import { Logo } from '@/components/shared/logo';
+import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/shared/language-switcher';
+import { useI18n } from '@/hooks/use-i18n';
+
+export function Header() {
+  const { t } = useI18n();
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <Logo />
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <nav className="hidden items-center space-x-4 sm:flex">
+            <a href="#hero" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t('navIntro')}</a>
+            <a href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t('navFeatures')}</a>
+          </nav>
+          <LanguageSwitcher />
+          <Button variant="ghost" asChild>
+            <Link href="/login">{t('login')}</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/signup">{t('getStarted')}</Link>
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
