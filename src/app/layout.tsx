@@ -3,6 +3,7 @@ import './globals.css';
 import { I18nProvider } from '@/lib/i18n';
 import { Toaster } from "@/components/ui/toaster"
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { ThemeProvider } from '@/components/shared/theme-provider';
 
 export const metadata: Metadata = {
   title: 'BioDiversidade2',
@@ -23,10 +24,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <I18nProvider>
-          {children}
-          <Toaster />
-        </I18nProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <I18nProvider>
+            {children}
+            <Toaster />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
