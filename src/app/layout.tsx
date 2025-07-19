@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n';
 import { Toaster } from "@/components/ui/toaster"
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 export const metadata: Metadata = {
   title: 'BioDiversidade2',
