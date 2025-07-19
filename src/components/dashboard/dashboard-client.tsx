@@ -55,10 +55,10 @@ export default function DashboardClient() {
   return (
     <ResizablePanelGroup 
         direction="horizontal"
-        className="h-[calc(100vh-3.6rem)] w-full rounded-lg border"
+        className="h-[calc(100vh-3.6rem)] w-full border"
     >
         <ResizablePanel defaultSize={67}>
-            <div className="h-full rounded-lg overflow-hidden">
+            <div className="h-full overflow-hidden">
                 <InteractiveMap onAreaSelect={handleAreaSelect} />
             </div>
         </ResizablePanel>

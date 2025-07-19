@@ -32,7 +32,7 @@ interface StatsPanelProps {
 
 function StatsPanelSkeleton() {
     return (
-        <Card className="h-full">
+        <Card className="h-full rounded-none border-none">
             <CardHeader>
                 <Skeleton className="h-8 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
@@ -70,7 +70,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   }
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-full rounded-none border-none">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
         <CardDescription>{data.type}</CardDescription>
