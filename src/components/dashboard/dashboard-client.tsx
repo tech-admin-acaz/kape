@@ -4,6 +4,11 @@ import React, { useState } from 'react';
 import InteractiveMap from './interactive-map';
 import StatsPanel from './stats-panel';
 import type { StatsData } from './stats-panel';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable"
 
 const mockData: Record<string, StatsData> = {
   "1": {
@@ -48,13 +53,21 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.6rem)] flex-col lg:flex-row gap-4 p-4">
-      <div className="flex-grow lg:w-2/3 h-1/2 lg:h-full rounded-lg overflow-hidden border shadow-sm">
-        <InteractiveMap onAreaSelect={handleAreaSelect} />
-      </div>
-      <div className="lg:w-1/3 w-full h-1/2 lg:h-full">
-        <StatsPanel data={selectedArea} />
-      </div>
-    </div>
+    <ResizablePanelGroup 
+        direction="horizontal"
+        className="h-[calc(100vh-3.6rem)] w-full rounded-lg border"
+    >
+        <ResizablePanel defaultSize={67}>
+            <div className="h-full rounded-lg overflow-hidden">
+                <InteractiveMap onAreaSelect={handleAreaSelect} />
+            </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={33}>
+            <div className="h-full">
+                <StatsPanel data={selectedArea} />
+            </div>
+        </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }
