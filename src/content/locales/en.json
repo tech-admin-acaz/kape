@@ -27,5 +27,6 @@
   "nameLabel": "Name",
   "signupButton": "Create Account",
   "googleSignup": "Sign up with Google",
-  "hasAccount": "Already have an account?"
+  "hasAccount": "Already have an account?",
+  "about": "About"
 }

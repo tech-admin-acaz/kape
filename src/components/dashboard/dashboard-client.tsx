@@ -48,7 +48,7 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-1rem)] flex-col lg:flex-row gap-4 p-4">
+    <div className="flex h-[calc(100vh-3.6rem)] flex-col lg:flex-row gap-4 p-4">
       <div className="flex-grow lg:w-2/3 h-1/2 lg:h-full rounded-lg overflow-hidden border shadow-sm">
         <InteractiveMap onAreaSelect={handleAreaSelect} />
       </div>

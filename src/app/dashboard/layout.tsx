@@ -1,17 +1,12 @@
-import { Sidebar, SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import SidebarContent from '@/components/dashboard/sidebar-content';
+import DashboardHeader from "@/components/dashboard/header";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen">
-        <Sidebar>
-          <SidebarContent />
-        </Sidebar>
-        <SidebarInset>
-          {children}
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+    <div className="flex flex-col min-h-screen">
+      <DashboardHeader />
+      <main className="flex-grow">
+        {children}
+      </main>
+    </div>
   );
 }
