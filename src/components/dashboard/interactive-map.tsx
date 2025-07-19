@@ -13,9 +13,9 @@ const locations = [
 
 const basemaps = {
     default: 'https://demotiles.maplibre.org/style.json',
-    streets: `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    dark: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    streets: 'https://api.maptiler.com/maps/streets-v2/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
+    satellite: 'https://api.maptiler.com/maps/satellite/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
+    dark: 'https://api.maptiler.com/maps/dataviz-dark/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
 };
 
 interface InteractiveMapProps {
