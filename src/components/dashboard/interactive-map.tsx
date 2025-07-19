@@ -26,7 +26,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         zoom: 3.5,
       }}
       style={{width: '100%', height: '100%'}}
-      mapStyle="https://api.maptiler.com/maps/dataviz/style.json?key=OpIi9ZULNADvP4s_2qA"
+      mapStyle="https://api.maptiler.com/maps/dataviz/style.json"
     >
       {locations.map((loc) => (
         <Marker
