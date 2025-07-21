@@ -12,10 +12,10 @@ const locations = [
 ];
 
 const basemaps = {
-    default: 'https://demotiles.maplibre.org/style.json',
-    streets: 'https://api.maptiler.com/maps/streets-v2/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
-    satellite: 'https://api.maptiler.com/maps/satellite/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
-    dark: 'https://api.maptiler.com/maps/dataviz-dark/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA',
+    default: `https://tiles.maplibre.org/styles/maptiler-toner-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    streets: `https://tiles.maplibre.org/styles/streets/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    satellite: `https://tiles.maplibre.org/styles/satellite/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    dark: `https://tiles.maplibre.org/styles/dark-matter/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
 };
 
 interface InteractiveMapProps {
@@ -39,7 +39,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             mapStyle={style}
             attributionControl={true}
         >
-        <NavigationControl position="top-left" />
+        
         {locations.map((loc) => (
             <Marker
             key={loc.id}
@@ -69,7 +69,10 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             </Popup>
         )}
         </Map>
-        <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+            <NavigationControl position="top-right" />
+            <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+        </div>
     </div>
   );
 }

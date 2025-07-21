@@ -25,24 +25,22 @@ export default function BasemapControl({ onStyleChange, basemaps }: BasemapContr
   }
 
   return (
-    <div className="absolute top-4 right-4 z-10">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon" className="bg-background/80 hover:bg-background">
-            <Layers className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {Object.keys(basemaps).map((styleKey) => (
-            <DropdownMenuItem key={styleKey} onSelect={() => handleStyleChange(styleKey)}>
-               <div className="w-4 mr-2">
-                {currentStyle === styleKey && <Check className="h-4 w-4" />}
-              </div>
-              <span className="capitalize">{styleKey}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-background">
+          <Layers className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {Object.keys(basemaps).map((styleKey) => (
+          <DropdownMenuItem key={styleKey} onSelect={() => handleStyleChange(styleKey)}>
+              <div className="w-4 mr-2">
+              {currentStyle === styleKey && <Check className="h-4 w-4" />}
+            </div>
+            <span className="capitalize">{styleKey}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
