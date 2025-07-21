@@ -12,10 +12,10 @@ const locations = [
 ];
 
 const basemaps = {
-    default: `https://tiles.maplibre.org/styles/maptiler-toner-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    streets: `https://tiles.maplibre.org/styles/streets/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    satellite: `https://tiles.maplibre.org/styles/satellite/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    dark: `https://tiles.maplibre.org/styles/dark-matter/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    default: `https://demotiles.maplibre.org/style.json`,
+    streets: `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+    dark: `https://api.maptiler.com/maps/darkmatter/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
 };
 
 interface InteractiveMapProps {
@@ -40,39 +40,40 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             attributionControl={true}
         >
         
-        {locations.map((loc) => (
-            <Marker
-            key={loc.id}
-            longitude={loc.lng}
-            latitude={loc.lat}
-            onClick={(e) => {
-                e.originalEvent.stopPropagation();
-                onAreaSelect(loc.id);
-                setSelectedLocation(loc);
-            }}
-            style={{cursor: 'pointer'}}
-            >
-            <MapPin className="w-6 h-6 text-primary fill-primary/50" />
-            </Marker>
-        ))}
+            <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+                <NavigationControl position="top-right" />
+                <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+            </div>
 
-        {selectedLocation && (
-            <Popup
-            longitude={selectedLocation.lng}
-            latitude={selectedLocation.lat}
-            onClose={() => setSelectedLocation(null)}
-            closeButton={false}
-            offset={30}
-            anchor="bottom"
-            >
-            <div className="text-sm font-semibold">{selectedLocation.name}</div>
-            </Popup>
-        )}
+            {locations.map((loc) => (
+                <Marker
+                key={loc.id}
+                longitude={loc.lng}
+                latitude={loc.lat}
+                onClick={(e) => {
+                    e.originalEvent.stopPropagation();
+                    onAreaSelect(loc.id);
+                    setSelectedLocation(loc);
+                }}
+                style={{cursor: 'pointer'}}
+                >
+                <MapPin className="w-6 h-6 text-primary fill-primary/50" />
+                </Marker>
+            ))}
+
+            {selectedLocation && (
+                <Popup
+                longitude={selectedLocation.lng}
+                latitude={selectedLocation.lat}
+                onClose={() => setSelectedLocation(null)}
+                closeButton={false}
+                offset={30}
+                anchor="bottom"
+                >
+                <div className="text-sm font-semibold">{selectedLocation.name}</div>
+                </Popup>
+            )}
         </Map>
-        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
-            <NavigationControl position="top-right" />
-            <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
-        </div>
     </div>
   );
 }
