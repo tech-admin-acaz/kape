@@ -37,7 +37,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={style}
-            attributionControl={false}
+            attributionControl={true}
         >
         <NavigationControl position="top-left" />
         {locations.map((loc) => (
