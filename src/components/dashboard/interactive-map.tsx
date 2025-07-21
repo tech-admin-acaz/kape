@@ -41,8 +41,8 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         >
         
             <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
-                <NavigationControl position="top-right" />
                 <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+                <NavigationControl position="top-right" />
             </div>
 
             {locations.map((loc) => (
