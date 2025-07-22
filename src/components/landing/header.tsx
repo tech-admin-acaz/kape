@@ -5,6 +5,7 @@ import { Logo } from '@/components/shared/logo';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/shared/language-switcher';
 import { useI18n } from '@/hooks/use-i18n';
+import { ThemeSwitcher } from '../shared/theme-switcher';
 
 export function Header() {
   const { t } = useI18n();
@@ -18,6 +19,7 @@ export function Header() {
             <a href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t('navFeatures')}</a>
           </nav>
           <LanguageSwitcher />
+          <ThemeSwitcher />
           <Button variant="ghost" asChild>
             <Link href="/login">{t('login')}</Link>
           </Button>
