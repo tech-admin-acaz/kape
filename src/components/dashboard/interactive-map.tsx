@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import Map, { Marker, Popup, MapRef, ControlPanel } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef } from 'react-map-gl';
 import maplibregl from 'maplibre-gl';
 import { MapPin, Plus, Minus, Compass } from 'lucide-react';
 import BasemapControl from './basemap-control';
@@ -15,9 +15,6 @@ const locations = [
 
 const basemaps = {
     default: `https://demotiles.maplibre.org/style.json`,
-    streets: `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
-    dark: `https://api.maptiler.com/maps/darkmatter/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
 };
 
 interface InteractiveMapProps {
