@@ -5,6 +5,7 @@ import Map, { Marker, Popup, NavigationControl } from 'react-map-gl';
 import maplibregl from 'maplibre-gl';
 import { MapPin } from 'lucide-react';
 import BasemapControl from './basemap-control';
+import MapFilters from './map-filters';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -74,6 +75,9 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 </Popup>
             )}
         </Map>
+        <div className="absolute top-4 left-4 z-10">
+            <MapFilters />
+        </div>
     </div>
   );
 }
