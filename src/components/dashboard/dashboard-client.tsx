@@ -55,7 +55,7 @@ export default function DashboardClient() {
   return (
     <ResizablePanelGroup 
         direction="horizontal"
-        className="h-[calc(100vh-3.5rem)] w-full border"
+        className="h-[calc(100vh-3.5rem)] w-full"
     >
         <ResizablePanel defaultSize={67}>
             <div className="h-full overflow-hidden">
