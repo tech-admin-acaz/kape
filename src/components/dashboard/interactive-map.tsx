@@ -14,7 +14,7 @@ const locations = [
 ];
 
 const basemaps = {
-    default: `https://demotiles.maplibre.org/style.json`,
+    default: `https://demotiles.maplibre.org/terrain-rgb/style.json`,
 };
 
 interface InteractiveMapProps {
