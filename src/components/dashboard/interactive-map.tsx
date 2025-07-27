@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import Map, { Marker, Popup, MapRef } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source, Terrain } from 'react-map-gl';
 import maplibregl from 'maplibre-gl';
 import { MapPin, Plus, Minus, Compass } from 'lucide-react';
 import BasemapControl from './basemap-control';
@@ -47,11 +47,20 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 longitude: -51.9253,
                 latitude: -14.235,
                 zoom: 3.5,
+                pitch: 45,
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={style}
             attributionControl={true}
         >
+            <Source
+                id="terrain-source"
+                type="raster-dem"
+                url="https://demotiles.maplibre.org/terrain-rgb/tiles.json"
+                tileSize={256}
+            >
+            </Source>
+            <Terrain source="terrain-source" exaggeration={1.5} />
         
             {locations.map((loc) => (
                 <Marker
