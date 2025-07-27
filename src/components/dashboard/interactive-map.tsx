@@ -14,7 +14,7 @@ const locations = [
 ];
 
 const basemaps = {
-    default: `https://demotiles.maplibre.org/terrain-rgb/style.json`,
+    default: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=get_your_own_OpIi9ZULNADvP4s_2qA`,
 };
 
 interface InteractiveMapProps {
