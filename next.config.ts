@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_MAPBOX_TOKEN: 'get_your_own_token',
+    NEXT_PUBLIC_MAPBOX_TOKEN: 'pk.eyJ1IjoiYWNheiIsImEiOiJjbHRnNGN0cXUweXZqMmlwZjdpYWs0MXd1In0.m0at9KcpNrxMpIK_Ab_2aQ',
   }
 };
 
