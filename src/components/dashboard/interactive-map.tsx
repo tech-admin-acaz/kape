@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import Map, { Marker, Popup, MapRef, Source, Terrain } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
 import { MapPin, Plus, Minus, Compass } from 'lucide-react';
 import BasemapControl from './basemap-control';
@@ -54,6 +54,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             style={{width: '100%', height: '100%'}}
             mapStyle={style}
             attributionControl={true}
+            terrain={{source: 'mapbox-dem', exaggeration: 1.5}}
         >
             <Source
                 id="mapbox-dem"
@@ -61,9 +62,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 url="mapbox://mapbox.mapbox-terrain-dem-v1"
                 tileSize={512}
                 maxzoom={14}
-            >
-            </Source>
-            <Terrain source="mapbox-dem" exaggeration={1.5} />
+            />
         
             {locations.map((loc) => (
                 <Marker
