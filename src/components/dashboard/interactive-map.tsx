@@ -2,11 +2,12 @@
 
 import React, { useState, useRef } from 'react';
 import Map, { Marker, Popup, MapRef, Source, Terrain } from 'react-map-gl';
-import maplibregl from 'maplibre-gl';
+import mapboxgl from 'mapbox-gl';
 import { MapPin, Plus, Minus, Compass } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import MapFilters from './map-filters';
 import { Button } from '@/components/ui/button';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -14,7 +15,7 @@ const locations = [
 ];
 
 const basemaps = {
-    default: `https://demotiles.maplibre.org/style.json`,
+    default: 'mapbox://styles/mapbox/satellite-streets-v12',
 };
 
 interface InteractiveMapProps {
@@ -42,7 +43,8 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
     <div className="relative w-full h-full">
         <Map
             ref={mapRef}
-            mapLib={maplibregl}
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+            mapLib={mapboxgl}
             initialViewState={{
                 longitude: -51.9253,
                 latitude: -14.235,
@@ -54,13 +56,14 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             attributionControl={true}
         >
             <Source
-                id="terrain-source"
+                id="mapbox-dem"
                 type="raster-dem"
-                url="https://demotiles.maplibre.org/terrain-rgb/tiles.json"
-                tileSize={256}
+                url="mapbox://mapbox.mapbox-terrain-dem-v1"
+                tileSize={512}
+                maxzoom={14}
             >
             </Source>
-            <Terrain source="terrain-source" exaggeration={1.5} />
+            <Terrain source="mapbox-dem" exaggeration={1.5} />
         
             {locations.map((loc) => (
                 <Marker
