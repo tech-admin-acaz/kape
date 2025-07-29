@@ -40,9 +40,9 @@ const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tool
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button className="text-muted-foreground">
+          <span className="text-muted-foreground">
             <Info className="w-3.5 h-3.5" />
-          </button>
+          </span>
         </TooltipTrigger>
         <TooltipContent>
           <p>{tooltipText}</p>
