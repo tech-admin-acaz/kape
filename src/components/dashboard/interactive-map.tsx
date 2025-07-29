@@ -113,7 +113,19 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             <MapFilters />
         </div>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
+             <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" onClick={toggle3D} className={cn("bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
+                            <Box className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+
             <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+
             <TooltipProvider>
                 <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
                   <Tooltip>
@@ -139,14 +151,6 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left"><p>Reset Orientation</p></TooltipContent>
-                  </Tooltip>
-                   <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={toggle3D} className={cn("w-10 h-10 rounded-none bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
-                        <Box className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
                   </Tooltip>
                 </div>
             </TooltipProvider>
