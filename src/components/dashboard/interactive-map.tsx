@@ -112,7 +112,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         <div className="absolute top-4 left-4 z-10">
             <MapFilters />
         </div>
-        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+        <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
             <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
             <TooltipProvider>
                 <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
