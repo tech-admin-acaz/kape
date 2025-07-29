@@ -9,6 +9,7 @@ import MapFilters from './map-filters';
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -18,6 +19,8 @@ const locations = [
 const basemaps = {
     default: 'https://demotiles.maplibre.org/style.json',
 };
+
+const mapbox3DStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
 
 interface InteractiveMapProps {
   onAreaSelect: (areaId: string | null) => void;
@@ -31,7 +34,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
 
   useEffect(() => {
     if (mapRef.current) {
-        mapRef.current.easeTo({ pitch: is3D ? 45 : 0, duration: 1000 });
+        mapRef.current.easeTo({ pitch: is3D ? 60 : 0, duration: 1000 });
     }
   }, [is3D]);
 
@@ -48,7 +51,9 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   };
   
   const toggle3D = () => {
-    setIs3D(!is3D);
+    const newIs3D = !is3D;
+    setIs3D(newIs3D);
+    setStyle(newIs3D ? mapbox3DStyle : basemaps.default);
   }
 
   return (
@@ -67,13 +72,13 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             attributionControl={true}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
         >
-            {is3D && <Source
+            <Source
                 id="mapbox-dem"
                 type="raster-dem"
                 url="mapbox://mapbox.mapbox-terrain-dem-v1"
                 tileSize={512}
                 maxzoom={14}
-            />}
+            />
         
             {locations.map((loc) => (
                 <Marker
@@ -109,20 +114,42 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         </div>
         <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
             <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
-            <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
-              <Button variant="ghost" size="icon" onClick={handleZoomIn} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={handleZoomOut} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
-                <Compass className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={toggle3D} className={cn("w-10 h-10 rounded-none bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
-                <Box className="h-4 w-4" />
-              </Button>
-            </div>
+            <TooltipProvider>
+                <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={handleZoomIn} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left"><p>Zoom In</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={handleZoomOut} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left"><p>Zoom Out</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                        <Compass className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left"><p>Reset Orientation</p></TooltipContent>
+                  </Tooltip>
+                   <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={toggle3D} className={cn("w-10 h-10 rounded-none bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
+                        <Box className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
+                  </Tooltip>
+                </div>
+            </TooltipProvider>
         </div>
     </div>
   );
