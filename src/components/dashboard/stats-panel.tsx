@@ -170,14 +170,15 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
         <CardDescription>{data.type}</CardDescription>
       </CardHeader>
-      <ScrollArea className="flex-grow">
-        <Tabs defaultValue="services" className="w-full">
+      
+      <div className="flex-grow flex flex-col min-h-0">
+        <Tabs defaultValue="services" className="w-full flex flex-col flex-grow min-h-0">
             <TabsList className="mx-6">
                 <TabsTrigger value="characterization">CARACTERIZAÇÃO</TabsTrigger>
                 <TabsTrigger value="services">SERVIÇOS AMBIENTAIS</TabsTrigger>
                 <TabsTrigger value="ranking">RANKING DE ESPÉCIES</TabsTrigger>
             </TabsList>
-            <TabsContent value="characterization">
+            <TabsContent value="characterization" className="flex-grow overflow-y-auto">
                 <CardContent className="space-y-6 px-6 pb-6 pt-6">
                   <div>
                     <h3 className="text-sm font-medium mb-2">Land Use</h3>
@@ -224,7 +225,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
 
                 </CardContent>
             </TabsContent>
-            <TabsContent value="services">
+            <TabsContent value="services" className="flex-grow overflow-y-auto">
                 <CardContent className="px-6 pb-6 pt-6 space-y-8">
                     {/* Biodiversity Section */}
                     <div className="space-y-4">
@@ -300,13 +301,14 @@ export default function StatsPanel({ data }: StatsPanelProps) {
 
                 </CardContent>
             </TabsContent>
-            <TabsContent value="ranking">
+            <TabsContent value="ranking" className="flex-grow overflow-y-auto">
                 <CardContent className="px-6 pb-6 pt-6">
                     <p className="text-muted-foreground">Painel de Ranking de Espécies em desenvolvimento.</p>
                 </CardContent>
             </TabsContent>
         </Tabs>
-      </ScrollArea>
+      </div>
+
       <CardFooter className="px-6 pb-6">
         <Button className="w-full">
           <Download className="mr-2 h-4 w-4" />
