@@ -3,10 +3,11 @@
 import React, { useState, useRef } from 'react';
 import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
-import { MapPin, Plus, Minus, Compass } from 'lucide-react';
+import { MapPin, Plus, Minus, Compass, Box } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import MapFilters from './map-filters';
 import { Button } from '@/components/ui/button';
+import { cn } from "@/lib/utils";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const locations = [
@@ -15,7 +16,7 @@ const locations = [
 ];
 
 const basemaps = {
-    default: 'mapbox://styles/mapbox/satellite-streets-v12',
+    default: 'https://demotiles.maplibre.org/style.json',
 };
 
 interface InteractiveMapProps {
@@ -25,6 +26,7 @@ interface InteractiveMapProps {
 export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [style, setStyle] = useState(basemaps.default);
+  const [is3D, setIs3D] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
   const handleZoomIn = () => {
@@ -39,6 +41,10 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
     mapRef.current?.resetNorth();
   };
   
+  const toggle3D = () => {
+    setIs3D(!is3D);
+  }
+
   return (
     <div className="relative w-full h-full">
         <Map
@@ -49,20 +55,20 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 longitude: -51.9253,
                 latitude: -14.235,
                 zoom: 3.5,
-                pitch: 45,
+                pitch: is3D ? 45 : 0,
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={style}
             attributionControl={true}
-            terrain={{source: 'mapbox-dem', exaggeration: 1.5}}
+            terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
         >
-            <Source
+            {is3D && <Source
                 id="mapbox-dem"
                 type="raster-dem"
                 url="mapbox://mapbox.mapbox-terrain-dem-v1"
                 tileSize={512}
                 maxzoom={14}
-            />
+            />}
         
             {locations.map((loc) => (
                 <Marker
@@ -107,6 +113,9 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
               </Button>
               <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
                 <Compass className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={toggle3D} className={cn("w-10 h-10 rounded-none bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
+                <Box className="h-4 w-4" />
               </Button>
             </div>
         </div>
