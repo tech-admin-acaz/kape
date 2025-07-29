@@ -17,10 +17,12 @@ const locations = [
 ];
 
 const basemaps = {
-    default: 'https://demotiles.maplibre.org/style.json',
+    'satélite': 'mapbox://styles/mapbox/satellite-streets-v12',
+    'ruas': 'https://demotiles.maplibre.org/style.json',
+    'escuro': 'mapbox://styles/mapbox/dark-v11',
 };
 
-const mapbox3DStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
+const defaultBasemapKey = 'ruas';
 
 interface InteractiveMapProps {
   onAreaSelect: (areaId: string | null) => void;
@@ -28,7 +30,7 @@ interface InteractiveMapProps {
 
 export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
-  const [style, setStyle] = useState(basemaps.default);
+  const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
@@ -37,6 +39,12 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         mapRef.current.easeTo({ pitch: is3D ? 60 : 0, duration: 1000 });
     }
   }, [is3D]);
+  
+  const handleStyleChange = (styleUrl: string) => {
+    const styleKey = Object.keys(basemaps).find(key => basemaps[key as keyof typeof basemaps] === styleUrl) || defaultBasemapKey;
+    setCurrentStyleKey(styleKey);
+    setIs3D(false); // Reset 3D when changing style
+  }
 
   const handleZoomIn = () => {
     mapRef.current?.zoomIn();
@@ -51,10 +59,10 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   };
   
   const toggle3D = () => {
-    const newIs3D = !is3D;
-    setIs3D(newIs3D);
-    setStyle(newIs3D ? mapbox3DStyle : basemaps.default);
+    setIs3D(prev => !prev);
   }
+
+  const mapStyle = is3D ? basemaps['satélite'] : basemaps[currentStyleKey as keyof typeof basemaps];
 
   return (
     <div className="relative w-full h-full">
@@ -68,7 +76,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 zoom: 3.5,
             }}
             style={{width: '100%', height: '100%'}}
-            mapStyle={style}
+            mapStyle={mapStyle}
             attributionControl={true}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
         >
@@ -124,7 +132,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 </Tooltip>
             </TooltipProvider>
 
-            <BasemapControl onStyleChange={setStyle} basemaps={basemaps} />
+            <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={is3D ? 'satélite' : currentStyleKey} />
 
             <TooltipProvider>
                 <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
