@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
 import { MapPin, Plus, Minus, Compass, Box } from 'lucide-react';
@@ -29,6 +29,12 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [is3D, setIs3D] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
+  useEffect(() => {
+    if (mapRef.current) {
+        mapRef.current.easeTo({ pitch: is3D ? 45 : 0, duration: 1000 });
+    }
+  }, [is3D]);
+
   const handleZoomIn = () => {
     mapRef.current?.zoomIn();
   };
@@ -55,7 +61,6 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 longitude: -51.9253,
                 latitude: -14.235,
                 zoom: 3.5,
-                pitch: is3D ? 45 : 0,
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={style}
