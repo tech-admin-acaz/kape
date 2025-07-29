@@ -190,7 +190,45 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             <div className="flex-grow overflow-y-auto">
                 <TabsContent value="characterization" className="mt-0">
                     <CardContent className="space-y-6 px-6 pb-6 pt-6">
-                      {/* This content is now inside a scrollable area */}
+                         <div className="space-y-4">
+                            <h3 className="font-headline text-lg font-semibold">Uso do Solo</h3>
+                            <div className="h-48">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={data.stats.landUse} layout="vertical" margin={{ left: 10, right: 10 }}>
+                                <XAxis type="number" hide />
+                                <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={80} tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }} />
+                                <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
+                                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                    {data.stats.landUse.map((entry, index) => (
+                                    <rect key={`cell-${index}`} fill={entry.fill} />
+                                    ))}
+                                </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <h3 className="font-headline text-base font-semibold flex items-center gap-2"><Droplets className="w-4 h-4 text-primary" /> Qualidade da Água</h3>
+                                <Progress value={data.stats.waterQuality} aria-label={`${data.stats.waterQuality}%`} />
+                                <span className="text-sm text-muted-foreground">{data.stats.waterQuality}%</span>
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="font-headline text-base font-semibold flex items-center gap-2"><Leaf className="w-4 h-4 text-primary" /> Índice de Vegetação</h3>
+                                <Progress value={data.stats.vegetationIndex} aria-label={`${data.stats.vegetationIndex}%`} />
+                                <span className="text-sm text-muted-foreground">{data.stats.vegetationIndex}%</span>
+                            </div>
+                        </div>
+                        
+                        <Card className="bg-muted/30">
+                            <CardHeader className='pb-2'>
+                                <CardTitle className="text-base font-medium flex items-center gap-2"><Info className="w-4 h-4" />Insights de Correlação</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm">{data.correlationInsights}</p>
+                            </CardContent>
+                        </Card>
                     </CardContent>
                 </TabsContent>
                 <TabsContent value="services" className="mt-0">
