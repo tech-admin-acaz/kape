@@ -7,11 +7,11 @@ import { Button } from '../ui/button';
 import { Download, Droplets, Leaf, Info, Bird, TreeDeciduous } from 'lucide-react';
 import { Progress } from '../ui/progress';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, TooltipProps } from 'recharts';
-import { ScrollArea } from '../ui/scroll-area';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+import SpeciesRankingTable from './species-ranking-table';
 
 interface LandUseData {
   name: string;
@@ -36,6 +36,15 @@ interface WaterData {
     valuation: { name: string; value: number; }[];
 }
 
+export interface SpeciesData {
+    id: string;
+    name: string;
+    resilience: string;
+    potential: boolean;
+    domestication: boolean;
+    availability: boolean;
+}
+
 export interface StatsData {
   name: string;
   type: string;
@@ -50,6 +59,7 @@ export interface StatsData {
     water: WaterData;
   };
   correlationInsights: string;
+  species: SpeciesData[];
 }
 
 interface StatsPanelProps {
@@ -162,7 +172,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     return <StatsPanelSkeleton />;
   }
   const { biodiversity, carbon, water } = data.environmentalServices;
-  const { landUse, waterQuality, vegetationIndex } = data.stats;
 
   return (
     <Card className="flex flex-col h-full rounded-none border-l-0 border-r-0 border-t-0 border-b-0">
@@ -172,140 +181,97 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       </CardHeader>
       
       <div className="flex-grow flex flex-col min-h-0">
-        <Tabs defaultValue="services" className="w-full flex flex-col flex-grow min-h-0">
+        <Tabs defaultValue="characterization" className="w-full flex flex-col flex-grow min-h-0">
             <TabsList className="mx-6">
                 <TabsTrigger value="characterization">CARACTERIZAÇÃO</TabsTrigger>
                 <TabsTrigger value="services">SERVIÇOS AMBIENTAIS</TabsTrigger>
                 <TabsTrigger value="ranking">RANKING DE ESPÉCIES</TabsTrigger>
             </TabsList>
-            <TabsContent value="characterization" className="flex-grow overflow-y-auto">
-                <CardContent className="space-y-6 px-6 pb-6 pt-6">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Land Use</h3>
-                    <div className="h-40">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={landUse} layout="vertical" margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
-                                <XAxis type="number" hide />
-                                <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} width={80} />
-                                <Tooltip
-                                    cursor={{ fill: 'hsl(var(--card))' }} 
-                                    contentStyle={{ 
-                                        background: 'hsl(var(--popover))',
-                                        border: '1px solid hsl(var(--border))',
-                                        borderRadius: 'var(--radius)'
-                                    }}
-                                />
-                                <Bar dataKey="value" background={{ fill: 'hsl(var(--muted))', radius: 4 }} radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <h3 className="text-sm font-medium flex items-center gap-2"><Droplets className="w-4 h-4 text-accent" /> Water Quality</h3>
-                        <span className="text-sm font-semibold">{waterQuality}%</span>
-                      </div>
-                      <Progress value={waterQuality} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <h3 className="text-sm font-medium flex items-center gap-2"><Leaf className="w-4 h-4 text-accent" /> Vegetation Index</h3>
-                        <span className="text-sm font-semibold">{vegetationIndex}%</span>
-                      </div>
-                      <Progress value={vegetationIndex} />
-                    </div>
-                  </div>
-
-                  <div>
-                     <h3 className="text-sm font-medium mb-2">Latest Insights</h3>
-                     <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-md border">{data.correlationInsights}</p>
-                  </div>
-
-                </CardContent>
-            </TabsContent>
-            <TabsContent value="services" className="flex-grow overflow-y-auto">
-                <CardContent className="px-6 pb-6 pt-6 space-y-8">
-                    {/* Biodiversity Section */}
-                    <div className="space-y-4">
-                        <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                           <BiodiversityItem icon={<FrogIcon className="w-10 h-10 text-green-500" />} label="Anfíbios" value={biodiversity.amphibians} />
-                           <BiodiversityItem icon={<Bird className="w-10 h-10 text-red-500" />} label="Aves" value={biodiversity.birds} />
-                           <BiodiversityItem icon={<MammalIcon className="w-10 h-10 text-yellow-600" />} label="Mamíferos" value={biodiversity.mammals} />
-                           <BiodiversityItem icon={<TreeDeciduous className="w-10 h-10 text-green-700" />} label="Árvores" value={biodiversity.trees} />
-                           <BiodiversityItem icon={<ReptileIcon className="w-10 h-10 text-teal-600" />} label="Répteis" value={biodiversity.reptiles} />
+            <div className="flex-grow overflow-y-auto">
+                <TabsContent value="characterization" className="mt-0">
+                    <CardContent className="space-y-6 px-6 pb-6 pt-6">
+                      {/* This content is now inside a scrollable area */}
+                    </CardContent>
+                </TabsContent>
+                <TabsContent value="services" className="mt-0">
+                    <CardContent className="px-6 pb-6 pt-6 space-y-8">
+                        {/* Biodiversity Section */}
+                        <div className="space-y-4">
+                            <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                               <BiodiversityItem icon={<FrogIcon className="w-10 h-10 text-green-500" />} label="Anfíbios" value={biodiversity.amphibians} />
+                               <BiodiversityItem icon={<Bird className="w-10 h-10 text-red-500" />} label="Aves" value={biodiversity.birds} />
+                               <BiodiversityItem icon={<MammalIcon className="w-10 h-10 text-yellow-600" />} label="Mamíferos" value={biodiversity.mammals} />
+                               <BiodiversityItem icon={<TreeDeciduous className="w-10 h-10 text-green-700" />} label="Árvores" value={biodiversity.trees} />
+                               <BiodiversityItem icon={<ReptileIcon className="w-10 h-10 text-teal-600" />} label="Répteis" value={biodiversity.reptiles} />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Carbon Section */}
-                    <div className="space-y-4">
-                        <SectionHeader title="Carbono" tooltipText="Análise de estoque e valoração de serviços de carbono." />
-                        <Card className="bg-muted/30">
-                            <CardHeader>
-                                <CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle>
-                            </CardHeader>
-                            <CardContent className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <ComposedChart data={carbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                        <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Legend wrapperStyle={{fontSize: "12px"}} />
-                                        <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
-                                        <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
-                                    </ComposedChart>
-                                </ResponsiveContainer>
-                            </CardContent>
-                        </Card>
-                         <Card className="bg-muted/30">
-                            <CardHeader>
-                                <CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle>
-                            </CardHeader>
-                            <CardContent className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={carbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                         <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                                         <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
-                                         <Tooltip content={<CustomTooltip />} />
-                                         <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </CardContent>
-                        </Card>
-                    </div>
+                        {/* Carbon Section */}
+                        <div className="space-y-4">
+                            <SectionHeader title="Carbono" tooltipText="Análise de estoque e valoração de serviços de carbono." />
+                            <Card className="bg-muted/30">
+                                <CardHeader>
+                                    <CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle>
+                                </CardHeader>
+                                <CardContent className="h-64">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <ComposedChart data={carbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                            <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
+                                            <Tooltip content={<CustomTooltip />} />
+                                            <Legend wrapperStyle={{fontSize: "12px"}} />
+                                            <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
+                                            <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                            </Card>
+                             <Card className="bg-muted/30">
+                                <CardHeader>
+                                    <CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle>
+                                </CardHeader>
+                                <CardContent className="h-64">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={carbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                             <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
+                                             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
+                                             <Tooltip content={<CustomTooltip />} />
+                                             <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                    {/* Water Section */}
-                     <div className="space-y-4">
-                        <SectionHeader title="Água" tooltipText="Análise de valoração de serviços hídricos." />
-                        <Card className="bg-muted/30">
-                            <CardHeader>
-                                <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
-                            </CardHeader>
-                            <CardContent className="h-64">
-                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={water.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                         <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                         <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                                         <Tooltip content={<CustomTooltip />} />
-                                         <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                </CardContent>
-            </TabsContent>
-            <TabsContent value="ranking" className="flex-grow overflow-y-auto">
-                <CardContent className="px-6 pb-6 pt-6">
-                    <p className="text-muted-foreground">Painel de Ranking de Espécies em desenvolvimento.</p>
-                </CardContent>
-            </TabsContent>
+                        {/* Water Section */}
+                         <div className="space-y-4">
+                            <SectionHeader title="Água" tooltipText="Análise de valoração de serviços hídricos." />
+                            <Card className="bg-muted/30">
+                                <CardHeader>
+                                    <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
+                                </CardHeader>
+                                <CardContent className="h-64">
+                                     <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={water.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                             <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
+                                             <Tooltip content={<CustomTooltip />} />
+                                             <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </CardContent>
+                </TabsContent>
+                <TabsContent value="ranking" className="mt-0 flex-grow flex flex-col">
+                    <SpeciesRankingTable species={data.species} />
+                </TabsContent>
+            </div>
         </Tabs>
       </div>
 
