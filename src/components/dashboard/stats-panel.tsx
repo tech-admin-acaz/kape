@@ -114,14 +114,13 @@ const BiodiversityItem = ({ icon, label, value }: { icon: React.ReactNode, label
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
+        const data = payload[0].payload;
         return (
             <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
-                <p className="font-bold mb-1">{label || (payload[0].payload as any).name}</p>
-                {payload.map((pld, index) => (
-                    <p key={index} style={{ color: pld.color }}>
-                        {`${pld.name}: ${pld.name === 'Valor' ? formatCurrency(pld.value as number) : (pld.name === 'value' ? `${(pld.value as number).toFixed(1)}%` : formatNumber(pld.value as number))}`}
-                    </p>
-                ))}
+                <p className="font-bold mb-1">{data.name}</p>
+                <p style={{ color: data.fill }}>
+                    Percentual de Area: {(data.value as number).toFixed(1)}%
+                </p>
             </div>
         );
     }
@@ -236,7 +235,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
 
                                                 return (
                                                     <text x={x} y={y} fill="hsl(var(--foreground))" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
-                                                        {name} ({(percent * 100).toFixed(1)}%)
+                                                        {`${name}: ${(percent * 100).toFixed(1)}%`}
                                                     </text>
                                                 );
                                             }}
@@ -250,7 +249,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                                 <Cell key={`cell-${index}`} fill={entry.fill} />
                                             ))}
                                         </Pie>
-                                        <Tooltip content={<CustomTooltip />} />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
@@ -357,3 +356,5 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </Card>
   );
 }
+
+    
