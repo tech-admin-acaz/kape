@@ -49,11 +49,19 @@ const mockData: Record<string, StatsData> = {
   "1": {
     name: "T.I. Yanomami",
     type: "Indigenous Territory",
+    generalInfo: {
+        state: "Roraima (RR)",
+        municipality: "Undefined",
+        territoryName: "T.I. Yanomami",
+        conservationUnit: "Undefined",
+    },
     stats: {
-      landUse: [
-        { name: "Forest", value: 85, fill: "var(--color-chart-1)" },
-        { name: "Agriculture", value: 5, fill: "var(--color-chart-2)" },
-        { name: "Mining", value: 10, fill: "var(--color-chart-3)" },
+      landCover: [
+        { name: "Formação Florestal Primária", value: 36.2, fill: "hsl(var(--chart-3))" },
+        { name: "Outras Formações Naturais", value: 24.5, fill: "hsl(var(--chart-2))" },
+        { name: "Pastagem", value: 24.2, fill: "hsl(var(--chart-4))" },
+        { name: "Agricultura", value: 13.3, fill: "hsl(var(--chart-5))" },
+        { name: "Outros", value: 1.8, fill: "hsl(var(--muted))" },
       ],
       waterQuality: 78,
       vegetationIndex: 92,
@@ -92,11 +100,19 @@ const mockData: Record<string, StatsData> = {
   "2": {
     name: "Serra da Canastra",
     type: "National Park",
+    generalInfo: {
+        state: "Minas Gerais (MG)",
+        municipality: "Undefined",
+        territoryName: "Undefined",
+        conservationUnit: "P.N. Serra da Canastra",
+    },
     stats: {
-      landUse: [
-        { name: "Savanna", value: 70, fill: "var(--color-chart-1)" },
-        { name: "Forest", value: 20, fill: "var(--color-chart-2)" },
-        { name: "Pasture", value: 10, fill: "var(--color-chart-3)" },
+      landCover: [
+        { name: "Formação Florestal Primária", value: 20, fill: "hsl(var(--chart-3))" },
+        { name: "Outras Formações Naturais", value: 60, fill: "hsl(var(--chart-2))" },
+        { name: "Pastagem", value: 15, fill: "hsl(var(--chart-4))" },
+        { name: "Agricultura", value: 5, fill: "hsl(var(--chart-5))" },
+        { name: "Outros", value: 0, fill: "hsl(var(--muted))" },
       ],
       waterQuality: 95,
       vegetationIndex: 88,

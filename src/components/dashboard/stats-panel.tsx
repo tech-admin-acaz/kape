@@ -6,17 +6,24 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '../ui/button';
 import { Download, Droplets, Leaf, Info, Bird, TreeDeciduous } from 'lucide-react';
 import { Progress } from '../ui/progress';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, TooltipProps } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, TooltipProps, PieChart, Pie, Cell } from 'recharts';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import SpeciesRankingTable from './species-ranking-table';
 
-interface LandUseData {
+interface LandCoverData {
   name: string;
   value: number;
   fill: string;
+}
+
+interface GeneralInfo {
+    state: string;
+    municipality: string;
+    territoryName: string;
+    conservationUnit: string;
 }
 
 interface BiodiversityData {
@@ -48,8 +55,9 @@ export interface SpeciesData {
 export interface StatsData {
   name: string;
   type: string;
+  generalInfo: GeneralInfo;
   stats: {
-    landUse: LandUseData[];
+    landCover: LandCoverData[];
     waterQuality: number;
     vegetationIndex: number;
   };
@@ -108,10 +116,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     if (active && payload && payload.length) {
         return (
             <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
-                <p className="font-bold mb-1">{label}</p>
+                <p className="font-bold mb-1">{label || (payload[0].payload as any).name}</p>
                 {payload.map((pld, index) => (
                     <p key={index} style={{ color: pld.color }}>
-                        {`${pld.name}: ${pld.name === 'Valor' ? formatCurrency(pld.value as number) : formatNumber(pld.value as number)}`}
+                        {`${pld.name}: ${pld.name === 'Valor' ? formatCurrency(pld.value as number) : (pld.name === 'value' ? `${(pld.value as number).toFixed(1)}%` : formatNumber(pld.value as number))}`}
                     </p>
                 ))}
             </div>
@@ -119,6 +127,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     }
     return null;
 };
+
 
 const FrogIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M14 6.07a6.5 6.5 0 1 1-4 0"/><path d="M10.15 11.23c-.22.33-.35.73-.35 1.17a3.18 3.18 0 0 0 3.18 3.18c.44 0 .84-.13 1.17-.35"/><path d="M21.5 14.5c.33.82 0 1.68-.82 2s-1.68 0-2-.82"/><path d="M2.5 14.5c-.33.82 0 1.68.82 2s1.68 0 2-.82"/></svg>
@@ -130,6 +139,13 @@ const ReptileIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const MammalIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M16 10s-1-2-3-2-3 2-3 2"/><path d="M5.3 11.3C4.2 12.5 4 14.2 4 16c0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4 0-1.8-.2-3.5-1.3-4.7-1.3-1.5-3.5-1.8-5.7-1.3-2.2.5-4.5.5-6.7 0-2.2-.5-4.4-.2-5.7 1.3Z"/></svg>
+);
+
+const GeneralInfoItem = ({ label, value }: { label: string; value: string }) => (
+    <div className="flex justify-between text-sm">
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="font-medium text-right">{value}</span>
+    </div>
 );
 
 
@@ -172,6 +188,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     return <StatsPanelSkeleton />;
   }
   const { biodiversity, carbon, water } = data.environmentalServices;
+  const { generalInfo, stats } = data;
 
   return (
     <Card className="flex flex-col h-full rounded-none border-l-0 border-r-0 border-t-0 border-b-0">
@@ -190,34 +207,52 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             <div className="flex-grow overflow-y-auto">
                 <TabsContent value="characterization" className="mt-0">
                     <CardContent className="space-y-6 px-6 pb-6 pt-6">
-                         <div className="space-y-4">
-                            <h3 className="font-headline text-lg font-semibold">Uso do Solo</h3>
-                            <div className="h-48">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.stats.landUse} layout="vertical" margin={{ left: 10, right: 10 }}>
-                                <XAxis type="number" hide />
-                                <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={80} tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }} />
-                                <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
-                                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                                    {data.stats.landUse.map((entry, index) => (
-                                    <rect key={`cell-${index}`} fill={entry.fill} />
-                                    ))}
-                                </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                            </div>
+                        <div className="space-y-3">
+                            <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
+                             <Card className="bg-muted/30 p-4 space-y-2">
+                                <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                                <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                                <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                                <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                            </Card>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <h3 className="font-headline text-base font-semibold flex items-center gap-2"><Droplets className="w-4 h-4 text-primary" /> Qualidade da Água</h3>
-                                <Progress value={data.stats.waterQuality} aria-label={`${data.stats.waterQuality}%`} />
-                                <span className="text-sm text-muted-foreground">{data.stats.waterQuality}%</span>
-                            </div>
-                            <div className="space-y-2">
-                                <h3 className="font-headline text-base font-semibold flex items-center gap-2"><Leaf className="w-4 h-4 text-primary" /> Índice de Vegetação</h3>
-                                <Progress value={data.stats.vegetationIndex} aria-label={`${data.stats.vegetationIndex}%`} />
-                                <span className="text-sm text-muted-foreground">{data.stats.vegetationIndex}%</span>
+                         <div className="space-y-4">
+                            <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats.landCover}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                                const { name } = stats.landCover[index];
+
+                                                return (
+                                                    <text x={x} y={y} fill="hsl(var(--foreground))" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
+                                                        {name} ({(percent * 100).toFixed(1)}%)
+                                                    </text>
+                                                );
+                                            }}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            stroke="hsl(var(--background))"
+                                            strokeWidth={2}
+                                        >
+                                            {stats.landCover.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
                         
