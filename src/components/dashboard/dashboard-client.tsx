@@ -57,11 +57,11 @@ const mockData: Record<string, StatsData> = {
     },
     stats: {
       landCover: [
-        { name: "Formação Florestal Primária", value: 36.2, fill: "hsl(var(--chart-3))" },
-        { name: "Outras Formações Naturais", value: 24.5, fill: "hsl(var(--chart-2))" },
-        { name: "Pastagem", value: 24.2, fill: "hsl(var(--chart-4))" },
-        { name: "Agricultura", value: 13.3, fill: "hsl(var(--chart-5))" },
-        { name: "Outros", value: 1.8, fill: "hsl(var(--muted))" },
+        { name: "Formação Florestal Primária", y: 36.2, color: "hsl(var(--chart-3))" },
+        { name: "Outras Formações Naturais", y: 24.5, color: "hsl(var(--chart-2))" },
+        { name: "Pastagem", y: 24.2, color: "hsl(var(--chart-4))" },
+        { name: "Agricultura", y: 13.3, color: "hsl(var(--chart-5))" },
+        { name: "Outros", y: 1.8, color: "hsl(var(--muted))" },
       ],
       waterQuality: 78,
       vegetationIndex: 92,
@@ -108,11 +108,11 @@ const mockData: Record<string, StatsData> = {
     },
     stats: {
       landCover: [
-        { name: "Formação Florestal Primária", value: 20, fill: "hsl(var(--chart-3))" },
-        { name: "Outras Formações Naturais", value: 60, fill: "hsl(var(--chart-2))" },
-        { name: "Pastagem", value: 15, fill: "hsl(var(--chart-4))" },
-        { name: "Agricultura", value: 5, fill: "hsl(var(--chart-5))" },
-        { name: "Outros", value: 0, fill: "hsl(var(--muted))" },
+        { name: "Formação Florestal Primária", y: 20, color: "hsl(var(--chart-3))" },
+        { name: "Outras Formações Naturais", y: 60, color: "hsl(var(--chart-2))" },
+        { name: "Pastagem", y: 15, color: "hsl(var(--chart-4))" },
+        { name: "Agricultura", y: 5, color: "hsl(var(--chart-5))" },
+        { name: "Outros", y: 0, color: "hsl(var(--muted))" },
       ],
       waterQuality: 95,
       vegetationIndex: 88,
