@@ -31,7 +31,7 @@ interface InteractiveMapProps {
 export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
-  const [is3D, setIs3D] = useState(false);
+  const [is3D, setIs3D] = useState(true);
   const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
@@ -74,6 +74,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 longitude: -51.9253,
                 latitude: -14.235,
                 zoom: 3.5,
+                pitch: 60,
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={mapStyle}
