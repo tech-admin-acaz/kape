@@ -173,9 +173,7 @@ export default function DashboardClient() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={33}>
-            <div className="h-full">
-                <StatsPanel data={selectedArea} />
-            </div>
+            <StatsPanel data={selectedArea} />
         </ResizablePanel>
     </ResizablePanelGroup>
   );

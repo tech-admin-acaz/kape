@@ -315,7 +315,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         </Tabs>
       </div>
 
-      <CardFooter className="px-6 pb-6">
+      <CardFooter className="px-6 pb-6 pt-0">
         <Button className="w-full">
           <Download className="mr-2 h-4 w-4" />
           Download PDF
