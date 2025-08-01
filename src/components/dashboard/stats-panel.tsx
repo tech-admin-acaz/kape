@@ -308,14 +308,14 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                         </div>
                     </CardContent>
                 </TabsContent>
-                <TabsContent value="ranking" className="mt-0 flex-grow flex flex-col">
+                <TabsContent value="ranking" className="mt-0 h-full flex flex-col">
                     <SpeciesRankingTable species={data.species} />
                 </TabsContent>
             </div>
         </Tabs>
       </div>
 
-      <CardFooter className="px-6 pb-6 pt-0">
+      <CardFooter className="px-6 pb-6 pt-4">
         <Button className="w-full">
           <Download className="mr-2 h-4 w-4" />
           Download PDF
@@ -324,3 +324,5 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </Card>
   );
 }
+
+    
