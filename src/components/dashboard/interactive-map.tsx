@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
-import { MapPin, Plus, Minus, Compass, Box } from 'lucide-react';
+import { MapPin, Plus, Minus, Navigation, Box } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import MapFilters from './map-filters';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ const locations = [
 
 const basemaps = {
     'satélite': 'mapbox://styles/mapbox/satellite-streets-v12',
-    'ruas': 'https://demotiles.maplibre.org/style.json',
+    'ruas': 'mapbox://styles/mapbox/streets-v12',
     'escuro': 'mapbox://styles/mapbox/dark-v11',
 };
 
@@ -32,6 +32,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(true);
+  const [bearing, setBearing] = useState(0);
   const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   };
 
   const handleResetBearing = () => {
-    mapRef.current?.resetNorth();
+    mapRef.current?.resetNorthPitch();
   };
   
   const toggle3D = () => {
@@ -80,6 +81,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             mapStyle={mapStyle}
             attributionControl={true}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
+            onMove={(evt) => setBearing(evt.viewState.bearing)}
         >
             <Source
                 id="mapbox-dem"
@@ -156,10 +158,10 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
-                        <Compass className="h-4 w-4" />
+                        <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="left"><p>Reset Orientation</p></TooltipContent>
+                    <TooltipContent side="left"><p>Orientação: {Math.abs(bearing).toFixed(0)}°</p></TooltipContent>
                   </Tooltip>
                 </div>
             </TooltipProvider>
