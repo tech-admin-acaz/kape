@@ -17,7 +17,7 @@ export default function DashboardClient() {
   const selectedArea = selectedAreaId ? mockData[selectedAreaId as keyof typeof mockData] : null;
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] w-full relative">
+    <div className="h-full w-full relative">
       <InteractiveMap onAreaSelect={handleAreaSelect} />
     </div>
   );
