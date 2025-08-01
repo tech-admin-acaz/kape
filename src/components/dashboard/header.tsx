@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeSwitcher } from '../shared/theme-switcher';
+import { SidebarTrigger } from '../ui/sidebar';
 
 export default function DashboardHeader() {
   const { t } = useI18n();
@@ -23,7 +24,7 @@ export default function DashboardHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         <Logo />
-        <div className="flex flex-1 items-center justify-end space-x-2 pr-6">
+        <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="hidden items-center space-x-4 sm:flex">
             <Button variant="ghost" asChild>
                 <Link href="#">{t('about')}</Link>
@@ -61,6 +62,7 @@ export default function DashboardHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <SidebarTrigger />
         </div>
       </div>
     </header>

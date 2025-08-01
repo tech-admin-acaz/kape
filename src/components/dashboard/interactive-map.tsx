@@ -81,6 +81,9 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
 
   return (
     <div className="relative w-full h-full">
+        <div className="absolute top-4 left-4 z-10">
+            <MapFilters />
+        </div>
         <Map
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
@@ -93,7 +96,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={mapStyle}
-            attributionControl={true}
+            attributionControl={false}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
         >
@@ -134,9 +137,6 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 </Popup>
             )}
         </Map>
-        <div className="absolute top-4 left-4 z-10">
-            <MapFilters />
-        </div>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
              <TooltipProvider>
                 <Tooltip>
