@@ -1,12 +1,11 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '../ui/button';
-import { Download, Droplets, Leaf, Info, Bird, TreeDeciduous } from 'lucide-react';
-import { Progress } from '../ui/progress';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, TooltipProps, PieChart, Pie, Cell, Sector } from 'recharts';
+import { Download, Info, Bird, TreeDeciduous } from 'lucide-react';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, TooltipProps, PieChart, Pie, Cell } from 'recharts';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -112,7 +111,7 @@ const BiodiversityItem = ({ icon, label, value }: { icon: React.ReactNode, label
     </div>
 );
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
         return (
@@ -146,46 +145,6 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string }) => 
       <span className="font-medium text-right">{value}</span>
     </div>
 );
-
-const renderActiveShape = (props: any) => {
-    const RADIAN = Math.PI / 180;
-    const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
-    const sin = Math.sin(-RADIAN * midAngle);
-    const cos = Math.cos(-RADIAN * midAngle);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? 'start' : 'end';
-
-    return (
-        <g>
-            <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-                {payload.name}
-            </text>
-            <Sector
-                cx={cx}
-                cy={cy}
-                innerRadius={innerRadius}
-                outerRadius={outerRadius}
-                startAngle={startAngle}
-                endAngle={endAngle}
-                fill={fill}
-            />
-            <Sector
-                cx={cx}
-                cy={cy}
-                startAngle={startAngle}
-                endAngle={endAngle}
-                innerRadius={outerRadius + 6}
-                outerRadius={outerRadius + 10}
-                fill={fill}
-            />
-        </g>
-    );
-};
 
 function StatsPanelSkeleton() {
     return (
@@ -227,15 +186,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   }
   const { biodiversity, carbon, water } = data.environmentalServices;
   const { generalInfo, stats } = data;
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const onPieEnter = (_: any, index: number) => {
-    setActiveIndex(index);
-  };
-  
-  const onPieClick = (_: any, index: number) => {
-    setActiveIndex(index);
-  };
 
   return (
     <Card className="flex flex-col h-full rounded-none border-l-0 border-r-0 border-t-0 border-b-0">
@@ -270,17 +220,32 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
-                                            activeIndex={activeIndex}
-                                            activeShape={renderActiveShape}
                                             data={stats.landCover}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={60}
+                                            labelLine={true}
+                                            label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                const radius = 25 + innerRadius + (outerRadius - innerRadius);
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                                                return (
+                                                    <text
+                                                    x={x}
+                                                    y={y}
+                                                    fill="hsl(var(--foreground))"
+                                                    textAnchor={x > cx ? "start" : "end"}
+                                                    dominantBaseline="central"
+                                                    className="text-xs"
+                                                    >
+                                                    {stats.landCover[index].name} ({(value as number).toFixed(1)}%)
+                                                    </text>
+                                                );
+                                            }}
                                             outerRadius={80}
                                             fill="#8884d8"
                                             dataKey="value"
-                                            onMouseEnter={onPieEnter}
-                                            onClick={onPieClick}
                                             stroke="hsl(var(--background))"
                                             strokeWidth={2}
                                         >
@@ -288,7 +253,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                                 <Cell key={`cell-${index}`} fill={entry.fill} />
                                             ))}
                                         </Pie>
-                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent) / 0.2)' }} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
