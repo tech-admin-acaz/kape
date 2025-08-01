@@ -1,24 +1,17 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import InteractiveMap from './interactive-map';
-import { mockData } from './mock-data';
 
-export default function DashboardClient() {
-  const [selectedAreaId, setSelectedAreaId] = useState<string | null>("1");
+interface DashboardClientProps {
+    onAreaSelect: (areaId: string | null) => void;
+}
 
-  const handleAreaSelect = (areaId: string | null) => {
-    setSelectedAreaId(areaId);
-    // Note: The actual data update for StatsPanel will be handled in the layout
-    // For now, we just manage the selected ID here.
-  };
-  
-  const selectedArea = selectedAreaId ? mockData[selectedAreaId as keyof typeof mockData] : null;
-
+export default function DashboardClient({ onAreaSelect }: DashboardClientProps) {
   return (
     <div className="h-full w-full relative">
-      <InteractiveMap onAreaSelect={handleAreaSelect} />
+      <InteractiveMap onAreaSelect={onAreaSelect} />
     </div>
   );
 }
