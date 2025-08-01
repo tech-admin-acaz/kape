@@ -13,7 +13,7 @@ import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import SpeciesRankingTable from './species-ranking-table';
 import LandCoverChart from './land-cover-chart';
-import { SidebarContent, SidebarFooter, SidebarHeader } from '../ui/sidebar';
+import { SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger } from '../ui/sidebar';
 
 interface LandCoverData {
   name: string;
@@ -192,9 +192,12 @@ export default function StatsPanel({ data }: StatsPanelProps) {
 
   return (
     <>
-      <SidebarHeader>
-        <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
-        <CardDescription>{data.type}</CardDescription>
+      <SidebarHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
+          <CardDescription>{data.type}</CardDescription>
+        </div>
+        <SidebarTrigger />
       </SidebarHeader>
 
       <SidebarContent>

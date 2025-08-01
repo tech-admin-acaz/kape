@@ -16,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeSwitcher } from '../shared/theme-switcher';
-import { SidebarTrigger } from '../ui/sidebar';
 
 export default function DashboardHeader() {
   const { t } = useI18n();
@@ -62,7 +61,6 @@ export default function DashboardHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <SidebarTrigger />
         </div>
       </div>
     </header>
