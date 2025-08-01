@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -44,7 +45,10 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const handleStyleChange = (styleUrl: string) => {
     const styleKey = Object.keys(basemaps).find(key => basemaps[key as keyof typeof basemaps] === styleUrl) || defaultBasemapKey;
     setCurrentStyleKey(styleKey);
-    setIs3D(false); // Reset 3D when changing style
+    // If the selected style is not satellite, turn off 3D mode.
+    if (styleKey !== 'satélite') {
+        setIs3D(false);
+    }
   }
 
   const handleZoomIn = () => {
@@ -60,10 +64,20 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   };
   
   const toggle3D = () => {
-    setIs3D(prev => !prev);
+    setIs3D(prevIs3D => {
+        const newIs3D = !prevIs3D;
+        if (newIs3D) {
+            // When turning 3D on, always switch to satellite view
+            setCurrentStyleKey('satélite');
+        } else {
+            // When turning 3D off, revert to a default 2D view like 'ruas'
+            setCurrentStyleKey('ruas');
+        }
+        return newIs3D;
+    });
   }
 
-  const mapStyle = is3D ? basemaps['satélite'] : basemaps[currentStyleKey as keyof typeof basemaps];
+  const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
   return (
     <div className="relative w-full h-full">
@@ -135,7 +149,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 </Tooltip>
             </TooltipProvider>
 
-            <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={is3D ? 'satélite' : currentStyleKey} />
+            <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={currentStyleKey} />
 
             <TooltipProvider>
                 <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
