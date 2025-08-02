@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -25,7 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Search, Download, Info, ChevronDown, Check, X, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { SpeciesData } from './stats-panel';
+import type { SpeciesData } from './stats-panel';
 import { cn } from '@/lib/utils';
 
 interface SpeciesRankingTableProps {
@@ -176,5 +175,3 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
     </div>
   );
 }
-
-    

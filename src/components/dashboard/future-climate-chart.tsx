@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useRef, useEffect } from 'react';
@@ -66,7 +65,8 @@ export default function FutureClimateChart({
                 style: {
                     color: 'hsl(var(--muted-foreground))'
                 }
-            }
+            },
+            tickInterval: 2
         },
         yAxis: { 
             labels: {
