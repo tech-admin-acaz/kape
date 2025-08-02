@@ -16,30 +16,40 @@ export interface FutureClimateData {
     trend: number;
 }
 
-interface FutureClimateComboChartProps {
-    temperatureData: FutureClimateData[];
-    precipitationData: FutureClimateData[];
+interface FutureClimateChartProps {
+    data: FutureClimateData[];
+    title: string;
+    yAxisTitle: string;
+    seriesName: string;
+    seriesType: 'spline' | 'column';
+    color: string;
+    unit: string;
 }
 
-export default function FutureClimateComboChart({ 
-    temperatureData,
-    precipitationData
-}: FutureClimateComboChartProps) {
+export default function FutureClimateChart({ 
+    data,
+    title,
+    yAxisTitle,
+    seriesName,
+    seriesType,
+    color,
+    unit
+}: FutureClimateChartProps) {
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
     useEffect(() => {
         if (chartComponentRef.current) {
             chartComponentRef.current.chart.reflow();
         }
-    }, [temperatureData, precipitationData]);
+    }, [data]);
 
     const options: Highcharts.Options = {
         chart: {
             backgroundColor: 'transparent',
-            zoomType: 'xy',
+            zoomType: 'x',
         },
         title: {
-            text: 'Tendências Climáticas Futuras',
+            text: title,
             align: 'left',
             style: {
                 color: 'hsl(var(--foreground))',
@@ -49,44 +59,30 @@ export default function FutureClimateComboChart({
         credits: {
             enabled: false
         },
-        xAxis: [{
-            categories: temperatureData.map(d => d.year),
+        xAxis: {
+            categories: data.map(d => d.year),
             crosshair: true,
             labels: {
                 style: {
                     color: 'hsl(var(--muted-foreground))'
                 }
             }
-        }],
-        yAxis: [{ // Primary yAxis for Precipitation
+        },
+        yAxis: { 
             labels: {
-                format: '{value} mm',
+                format: `{value} ${unit}`,
                 style: {
-                    color: 'hsl(var(--chart-2))'
+                    color: color
                 }
             },
             title: {
-                text: 'Precipitação Média Anual',
+                text: yAxisTitle,
                 style: {
-                    color: 'hsl(var(--chart-2))'
+                    color: color
                 }
             },
             gridLineColor: 'hsl(var(--border))',
-        }, { // Secondary yAxis for Temperature
-            title: {
-                text: 'Temperatura Média da Superfície',
-                style: {
-                    color: 'hsl(var(--destructive))'
-                }
-            },
-            labels: {
-                format: '{value}°C',
-                style: {
-                    color: 'hsl(var(--destructive))'
-                }
-            },
-            opposite: true
-        }],
+        },
         tooltip: {
             shared: true,
             backgroundColor: 'hsl(var(--popover))',
@@ -96,36 +92,31 @@ export default function FutureClimateComboChart({
             },
         },
         legend: {
-            layout: 'horizontal',
-            align: 'center',
-            verticalAlign: 'bottom',
-            backgroundColor: 'transparent',
-            itemStyle: {
-                color: 'hsl(var(--foreground))'
-            },
-            itemHoverStyle: {
-                color: 'hsl(var(--primary))'
-            }
+           enabled: false
         },
         series: [{
-            name: 'Precipitação',
-            type: 'column',
-            yAxis: 0,
-            data: precipitationData.map(d => d.value),
-            color: 'hsl(var(--chart-2) / 0.7)',
+            name: seriesName,
+            type: seriesType,
+            data: data.map(d => d.value),
+            color: color,
             tooltip: {
-                valueSuffix: ' mm'
+                valueSuffix: ` ${unit}`
             }
-        }, {
-            name: 'Temperatura',
+        },
+        {
+            name: `${seriesName} Trend`,
             type: 'spline',
-            yAxis: 1,
-            data: temperatureData.map(d => d.value),
+            data: data.map(d => d.trend),
             color: 'hsl(var(--destructive))',
+            dashStyle: 'Dash',
+            marker: {
+                enabled: false
+            },
             tooltip: {
-                valueSuffix: '°C'
+                valueSuffix: ` ${unit}`
             }
-        }],
+        }
+        ],
         exporting: {
             enabled: true,
             buttons: {
@@ -149,7 +140,7 @@ export default function FutureClimateComboChart({
     };
 
     return (
-        <div className="w-full h-[400px]">
+        <div className="w-full h-[320px]">
             <HighchartsReact
                 highcharts={Highcharts}
                 options={options}

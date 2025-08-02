@@ -13,7 +13,7 @@ import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import SpeciesRankingTable from './species-ranking-table';
 import LandCoverChart from './land-cover-chart';
-import FutureClimateComboChart, { FutureClimateData } from './future-climate-combo-chart';
+import FutureClimateChart, { FutureClimateData } from './future-climate-chart';
 
 interface LandCoverData {
   name: string;
@@ -238,9 +238,27 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             />
                             <Card className="bg-muted/30">
                                 <CardContent className="pt-6">
-                                    <FutureClimateComboChart 
-                                        temperatureData={futureClimate.temperature} 
-                                        precipitationData={futureClimate.precipitation}
+                                    <FutureClimateChart
+                                        title="Tendência de Temperatura da Superfície"
+                                        yAxisTitle="Temperatura Média"
+                                        seriesName="Temperatura"
+                                        seriesType="spline"
+                                        color="hsl(var(--destructive))"
+                                        unit="°C"
+                                        data={futureClimate.temperature} 
+                                    />
+                                </CardContent>
+                            </Card>
+                             <Card className="bg-muted/30">
+                                <CardContent className="pt-6">
+                                     <FutureClimateChart
+                                        title="Tendência da Chuva Média Anual"
+                                        yAxisTitle="Precipitação Média"
+                                        seriesName="Precipitação"
+                                        seriesType="column"
+                                        color="hsl(var(--chart-2))"
+                                        unit="mm"
+                                        data={futureClimate.precipitation} 
                                     />
                                 </CardContent>
                             </Card>
@@ -268,8 +286,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <CardHeader>
                                   <CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle>
                               </CardHeader>
-                              <CardContent className="h-64">
-                                  <ResponsiveContainer width="100%" height="100%">
+                              <CardContent>
+                                  <ResponsiveContainer width="100%" height="256px">
                                       <ComposedChart data={carbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
@@ -286,8 +304,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <CardHeader>
                                   <CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle>
                               </CardHeader>
-                              <CardContent className="h-64">
-                                  <ResponsiveContainer width="100%" height="100%">
+                              <CardContent>
+                                  <ResponsiveContainer width="100%" height="256px">
                                       <BarChart data={carbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                             <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
@@ -307,8 +325,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <CardHeader>
                                   <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
                               </CardHeader>
-                              <CardContent className="h-64">
-                                    <ResponsiveContainer width="100%" height="100%">
+                              <CardContent>
+                                    <ResponsiveContainer width="100%" height="256px">
                                       <BarChart data={water.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
