@@ -55,6 +55,7 @@ export interface SpeciesData {
 }
 
 export interface StatsData {
+  id: string;
   name: string;
   type: string;
   generalInfo: GeneralInfo;
@@ -194,7 +195,12 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="outline" size="icon" className="flex-shrink-0 bg-white hover:bg-gray-50 border-gray-300 shadow-sm" onClick={() => window.open('/path-to-your-pdf.pdf', '_blank')}>
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="flex-shrink-0 bg-white hover:bg-gray-50 border-gray-300 shadow-sm" 
+                                onClick={() => window.open(`/report?areaId=${data.id}`, '_blank')}
+                            >
                                 <FileText className="w-5 h-5 text-primary" />
                             </Button>
                         </TooltipTrigger>

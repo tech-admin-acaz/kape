@@ -48,6 +48,7 @@ const generateFutureClimateData = (startYear: number, endYear: number, startValu
 
 export const mockData: Record<string, StatsData> = {
   "1": {
+    id: "1",
     name: "T.I. Yanomami",
     type: "Indigenous Territory",
     generalInfo: {
@@ -103,6 +104,7 @@ export const mockData: Record<string, StatsData> = {
     },
   },
   "2": {
+    id: "2",
     name: "Serra da Canastra",
     type: "National Park",
     generalInfo: {
