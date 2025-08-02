@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,20 +14,54 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { runCorrelation } from '@/actions/ai';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, Info, FilePenLine, Save, X, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { cn } from '@/lib/utils';
+
+type EditableField = 'insights' | 'suggestedUpdates';
 
 export function AICorrelator({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
+    
     const [result, setResult] = useState<{ insights: string; suggestedUpdates: string } | null>(null);
+    const [editableContent, setEditableContent] = useState({ insights: '', suggestedUpdates: '' });
+    const [editing, setEditing] = useState<EditableField | null>(null);
+    
     const [newDatasetDesc, setNewDatasetDesc] = useState('');
     const { toast } = useToast();
+
+    useEffect(() => {
+        if (result) {
+            setEditableContent({
+                insights: result.insights,
+                suggestedUpdates: result.suggestedUpdates
+            });
+        }
+    }, [result]);
+
+    const handleEdit = (field: EditableField) => {
+        setEditing(field);
+    };
+
+    const handleCancel = (field: EditableField) => {
+        if (result) {
+            setEditableContent(prev => ({ ...prev, [field]: result[field] }));
+        }
+        setEditing(null);
+    };
+
+    const handleSave = (field: EditableField) => {
+        // Here you could potentially save the edited content back to a state or DB
+        setEditing(null);
+    };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setResult(null);
+        setEditing(null);
 
         startTransition(async () => {
             const { output, error } = await runCorrelation({
@@ -76,12 +110,92 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                 {result && (
                      <div className='space-y-4'>
                         <Alert>
-                            <AlertTitle>Insights de Correlação</AlertTitle>
-                            <AlertDescription>{result.insights}</AlertDescription>
+                            <div className="flex justify-between items-center mb-2">
+                                <div className="flex items-center gap-2">
+                                     <AlertTitle>Insights de Correlação</AlertTitle>
+                                     <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button type="button"><Info className="h-4 w-4 text-muted-foreground" /></button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="max-w-xs">Análise da IA sobre como os novos dados se conectam<br/> com as informações e visualizações existentes.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {editing === 'insights' ? (
+                                        <>
+                                            <TooltipProvider>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('insights')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>Salvar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('insights')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>Cancelar</p></TooltipContent></Tooltip>
+                                            </TooltipProvider>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <TooltipProvider>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('insights')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>Editar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>Enviar para PDF</p></TooltipContent></Tooltip>
+                                            </TooltipProvider>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                             {editing === 'insights' ? (
+                                <Textarea 
+                                    value={editableContent.insights}
+                                    onChange={(e) => setEditableContent(prev => ({...prev, insights: e.target.value}))}
+                                    rows={5}
+                                    className="text-sm"
+                                />
+                             ) : (
+                                <AlertDescription>{editableContent.insights}</AlertDescription>
+                             )}
                         </Alert>
                          <Alert>
-                            <AlertTitle>Atualizações Sugeridas</AlertTitle>
-                            <AlertDescription>{result.suggestedUpdates}</AlertDescription>
+                            <div className="flex justify-between items-center mb-2">
+                                 <div className="flex items-center gap-2">
+                                     <AlertTitle>Atualizações Sugeridas</AlertTitle>
+                                     <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button type="button"><Info className="h-4 w-4 text-muted-foreground" /></button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="max-w-xs">Recomendações da IA para novos gráficos ou<br/> modificações nas visualizações atuais.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                               <div className="flex items-center gap-1">
+                                    {editing === 'suggestedUpdates' ? (
+                                        <>
+                                            <TooltipProvider>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('suggestedUpdates')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>Salvar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('suggestedUpdates')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>Cancelar</p></TooltipContent></Tooltip>
+                                            </TooltipProvider>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <TooltipProvider>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('suggestedUpdates')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>Editar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>Enviar para PDF</p></TooltipContent></Tooltip>
+                                            </TooltipProvider>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                             {editing === 'suggestedUpdates' ? (
+                                <Textarea 
+                                    value={editableContent.suggestedUpdates}
+                                    onChange={(e) => setEditableContent(prev => ({...prev, suggestedUpdates: e.target.value}))}
+                                    rows={5}
+                                    className="text-sm"
+                                />
+                             ) : (
+                                <AlertDescription>{editableContent.suggestedUpdates}</AlertDescription>
+                             )}
                         </Alert>
                     </div>
                 )}
