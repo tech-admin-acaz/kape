@@ -13,6 +13,7 @@ import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import SpeciesRankingTable from './species-ranking-table';
 import LandCoverChart from './land-cover-chart';
+import FutureClimateChart, { FutureClimateData } from './future-climate-chart';
 
 interface LandCoverData {
   name: string;
@@ -69,6 +70,10 @@ export interface StatsData {
   };
   correlationInsights: string;
   species: SpeciesData[];
+  futureClimate: {
+    temperature: FutureClimateData[];
+    precipitation: FutureClimateData[];
+  };
 }
 
 interface StatsPanelProps {
@@ -179,7 +184,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     return <StatsPanelSkeleton />;
   }
   const { biodiversity, carbon, water } = data.environmentalServices;
-  const { generalInfo, stats } = data;
+  const { generalInfo, stats, futureClimate } = data;
 
   return (
     <div className="h-full flex flex-col">
@@ -225,6 +230,44 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <p className="text-sm">{data.correlationInsights}</p>
                           </CardContent>
                       </Card>
+
+                      <div className="space-y-4">
+                          <SectionHeader title="Clima do Futuro" tooltipText="Projeções climáticas para a área selecionada." />
+                           <Card className="bg-muted/30">
+                              <CardHeader>
+                                  <CardTitle className="text-base font-medium">Tendência de Temperatura da Superfície</CardTitle>
+                              </CardHeader>
+                              <CardContent className="h-64">
+                                  <FutureClimateChart 
+                                      data={futureClimate.temperature} 
+                                      yAxisLabel="Temperatura (°C)"
+                                      valueKey="value"
+                                      trendKey="trend"
+                                      valueName="Temperatura"
+                                      trendName="Linha de Tendência"
+                                      valueColor="hsl(var(--muted-foreground) / 0.5)"
+                                      trendColor="hsl(var(--destructive))"
+                                  />
+                              </CardContent>
+                          </Card>
+                           <Card className="bg-muted/30">
+                              <CardHeader>
+                                  <CardTitle className="text-base font-medium">Tendência da Chuva Média Anual</CardTitle>
+                              </CardHeader>
+                              <CardContent className="h-64">
+                                  <FutureClimateChart 
+                                      data={futureClimate.precipitation}
+                                      yAxisLabel="Chuva Média Anual (mm/ano)"
+                                      valueKey="value"
+                                      trendKey="trend"
+                                      valueName="Chuva"
+                                      trendName="Linha de Tendência"
+                                      valueColor="hsl(var(--foreground))"
+                                      trendColor="hsl(var(--destructive))"
+                                  />
+                              </CardContent>
+                          </Card>
+                      </div>
                   </div>
               </TabsContent>
               <TabsContent value="services" className="mt-0">

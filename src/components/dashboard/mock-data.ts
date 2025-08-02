@@ -1,3 +1,4 @@
+
 import type { StatsData } from './stats-panel';
 
 const mockSpecies = [
@@ -32,6 +33,18 @@ const mockSpecies = [
     { id: '29', name: 'Annona muricata', resilience: '3 - Média', potential: true, domestication: true, availability: true },
     { id: '30', name: 'Psidium guajava', resilience: '3 - Média', potential: true, domestication: true, availability: true },
 ];
+
+const generateFutureClimateData = (startYear: number, endYear: number, startValue: number, valueRange: number, trendStart: number, trendEnd: number) => {
+    const data = [];
+    const yearCount = endYear - startYear;
+    for (let i = 0; i <= yearCount; i++) {
+        const year = startYear + i;
+        const value = startValue + (Math.random() - 0.5) * valueRange;
+        const trend = trendStart + ((trendEnd - trendStart) / yearCount) * i;
+        data.push({ year: year.toString(), value: parseFloat(value.toFixed(2)), trend: parseFloat(trend.toFixed(2)) });
+    }
+    return data;
+};
 
 export const mockData: Record<string, StatsData> = {
   "1": {
@@ -84,6 +97,10 @@ export const mockData: Record<string, StatsData> = {
     },
     correlationInsights: "Recent satellite data shows a 2% increase in deforestation on the eastern border, likely linked to illegal mining activities.",
     species: mockSpecies,
+    futureClimate: {
+      temperature: generateFutureClimateData(2014, 2043, 26.5, 2, 26.2, 27.4),
+      precipitation: generateFutureClimateData(2014, 2043, 1450, 400, 1450, 1450),
+    },
   },
   "2": {
     name: "Serra da Canastra",
@@ -135,5 +152,9 @@ export const mockData: Record<string, StatsData> = {
     },
     correlationInsights: "The park's water sources remain pristine, showing high resilience to surrounding agricultural activities.",
     species: mockSpecies.slice().reverse(), // just to show different data
+    futureClimate: {
+      temperature: generateFutureClimateData(2014, 2043, 22, 2.5, 21.8, 23.5),
+      precipitation: generateFutureClimateData(2014, 2043, 1300, 350, 1300, 1300),
+    },
   },
 };
