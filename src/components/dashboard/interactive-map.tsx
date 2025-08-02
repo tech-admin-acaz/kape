@@ -23,7 +23,7 @@ const basemaps = {
     'escuro': 'mapbox://styles/mapbox/dark-v11',
 };
 
-const defaultBasemapKey = 'ruas';
+const defaultBasemapKey = 'escuro';
 
 interface InteractiveMapProps {
   onAreaSelect: (areaId: string | null) => void;
@@ -32,7 +32,7 @@ interface InteractiveMapProps {
 export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
-  const [is3D, setIs3D] = useState(true);
+  const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const mapRef = useRef<MapRef>(null);
 
@@ -45,10 +45,6 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const handleStyleChange = (styleUrl: string) => {
     const styleKey = Object.keys(basemaps).find(key => basemaps[key as keyof typeof basemaps] === styleUrl) || defaultBasemapKey;
     setCurrentStyleKey(styleKey);
-    // If the selected style is not satellite, turn off 3D mode.
-    if (styleKey !== 'satélite') {
-        setIs3D(false);
-    }
   }
 
   const handleZoomIn = () => {
@@ -64,17 +60,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   };
   
   const toggle3D = () => {
-    setIs3D(prevIs3D => {
-        const newIs3D = !prevIs3D;
-        if (newIs3D) {
-            // When turning 3D on, always switch to satellite view
-            setCurrentStyleKey('satélite');
-        } else {
-            // When turning 3D off, revert to a default 2D view like 'ruas'
-            setCurrentStyleKey('ruas');
-        }
-        return newIs3D;
-    });
+    setIs3D(prevIs3D => !prevIs3D);
   }
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
@@ -92,7 +78,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 longitude: -51.9253,
                 latitude: -14.235,
                 zoom: 3.5,
-                pitch: 60,
+                pitch: 0,
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={mapStyle}
