@@ -65,6 +65,8 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        'sparkle-from': 'hsl(var(--sparkle-from))',
+        'sparkle-to': 'hsl(var(--sparkle-to))',
       },
       borderRadius: {
         lg: 'var(--radius)',

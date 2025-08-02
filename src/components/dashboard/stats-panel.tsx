@@ -1,15 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from '../ui/button';
-import { Download } from 'lucide-react';
+import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { FutureClimateData } from './future-climate-chart';
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
+import { AICorrelator } from './ai-correlator';
+import { SparkleIcon } from '../shared/sparkle-icon';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 
 interface LandCoverData {
@@ -179,10 +182,28 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             </div>
         </Tabs>
         <CardFooter>
-            <Button className="w-full">
-                <Download className="mr-2 h-4 w-4" />
-                Download PDF
-            </Button>
+            <div className="w-full flex items-center gap-2">
+                <AICorrelator>
+                    <Button variant="outline" className="w-full justify-start text-muted-foreground bg-white hover:bg-gray-50 border-gray-300 shadow-sm hover:text-foreground">
+                        <span className="p-1 rounded-full bg-gradient-to-br from-sparkle-from to-sparkle-to mr-2">
+                            <SparkleIcon className="w-4 h-4 text-white" />
+                        </span>
+                        Aprofundar Análise com IA...
+                    </Button>
+                </AICorrelator>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="outline" size="icon" className="flex-shrink-0 bg-white hover:bg-gray-50 border-gray-300 shadow-sm" onClick={() => window.open('/path-to-your-pdf.pdf', '_blank')}>
+                                <FileText className="w-5 h-5 text-primary" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Visualizar PDF</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
         </CardFooter>
     </div>
   );
