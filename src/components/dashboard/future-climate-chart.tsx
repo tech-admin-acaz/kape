@@ -147,7 +147,7 @@ export default function FutureClimateChart({
     };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-80 relative">
         <div className='absolute top-2 right-12 z-10 flex gap-1'>
             <Button 
                 variant="outline" 

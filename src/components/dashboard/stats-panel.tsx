@@ -237,7 +237,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <CardHeader>
                                   <CardTitle className="text-base font-medium">Tendência de Temperatura da Superfície</CardTitle>
                               </CardHeader>
-                              <CardContent className="h-64 relative">
+                              <CardContent>
                                   <FutureClimateChart 
                                       data={futureClimate.temperature} 
                                       yAxisLabel="Temperatura (°C)"
@@ -253,7 +253,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                               <CardHeader>
                                   <CardTitle className="text-base font-medium">Tendência da Chuva Média Anual</CardTitle>
                               </CardHeader>
-                              <CardContent className="h-64 relative">
+                              <CardContent>
                                   <FutureClimateChart 
                                       data={futureClimate.precipitation}
                                       yAxisLabel="Chuva Média Anual (mm/ano)"
