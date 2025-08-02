@@ -241,11 +241,9 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                   <FutureClimateChart 
                                       data={futureClimate.temperature} 
                                       yAxisLabel="Temperatura (°C)"
-                                      valueKey="value"
-                                      trendKey="trend"
                                       valueName="Temperatura"
                                       trendName="Linha de Tendência"
-                                      valueColor="hsl(var(--muted-foreground) / 0.5)"
+                                      valueColor="hsl(var(--chart-1))"
                                       trendColor="hsl(var(--destructive))"
                                   />
                               </CardContent>
@@ -258,12 +256,10 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                   <FutureClimateChart 
                                       data={futureClimate.precipitation}
                                       yAxisLabel="Chuva Média Anual (mm/ano)"
-                                      valueKey="value"
-                                      trendKey="trend"
                                       valueName="Chuva"
                                       trendName="Linha de Tendência"
-                                      valueColor="hsl(var(--foreground))"
-                                      trendColor="hsl(var(--destructive))"
+                                      valueColor="hsl(var(--chart-2))"
+                                      trendColor="hsl(var(--primary))"
                                   />
                               </CardContent>
                           </Card>

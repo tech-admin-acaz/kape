@@ -2,8 +2,14 @@
 "use client";
 
 import React from 'react';
-import { Area, AreaChart, CartesianGrid, Line, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import ClimateChartTooltip from './climate-chart-tooltip';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import exporting from 'highcharts/modules/exporting';
+
+if (typeof Highcharts === 'object') {
+  exporting(Highcharts);
+}
+
 
 export interface FutureClimateData {
     year: string;
@@ -14,8 +20,6 @@ export interface FutureClimateData {
 interface FutureClimateChartProps {
     data: FutureClimateData[];
     yAxisLabel: string;
-    valueKey: keyof FutureClimateData;
-    trendKey: keyof FutureClimateData;
     valueName: string;
     trendName: string;
     valueColor: string;
@@ -24,59 +28,112 @@ interface FutureClimateChartProps {
 
 export default function FutureClimateChart({ 
     data, 
-    yAxisLabel, 
-    valueKey, 
-    trendKey,
+    yAxisLabel,
     valueName,
     trendName,
     valueColor,
     trendColor
 }: FutureClimateChartProps) {
+
+    const options: Highcharts.Options = {
+        chart: {
+            backgroundColor: 'transparent',
+        },
+        title: {
+            text: ''
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: {
+            categories: data.map(d => d.year),
+            labels: {
+                style: {
+                    color: 'hsl(var(--muted-foreground))'
+                }
+            },
+            tickInterval: 5,
+        },
+        yAxis: {
+            title: {
+                text: yAxisLabel,
+                style: {
+                    color: 'hsl(var(--muted-foreground))'
+                }
+            },
+            labels: {
+                style: {
+                    color: 'hsl(var(--muted-foreground))'
+                }
+            },
+            gridLineColor: 'hsl(var(--border))'
+        },
+        tooltip: {
+            shared: true,
+            backgroundColor: 'hsl(var(--popover))',
+            borderColor: 'hsl(var(--border))',
+            style: {
+                color: 'hsl(var(--popover-foreground))',
+            },
+        },
+        legend: {
+            enabled: false,
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            },
+            area: {
+                fillOpacity: 0.3
+            }
+        },
+        series: [
+            {
+                type: 'area',
+                name: valueName,
+                data: data.map(d => d.value),
+                color: valueColor,
+                
+            },
+            {
+                type: 'line',
+                name: trendName,
+                data: data.map(d => d.trend),
+                color: trendColor,
+                dashStyle: 'Dash',
+                lineWidth: 2,
+            }
+        ],
+        exporting: {
+            enabled: true,
+            buttons: {
+                contextButton: {
+                    symbol: 'menu',
+                    symbolStroke: 'hsl(var(--foreground))',
+                    theme: {
+                        fill: 'transparent',
+                        states: {
+                            hover: {
+                                fill: 'hsl(var(--muted))',
+                            },
+                            select: {
+                                fill: 'hsl(var(--muted))',
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    };
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <ComposedChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis 
-            dataKey="year" 
-            tick={{ fontSize: 12 }} 
-            tickLine={false} 
-            axisLine={false} 
-            tickMargin={8}
-            interval={5}
+    <div className="w-full h-full">
+        <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
         />
-        <YAxis 
-            tick={{ fontSize: 12 }} 
-            tickLine={false} 
-            axisLine={false} 
-            tickMargin={8}
-            label={{ value: yAxisLabel, angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: 'hsl(var(--muted-foreground))' } }}
-        />
-        <Tooltip 
-            content={<ClimateChartTooltip 
-                valueName={valueName} 
-                trendName={trendName} 
-            />}
-            cursor={{ stroke: 'hsl(var(--foreground))', strokeWidth: 1 }}
-        />
-        <Area 
-            type="monotone" 
-            dataKey={valueKey} 
-            stroke={valueColor}
-            fill={valueColor} 
-            fillOpacity={0.3}
-            strokeWidth={2}
-            name={valueName}
-        />
-        <Line 
-            type="monotone" 
-            dataKey={trendKey} 
-            stroke={trendColor}
-            strokeWidth={2}
-            strokeDasharray="5 5"
-            dot={false}
-            name={trendName}
-        />
-      </ComposedChart>
-    </ResponsiveContainer>
+    </div>
   );
 }
