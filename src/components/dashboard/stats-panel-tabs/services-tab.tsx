@@ -2,6 +2,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Bird, TreeDeciduous } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart } from 'recharts';
@@ -44,16 +45,6 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const BiodiversityItem = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) => (
-    <div className="flex items-center gap-3">
-        {icon}
-        <div>
-            <div className="font-semibold">{label}</div>
-            <div className="text-2xl font-bold text-primary">{value}</div>
-        </div>
-    </div>
-);
-
 const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
@@ -69,33 +60,79 @@ const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) =
     return null;
 };
 
-const FrogIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M14 6.07a6.5 6.5 0 1 1-4 0"/><path d="M10.15 11.23c-.22.33-.35.73-.35 1.17a3.18 3.18 0 0 0 3.18 3.18c.44 0 .84-.13 1.17-.35"/><path d="M21.5 14.5c.33.82 0 1.68-.82 2s-1.68 0-2-.82"/><path d="M2.5 14.5c-.33.82 0 1.68.82 2s1.68 0 2-.82"/></svg>
+const BiodiversityCard = ({
+  imageUrl,
+  imageHint,
+  category,
+  count,
+}: {
+  imageUrl: string;
+  imageHint: string;
+  category: string;
+  count: number;
+}) => (
+  <div className="bg-gray-800 rounded-lg overflow-hidden flex items-center shadow-lg text-white">
+    <div className="relative w-24 h-24 flex-shrink-0">
+      <Image
+        src={imageUrl}
+        alt={category}
+        layout="fill"
+        objectFit="cover"
+        className="rounded-l-lg"
+        data-ai-hint={imageHint}
+      />
+    </div>
+    <div className="p-4">
+      <p className="text-lg font-semibold">{category}</p>
+      <p className="text-5xl font-bold text-lime-400">{count}</p>
+    </div>
+  </div>
 );
-
-const ReptileIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.83 8.17a.5.5 0 0 0-.83.5V11a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .33-.83l-2-2Z"/><path d="m9.42 3.34.46.13a2.17 2.17 0 0 1 1.53 2.12V6.5a1.5 1.5 0 0 0 1.5 1.5h.09a1.5 1.5 0 0 1 1.5 1.5v1.4a.5.5 0 0 0 .5.5h.09a1.41 1.41 0 0 1 1.41 1.41V14a4 4 0 1 1-8 0v-.59a1.41 1.41 0 0 1 1.41-1.41h.09a.5.5 0 0 0 .5-.5v-1.4a1.5 1.5 0 0 1 1.5-1.5h.09a1.5 1.5 0 0 0 1.5-1.5V6.16a2.17 2.17 0 0 1 2.45-2.3Z"/><path d="m3.34 14.6-1.54.54a1 1 0 0 0-.6 1.6l1.3 2.12a1 1 0 0 0 1.6.6l1.54-.54"/><path d="m20.66 14.6 1.54.54a1 1 0 0 1 .6 1.6l-1.3 2.12a1 1 0 0 1-1.6.6l-1.54-.54"/></svg>
-);
-
-const MammalIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M16 10s-1-2-3-2-3 2-3 2"/><path d="M5.3 11.3C4.2 12.5 4 14.2 4 16c0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4 0-1.8-.2-3.5-1.3-4.7-1.3-1.5-3.5-1.8-5.7-1.3-2.2.5-4.5.5-6.7 0-2.2-.5-4.4-.2-5.7 1.3Z"/></svg>
-);
-
 
 export default function ServicesTab({ data }: ServicesTabProps) {
     const { biodiversity, carbon, water } = data;
+    const biodiversityData = [
+      {
+        category: 'Anfíbios',
+        count: biodiversity.amphibians,
+        imageUrl: 'https://placehold.co/100x100.png',
+        imageHint: 'frog tree',
+      },
+      {
+        category: 'Aves',
+        count: biodiversity.birds,
+        imageUrl: 'https://placehold.co/100x100.png',
+        imageHint: 'macaw bird',
+      },
+      {
+        category: 'Mamíferos',
+        count: biodiversity.mammals,
+        imageUrl: 'https://placehold.co/100x100.png',
+        imageHint: 'jaguar animal',
+      },
+      {
+        category: 'Árvores',
+        count: biodiversity.trees,
+        imageUrl: 'https://placehold.co/100x100.png',
+        imageHint: 'brazil nut tree',
+      },
+      {
+        category: 'Répteis',
+        count: biodiversity.reptiles,
+        imageUrl: 'https://placehold.co/100x100.png',
+        imageHint: 'green snake',
+      },
+    ];
 
   return (
     <div className="p-6 space-y-8">
         {/* Biodiversity Section */}
         <div className="space-y-4">
             <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <BiodiversityItem icon={<FrogIcon className="w-10 h-10 text-green-500" />} label="Anfíbios" value={biodiversity.amphibians} />
-                <BiodiversityItem icon={<Bird className="w-10 h-10 text-red-500" />} label="Aves" value={biodiversity.birds} />
-                <BiodiversityItem icon={<MammalIcon className="w-10 h-10 text-yellow-600" />} label="Mamíferos" value={biodiversity.mammals} />
-                <BiodiversityItem icon={<TreeDeciduous className="w-10 h-10 text-green-700" />} label="Árvores" value={biodiversity.trees} />
-                <BiodiversityItem icon={<ReptileIcon className="w-10 h-10 text-teal-600" />} label="Répteis" value={biodiversity.reptiles} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {biodiversityData.map((item) => (
+                    <BiodiversityCard key={item.category} {...item} />
+                ))}
             </div>
         </div>
 
