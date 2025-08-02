@@ -17,7 +17,7 @@ import { runCorrelation } from '@/actions/ai';
 import { Loader2, Wand2, Info, FilePenLine, Save, X, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { Tooltip, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { cn } from '@/lib/utils';
 
 type EditableField = 'insights' | 'suggestedUpdates';
