@@ -13,7 +13,7 @@ import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import SpeciesRankingTable from './species-ranking-table';
 import LandCoverChart from './land-cover-chart';
-import FutureClimateChart, { FutureClimateData } from './future-climate-chart';
+import FutureClimateComboChart, { FutureClimateData } from './future-climate-combo-chart';
 
 interface LandCoverData {
   name: string;
@@ -232,35 +232,19 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                       </Card>
 
                       <div className="space-y-4">
-                          <SectionHeader title="Clima do Futuro" tooltipText="Projeções climáticas para a área selecionada." />
-                           <Card className="bg-muted/30">
-                              <CardHeader>
-                                  <CardTitle className="text-base font-medium">Tendência de Temperatura da Superfície</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                  <FutureClimateChart 
-                                      data={futureClimate.temperature} 
-                                      yAxisLabel="Temperatura (°C)"
-                                      valueName="Temperatura"
-                                      trendName="Linha de Tendência"
-                                      tickAmount={4}
-                                  />
-                              </CardContent>
-                          </Card>
-                           <Card className="bg-muted/30">
-                              <CardHeader>
-                                  <CardTitle className="text-base font-medium">Tendência da Chuva Média Anual</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                  <FutureClimateChart 
-                                      data={futureClimate.precipitation}
-                                      yAxisLabel="Chuva Média Anual (mm/ano)"
-                                      valueName="Chuva"
-                                      trendName="Linha de Tendência"
-                                  />
-                              </CardContent>
-                          </Card>
-                      </div>
+                            <SectionHeader 
+                                title="Clima do Futuro" 
+                                tooltipText="Projeções de temperatura e precipitação para a área selecionada." 
+                            />
+                            <Card className="bg-muted/30">
+                                <CardContent className="pt-6">
+                                    <FutureClimateComboChart 
+                                        temperatureData={futureClimate.temperature} 
+                                        precipitationData={futureClimate.precipitation}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
                   </div>
               </TabsContent>
               <TabsContent value="services" className="mt-0">

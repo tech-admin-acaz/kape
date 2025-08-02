@@ -21,11 +21,11 @@ export function LoginForm() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'teste@email.com' && password === 'senha123') {
+    if (email === 'acaz.dev@gmail.com' && password === 'qazx74123') {
       setError('');
       router.push('/dashboard');
     } else {
-      setError('Credenciais inválidas. Use teste@email.com e senha123.');
+      setError('Credenciais inválidas. Use acaz.dev@gmail.com e qazx74123.');
     }
   };
 
