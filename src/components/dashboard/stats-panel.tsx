@@ -243,8 +243,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                       yAxisLabel="Temperatura (°C)"
                                       valueName="Temperatura"
                                       trendName="Linha de Tendência"
-                                      valueColor="hsl(var(--chart-1))"
-                                      trendColor="hsl(var(--destructive))"
                                       tickAmount={4}
                                   />
                               </CardContent>
@@ -259,8 +257,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                       yAxisLabel="Chuva Média Anual (mm/ano)"
                                       valueName="Chuva"
                                       trendName="Linha de Tendência"
-                                      valueColor="hsl(var(--chart-2))"
-                                      trendColor="hsl(var(--primary))"
                                   />
                               </CardContent>
                           </Card>
