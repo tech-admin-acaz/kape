@@ -15,13 +15,13 @@ import {z} from 'genkit';
 const CorrelateDatasetsInputSchema = z.object({
   newDatasetDescription: z
     .string()
-    .describe('Description of the new environmental dataset added.'),
+    .describe('Descrição do novo conjunto de dados ambiental adicionado.'),
   existingVisualizationsDescription: z
     .string()
-    .describe('Description of the existing visualizations.'),
+    .describe('Descrição das visualizações existentes.'),
   existingStatisticalInsightsDescription: z
     .string()
-    .describe('Description of the existing statistical insights.'),
+    .describe('Descrição dos insights estatísticos existentes.'),
 });
 export type CorrelateDatasetsInput = z.infer<typeof CorrelateDatasetsInputSchema>;
 
@@ -29,12 +29,12 @@ const CorrelateDatasetsOutputSchema = z.object({
   insights: z
     .string()
     .describe(
-      'Insights on how the new dataset correlates with existing visualizations and statistical insights.'
+      'Insights sobre como o novo conjunto de dados se correlaciona com as visualizações e insights estatísticos existentes.'
     ),
   suggestedUpdates: z
     .string()
     .describe(
-      'Suggested updates to visualizations and statistical insights based on the new dataset.'
+      'Atualizações sugeridas para as visualizações e insights estatísticos com base no novo conjunto de dados.'
     ),
 });
 export type CorrelateDatasetsOutput = z.infer<typeof CorrelateDatasetsOutputSchema>;
@@ -47,20 +47,20 @@ const prompt = ai.definePrompt({
   name: 'correlateDatasetsPrompt',
   input: {schema: CorrelateDatasetsInputSchema},
   output: {schema: CorrelateDatasetsOutputSchema},
-  prompt: `You are an AI assistant helping data scientists understand the impact of new environmental datasets.
+  prompt: `Você é um assistente de IA ajudando cientistas de dados a entender o impacto de novos conjuntos de dados ambientais.
 
-You will receive a description of a new environmental dataset, as well as descriptions of existing visualizations and statistical insights.
+Você receberá a descrição de um novo conjunto de dados ambiental, bem como descrições de visualizações e insights estatísticos existentes.
 
-Your task is to analyze how the new dataset correlates with the existing visualizations and statistical insights, and suggest updates to the visualizations and insights accordingly.
+Sua tarefa é analisar como o novo conjunto de dados se correlaciona com as visualizações e insights estatísticos existentes e sugerir atualizações para as visualizações e insights de acordo.
 
-New Dataset Description: {{{newDatasetDescription}}}
+Descrição do Novo Conjunto de Dados: {{{newDatasetDescription}}}
 
-Existing Visualizations Description: {{{existingVisualizationsDescription}}}
+Descrição das Visualizações Existentes: {{{existingVisualizationsDescription}}}
 
-Existing Statistical Insights Description: {{{existingStatisticalInsightsDescription}}}
+Descrição dos Insights Estatísticos Existentes: {{{existingStatisticalInsightsDescription}}}
 
-Correlation Insights:
-Suggested Updates: `,
+Insights de Correlação:
+Atualizações Sugeridas: `,
 });
 
 const correlateDatasetsFlow = ai.defineFlow(

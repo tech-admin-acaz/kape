@@ -32,16 +32,16 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
         startTransition(async () => {
             const { output, error } = await runCorrelation({
                 newDatasetDescription: newDatasetDesc,
-                existingVisualizationsDescription: "Bar chart of land use, progress bars for water quality and vegetation index.",
-                existingStatisticalInsightsDescription: "Correlation between mining and deforestation. Resilience of water sources in protected areas.",
+                existingVisualizationsDescription: "Gráfico de barras do uso da terra, barras de progresso para a qualidade da água e índice de vegetação.",
+                existingStatisticalInsightsDescription: "Correlação entre mineração e desmatamento. Resiliência de fontes de água em áreas protegidas.",
             });
 
             if (error) {
                 console.error(error);
                 toast({
                     variant: 'destructive',
-                    title: 'Error',
-                    description: 'Failed to run AI correlation. Please try again.',
+                    title: 'Erro',
+                    description: 'Falha ao executar a correlação de IA. Por favor, tente novamente.',
                 })
                 return;
             }
@@ -56,17 +56,17 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle className="font-headline flex items-center gap-2"><Wand2 className="w-5 h-5 text-primary" /> AI Dataset Correlation</DialogTitle>
+          <DialogTitle className="font-headline flex items-center gap-2"><Wand2 className="w-5 h-5 text-primary" /> Correlação de Conjunto de Dados com IA</DialogTitle>
           <DialogDescription>
-            Describe a new environmental dataset to see how it correlates with existing data and get suggestions for updates.
+            Descreva um novo conjunto de dados ambientais para ver como ele se correlaciona com os dados existentes e obter sugestões de atualizações.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
                 <div className="grid w-full gap-1.5">
-                    <Label htmlFor="dataset-description">New Dataset Description</Label>
+                    <Label htmlFor="dataset-description">Descrição do Novo Conjunto de Dados</Label>
                     <Textarea 
-                        placeholder="e.g., 'Weekly satellite imagery from Sentinel-2 showing vegetation stress levels in the Amazon basin for Q2 2024.'" 
+                        placeholder="Ex: 'Imagens de satélite semanais do Sentinel-2 mostrando os níveis de estresse da vegetação na bacia amazônica para o segundo trimestre de 2024.'" 
                         id="dataset-description" 
                         value={newDatasetDesc}
                         onChange={(e) => setNewDatasetDesc(e.target.value)}
@@ -76,11 +76,11 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                 {result && (
                      <div className='space-y-4'>
                         <Alert>
-                            <AlertTitle>Correlation Insights</AlertTitle>
+                            <AlertTitle>Insights de Correlação</AlertTitle>
                             <AlertDescription>{result.insights}</AlertDescription>
                         </Alert>
                          <Alert>
-                            <AlertTitle>Suggested Updates</AlertTitle>
+                            <AlertTitle>Atualizações Sugeridas</AlertTitle>
                             <AlertDescription>{result.suggestedUpdates}</AlertDescription>
                         </Alert>
                     </div>
@@ -89,7 +89,7 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
             <DialogFooter>
                 <Button type="submit" disabled={isPending || !newDatasetDesc}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Correlate Data
+                    Correlacionar Dados
                 </Button>
             </DialogFooter>
         </form>
