@@ -54,14 +54,14 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-[625px] grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="font-headline flex items-center gap-2"><Wand2 className="w-5 h-5 text-primary" /> Correlação de Conjunto de Dados com IA</DialogTitle>
           <DialogDescription>
             Descreva um novo conjunto de dados ambientais para ver como ele se correlaciona com os dados existentes e obter sugestões de atualizações.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="overflow-y-auto space-y-4 pr-2">
             <div className="grid gap-4 py-4">
                 <div className="grid w-full gap-1.5">
                     <Label htmlFor="dataset-description">Descrição do Novo Conjunto de Dados</Label>
@@ -86,7 +86,7 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                     </div>
                 )}
             </div>
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 bg-background py-4">
                 <Button type="submit" disabled={isPending || !newDatasetDesc}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Correlacionar Dados
