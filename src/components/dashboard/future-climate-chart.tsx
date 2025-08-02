@@ -1,15 +1,19 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
+import { Button } from '../ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
 }
 
+const WINDOW_SIZE = 15;
 
 export interface FutureClimateData {
     year: string;
@@ -24,6 +28,7 @@ interface FutureClimateChartProps {
     trendName: string;
     valueColor: string;
     trendColor: string;
+    tickAmount?: number;
 }
 
 export default function FutureClimateChart({ 
@@ -32,8 +37,20 @@ export default function FutureClimateChart({
     valueName,
     trendName,
     valueColor,
-    trendColor
+    trendColor,
+    tickAmount
 }: FutureClimateChartProps) {
+    const [startIndex, setStartIndex] = useState(0);
+
+    const visibleData = data.slice(startIndex, startIndex + WINDOW_SIZE);
+    
+    const handlePrev = () => {
+        setStartIndex(prev => Math.max(0, prev - 1));
+    }
+
+    const handleNext = () => {
+        setStartIndex(prev => Math.min(data.length - WINDOW_SIZE, prev + 1));
+    }
 
     const options: Highcharts.Options = {
         chart: {
@@ -46,13 +63,13 @@ export default function FutureClimateChart({
             enabled: false
         },
         xAxis: {
-            categories: data.map(d => d.year),
+            categories: visibleData.map(d => d.year),
             labels: {
                 style: {
                     color: 'hsl(var(--muted-foreground))'
                 }
             },
-            tickInterval: 5,
+            tickInterval: 2,
         },
         yAxis: {
             title: {
@@ -66,7 +83,8 @@ export default function FutureClimateChart({
                     color: 'hsl(var(--muted-foreground))'
                 }
             },
-            gridLineColor: 'hsl(var(--border))'
+            gridLineColor: 'hsl(var(--border))',
+            tickAmount: tickAmount,
         },
         tooltip: {
             shared: true,
@@ -93,14 +111,14 @@ export default function FutureClimateChart({
             {
                 type: 'area',
                 name: valueName,
-                data: data.map(d => d.value),
+                data: visibleData.map(d => d.value),
                 color: valueColor,
                 
             },
             {
                 type: 'line',
                 name: trendName,
-                data: data.map(d => d.trend),
+                data: visibleData.map(d => d.trend),
                 color: trendColor,
                 dashStyle: 'Dash',
                 lineWidth: 2,
@@ -129,10 +147,31 @@ export default function FutureClimateChart({
     };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
+        <div className='absolute top-2 right-12 z-10 flex gap-1'>
+            <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-6 w-6" 
+                onClick={handlePrev} 
+                disabled={startIndex === 0}
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-6 w-6" 
+                onClick={handleNext}
+                disabled={startIndex >= data.length - WINDOW_SIZE}
+            >
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
         <HighchartsReact
             highcharts={Highcharts}
             options={options}
+            containerProps={{ style: { height: "100%", width: "100%" } }}
         />
     </div>
   );
