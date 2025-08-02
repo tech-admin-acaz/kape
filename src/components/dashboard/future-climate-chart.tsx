@@ -72,16 +72,17 @@ export default function FutureClimateChart({
             labels: {
                 format: `{value} ${unit}`,
                 style: {
-                    color: color
+                    color: 'hsl(var(--foreground))'
                 }
             },
             title: {
                 text: yAxisTitle,
                 style: {
-                    color: color
+                    color: 'hsl(var(--foreground))'
                 }
             },
             gridLineColor: 'hsl(var(--border))',
+            tickAmount: 5,
         },
         tooltip: {
             shared: true,
