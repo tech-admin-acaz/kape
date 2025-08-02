@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -28,10 +29,10 @@ export default function DashboardPage() {
         }
     };
 
-    const handleResize: PanelOnResize = (size) => {
-      if (panelGroupRef.current && size < COLLAPSE_THRESHOLD_PERCENT && !isCollapsed) {
-          panelGroupRef.current.collapse("stats-panel");
-      }
+    const handleResize: PanelOnResize = (size, prevSize) => {
+      // Note: We don't need to manually call collapse here.
+      // The panel will collapse automatically when the user drags it below the minSize.
+      // We just use the onCollapse and onExpand callbacks to track the state.
     };
 
     return (
