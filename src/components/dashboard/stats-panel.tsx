@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '../ui/button';
 import { Download } from 'lucide-react';
@@ -104,13 +104,48 @@ function StatsPanelSkeleton() {
 }
 
 export default function StatsPanel({ data }: StatsPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [useAbbreviations, setUseAbbreviations] = useState(false);
+
+  useEffect(() => {
+    if (!panelRef.current) return;
+
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width } = entry.contentRect;
+        setUseAbbreviations(width <= 499);
+      }
+    });
+
+    observer.observe(panelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   if (!data) {
     return <StatsPanelSkeleton />;
   }
+  
+  const TABS = {
+    characterization: {
+      full: "CARACTERIZAÇÃO",
+      abbr: "Caracterização"
+    },
+    services: {
+      full: "SERVIÇOS AMBIENTAIS",
+      abbr: "Serv. Ambientais"
+    },
+    ranking: {
+      full: "RANKING DE ESPÉCIES",
+      abbr: "Rank. Espécies"
+    }
+  }
+
 
   return (
-    <div className="h-full flex flex-col">
+    <div ref={panelRef} className="h-full flex flex-col">
         <CardHeader>
             <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
             <CardDescription>{data.type}</CardDescription>
@@ -119,9 +154,15 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
               <TabsList className="w-full">
-                  <TabsTrigger value="characterization" className="flex-1">CARACTERIZAÇÃO</TabsTrigger>
-                  <TabsTrigger value="services" className="flex-1">SERVIÇOS AMBIENTAIS</TabsTrigger>
-                  <TabsTrigger value="ranking" className="flex-1">RANKING DE ESPÉCIES</TabsTrigger>
+                  <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
+                    {useAbbreviations ? TABS.characterization.abbr : TABS.characterization.full}
+                  </TabsTrigger>
+                  <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
+                     {useAbbreviations ? TABS.services.abbr : TABS.services.full}
+                  </TabsTrigger>
+                  <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
+                    {useAbbreviations ? TABS.ranking.abbr : TABS.ranking.full}
+                  </TabsTrigger>
               </TabsList>
             </div>
             
