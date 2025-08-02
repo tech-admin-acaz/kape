@@ -2,14 +2,12 @@
 "use client";
 
 import React from 'react';
-import type { PanelGroup, PanelOnResize } from "react-resizable-panels";
+import type { PanelGroup } from "react-resizable-panels";
 import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { mockData } from "@/components/dashboard/mock-data";
 
-
-const COLLAPSE_THRESHOLD_PERCENT = 20;
 
 export default function DashboardPage() {
     const [selectedAreaId, setSelectedAreaId] = React.useState<string | null>("1");
@@ -26,13 +24,8 @@ export default function DashboardPage() {
     const expandPanel = () => {
         if (panelGroupRef.current) {
             panelGroupRef.current.setLayout([70, 30]);
+            setIsCollapsed(false);
         }
-    };
-
-    const handleResize: PanelOnResize = (size, prevSize) => {
-      // Note: We don't need to manually call collapse here.
-      // The panel will collapse automatically when the user drags it below the minSize.
-      // We just use the onCollapse and onExpand callbacks to track the state.
     };
 
     return (
@@ -57,7 +50,6 @@ export default function DashboardPage() {
                 collapsedSize={0}
                 onCollapse={() => setIsCollapsed(true)}
                 onExpand={() => setIsCollapsed(false)}
-                onResize={handleResize}
             >
                 {isClient && isCollapsed ? null : <StatsPanel data={selectedData} />}
             </ResizablePanel>
