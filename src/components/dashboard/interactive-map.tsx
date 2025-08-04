@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source, Layer } from 'react-map-gl';
+import type { RasterLayer } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
 import { MapPin, Plus, Minus, Navigation, Box, Layers2, Map as MapIcon } from 'lucide-react';
 import BasemapControl from './basemap-control';
@@ -13,6 +14,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
+import { getIndicatorXYZ } from '@/services/map.service';
+
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -27,6 +30,14 @@ const basemaps = {
 
 const defaultBasemapKey = 'escuro';
 
+const indicatorLayer: RasterLayer = {
+    id: 'indicator',
+    type: 'raster',
+    paint: {
+        'raster-opacity': 0.7,
+    },
+};
+
 interface InteractiveMapProps {
   onAreaSelect: (areaId: string | null) => void;
 }
@@ -36,6 +47,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
+  const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
@@ -46,6 +58,18 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
     restorationCost: false,
     mapbiomas: false,
   });
+
+   useEffect(() => {
+        async function fetchIndicatorLayer() {
+            try {
+                const xyzUrl = await getIndicatorXYZ();
+                setIndicatorXYZ(xyzUrl);
+            } catch (error) {
+                console.error('Failed to fetch indicator layer:', error);
+            }
+        }
+        fetchIndicatorLayer();
+    }, []);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -111,6 +135,17 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 tileSize={512}
                 maxzoom={14}
             />
+
+            {layers.indicator && indicatorXYZ && (
+                <Source
+                    id="indicator-source"
+                    type="raster"
+                    tiles={[indicatorXYZ]}
+                    tileSize={256}
+                >
+                    <Layer {...indicatorLayer} />
+                </Source>
+            )}
         
             {locations.map((loc) => (
                 <Marker
