@@ -1,7 +1,8 @@
+
 "use client"
 
 import * as React from "react"
-import { Layers, CheckCircle2 } from "lucide-react"
+import { Map as MapIcon, CheckCircle2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -29,8 +30,8 @@ export default function BasemapControl({ onStyleChange, basemaps, currentStyleKe
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-background">
-          <Layers className="h-4 w-4" />
+        <Button variant="outline" size="icon" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <MapIcon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

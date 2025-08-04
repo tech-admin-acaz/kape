@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
-import { MapPin, Plus, Minus, Navigation, Box, Layers2 } from 'lucide-react';
+import { MapPin, Plus, Minus, Navigation, Box, Layers2, Map as MapIcon } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
 import { Button } from '@/components/ui/button';
