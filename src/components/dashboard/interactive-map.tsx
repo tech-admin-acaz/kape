@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Map, { Marker, Popup, MapRef, Source, Layer, Map as MapboxMap } from 'react-map-gl';
-import type { RasterLayer } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source, Layer } from 'react-map-gl';
+import MapboxMap from 'mapbox-gl';
 import { MapPin, Plus, Minus, Navigation, Box, Layers2, Map as MapIcon } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
@@ -28,14 +28,6 @@ const basemaps = {
 };
 
 const defaultBasemapKey = 'escuro';
-
-const indicatorLayer: RasterLayer = {
-    id: 'indicator',
-    type: 'raster',
-    paint: {
-        'raster-opacity': 1,
-    },
-};
 
 interface InteractiveMapProps {
   onAreaSelect: (areaId: string | null) => void;
@@ -114,7 +106,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         <Map
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-            mapLib={MapboxMap}
+            mapLib={MapboxMap as any}
             initialViewState={{
                 longitude: -51.9253,
                 latitude: -14.235,
@@ -143,9 +135,9 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                     tileSize={256}
                 >
                     <Layer 
-                      id={indicatorLayer.id}
-                      type={indicatorLayer.type}
-                      paint={indicatorLayer.paint}
+                      id={'indicator'}
+                      type={'raster'}
+                      paint={{'raster-opacity': 1}}
                     />
                 </Source>
             )}
