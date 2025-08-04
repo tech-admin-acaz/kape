@@ -1,9 +1,7 @@
-
 "use client"
 
 import * as React from "react"
 import { Layers, ChevronDown } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,7 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+
 
 export interface LayerState {
     indicator: boolean;
@@ -57,33 +61,36 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
         <DropdownMenuSeparator />
         
         <div className="p-1">
-            {layerItems.map((item) => (
-                <Collapsible key={item.id} className="space-y-2">
-                    <div className="flex items-center space-x-2 p-1">
-                        <Switch 
-                            id={item.id} 
-                            checked={layers[item.id as keyof LayerState]}
-                            onCheckedChange={() => handleLayerChange(item.id as keyof LayerState)}
-                        />
-                        <Label htmlFor={item.id} className="flex-1 cursor-pointer">{item.label}</Label>
+            <Accordion type="single" collapsible className="w-full">
+                {layerItems.map((item) => (
+                    <AccordionItem value={item.id} key={item.id} className="border-b-0">
+                         <div className="flex items-center space-x-2 p-1">
+                            <Switch 
+                                id={item.id} 
+                                checked={layers[item.id as keyof LayerState]}
+                                onClick={(e) => e.stopPropagation()}
+                                onCheckedChange={() => handleLayerChange(item.id as keyof LayerState)}
+                            />
+                             <Label htmlFor={item.id} className="flex-1 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                                {item.label}
+                            </Label>
+                             {item.collapsible && (
+                                <AccordionTrigger className="p-1 -ml-1 [&[data-state=open]>svg]:rotate-180">
+                                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                                </AccordionTrigger>
+                            )}
+                        </div>
                         {item.collapsible && (
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6">
-                                    <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                                </Button>
-                            </CollapsibleTrigger>
+                            <AccordionContent>
+                                <div className="mx-3 mb-2 rounded-md bg-muted/50 p-2 text-sm text-muted-foreground">
+                                    <p>Fonte: GEE</p>
+                                    <p>Ano: 2024</p>
+                                </div>
+                            </AccordionContent>
                         )}
-                    </div>
-                    {item.collapsible && (
-                        <CollapsibleContent>
-                            <div className="mx-3 mb-2 rounded-md bg-muted/50 p-2 text-sm text-muted-foreground">
-                                <p>Fonte: GEE</p>
-                                <p>Ano: 2024</p>
-                            </div>
-                        </CollapsibleContent>
-                    )}
-                </Collapsible>
-            ))}
+                    </AccordionItem>
+                ))}
+            </Accordion>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
