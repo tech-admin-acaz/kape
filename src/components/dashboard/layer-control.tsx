@@ -73,7 +73,7 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
                                 thumbClassName="h-4 w-4"
                             />
                             <AccordionTrigger className="p-1 flex-1 [&[data-state=open]>svg]:rotate-180">
-                                <Label htmlFor={item.id} className="cursor-pointer">
+                                <Label htmlFor={item.id}>
                                     {item.label}
                                 </Label>
                              </AccordionTrigger>
