@@ -34,7 +34,7 @@ const indicatorLayer: RasterLayer = {
     id: 'indicator',
     type: 'raster',
     paint: {
-        'raster-opacity': 0.7,
+        'raster-opacity': 1,
     },
 };
 
