@@ -52,7 +52,7 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-background">
+        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
           <Layers className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -64,7 +64,7 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
             <Accordion type="single" collapsible className="w-full">
                 {layerItems.map((item) => (
                     <AccordionItem value={item.id} key={item.id} className="border-b-0">
-                         <div className="flex items-center space-x-2 p-1">
+                         <div className="flex items-center p-1">
                             <Switch 
                                 id={item.id} 
                                 checked={layers[item.id as keyof LayerState]}
@@ -72,8 +72,8 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
                                 className="h-5 w-9 border-input"
                                 thumbClassName="h-4 w-4"
                             />
-                            <AccordionTrigger className="p-1 flex-1 [&[data-state=open]>svg]:rotate-180">
-                                <Label htmlFor={item.id}>
+                            <AccordionTrigger className="p-1 flex-1 flex justify-between [&[data-state=open]>svg]:rotate-180">
+                                <Label htmlFor={item.id} className="ml-2">
                                     {item.label}
                                 </Label>
                              </AccordionTrigger>

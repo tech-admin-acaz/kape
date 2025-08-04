@@ -67,6 +67,7 @@ export default {
         },
         'sparkle-from': 'hsl(var(--sparkle-from))',
         'sparkle-to': 'hsl(var(--sparkle-to))',
+        hover: 'hsl(var(--hover))',
       },
       borderRadius: {
         lg: 'var(--radius)',

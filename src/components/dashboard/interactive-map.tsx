@@ -145,7 +145,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={toggle3D} className={cn("bg-background/80 hover:bg-background", is3D && "bg-accent text-accent-foreground")}>
+                        <Button variant="outline" size="icon" onClick={toggle3D} className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}>
                             <Box className="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
@@ -160,7 +160,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleZoomIn} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                      <Button variant="ghost" size="icon" onClick={handleZoomIn} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -168,7 +168,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleZoomOut} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                      <Button variant="ghost" size="icon" onClick={handleZoomOut} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
                         <Minus className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -176,7 +176,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-background">
+                      <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
                         <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
                       </Button>
                     </TooltipTrigger>
