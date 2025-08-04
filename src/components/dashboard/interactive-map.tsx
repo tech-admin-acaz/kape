@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Map, { Marker, Popup, MapRef, Source, Layer } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source, Layer, Map as MapboxMap } from 'react-map-gl';
 import type { RasterLayer } from 'react-map-gl';
-import mapboxgl from 'mapbox-gl';
 import { MapPin, Plus, Minus, Navigation, Box, Layers2, Map as MapIcon } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
@@ -115,7 +114,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         <Map
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-            mapLib={mapboxgl}
+            mapLib={MapboxMap}
             initialViewState={{
                 longitude: -51.9253,
                 latitude: -14.235,
@@ -143,7 +142,11 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                     tiles={[indicatorXYZ]}
                     tileSize={256}
                 >
-                    <Layer {...indicatorLayer} />
+                    <Layer 
+                      id={indicatorLayer.id}
+                      type={indicatorLayer.type}
+                      paint={indicatorLayer.paint}
+                    />
                 </Source>
             )}
         
