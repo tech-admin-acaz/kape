@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Globe } from 'lucide-react';
+import { Globe, Check } from 'lucide-react';
 
 export function LanguageSwitcher() {
-  const { setLocale } = useI18n();
+  const { locale, setLocale } = useI18n();
 
   return (
     <DropdownMenu>
@@ -24,9 +24,11 @@ export function LanguageSwitcher() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setLocale('en')}>
           <span className="mr-2">🇺🇸</span> English
+          {locale === 'en' && <Check className="ml-auto h-4 w-4" />}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLocale('pt')}>
           <span className="mr-2">🇧🇷</span> Português
+          {locale === 'pt' && <Check className="ml-auto h-4 w-4" />}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
