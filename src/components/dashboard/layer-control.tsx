@@ -68,17 +68,15 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
                             <Switch 
                                 id={item.id} 
                                 checked={layers[item.id as keyof LayerState]}
-                                onClick={(e) => e.stopPropagation()}
                                 onCheckedChange={() => handleLayerChange(item.id as keyof LayerState)}
+                                className="h-5 w-9 border-input"
+                                thumbClassName="h-4 w-4"
                             />
-                             <Label htmlFor={item.id} className="flex-1 cursor-pointer" onClick={(e) => e.stopPropagation()}>
-                                {item.label}
-                            </Label>
-                             {item.collapsible && (
-                                <AccordionTrigger className="p-1 -ml-1 [&[data-state=open]>svg]:rotate-180">
-                                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                </AccordionTrigger>
-                            )}
+                            <AccordionTrigger className="p-1 flex-1 [&[data-state=open]>svg]:rotate-180">
+                                <Label htmlFor={item.id} className="cursor-pointer">
+                                    {item.label}
+                                </Label>
+                             </AccordionTrigger>
                         </div>
                         {item.collapsible && (
                             <AccordionContent>
