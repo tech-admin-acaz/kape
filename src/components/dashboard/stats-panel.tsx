@@ -109,42 +109,15 @@ function StatsPanelSkeleton() {
 
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [useAbbreviations, setUseAbbreviations] = useState(false);
-
-  useEffect(() => {
-    if (!panelRef.current) return;
-
-    const observer = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        const { width } = entry.contentRect;
-        setUseAbbreviations(width <= 499);
-      }
-    });
-
-    observer.observe(panelRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
+  
   if (!data) {
     return <StatsPanelSkeleton />;
   }
   
   const TABS = {
-    characterization: {
-      full: "CARACTERIZAÇÃO",
-      abbr: "Caracterização"
-    },
-    services: {
-      full: "SERVIÇOS AMBIENTAIS",
-      abbr: "Serv. Ambientais"
-    },
-    ranking: {
-      full: "RANKING DE ESPÉCIES",
-      abbr: "Rank. Espécies"
-    }
+    characterization: "Caracterização",
+    services: "Serviços Ambientais",
+    ranking: "Ranking de Espécies"
   }
 
 
@@ -159,13 +132,13 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             <div className="px-6">
               <TabsList className="w-full">
                   <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
-                    {useAbbreviations ? TABS.characterization.abbr : TABS.characterization.full}
+                    {TABS.characterization}
                   </TabsTrigger>
                   <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
-                     {useAbbreviations ? TABS.services.abbr : TABS.services.full}
+                     {TABS.services}
                   </TabsTrigger>
                   <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
-                    {useAbbreviations ? TABS.ranking.abbr : TABS.ranking.full}
+                    {TABS.ranking}
                   </TabsTrigger>
               </TabsList>
             </div>

@@ -25,7 +25,7 @@ export function LoginForm() {
       setError('');
       router.push('/dashboard');
     } else {
-      setError('Credenciais inválidas. Use acaz.dev@gmail.com e qazx74123.');
+      setError('Credenciais inválidas. Use o e-mail acaz.dev@gmail.com e a senha qazx74123 para entrar.');
     }
   };
 
