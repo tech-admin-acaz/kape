@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -38,7 +39,7 @@ const groupings = {
 
 type GroupingKey = keyof typeof groupings;
 
-export default function MapFilters() {
+export default function SearchControl() {
   const [open, setOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [grouping, setGrouping] = React.useState<GroupingKey>("states");

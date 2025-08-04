@@ -4,13 +4,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
-import { MapPin, Plus, Minus, Navigation, Box } from 'lucide-react';
+import { MapPin, Plus, Minus, Navigation, Box, Layers2 } from 'lucide-react';
 import BasemapControl from './basemap-control';
-import MapFilters from './map-filters';
+import SearchControl from './search-control';
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import LayerControl, { type LayerState } from './layer-control';
+import LegendControl from './legend-control';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -35,6 +37,15 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const mapRef = useRef<MapRef>(null);
+
+  const [layers, setLayers] = React.useState<LayerState>({
+    indicator: true,
+    restoredCarbon: false,
+    currentCarbon: false,
+    opportunityCost: false,
+    restorationCost: false,
+    mapbiomas: false,
+  });
 
   useEffect(() => {
     if (mapRef.current) {
@@ -68,8 +79,15 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   return (
     <div className="relative w-full h-full">
         <div className="absolute top-4 left-4 z-10">
-            <MapFilters />
+            <SearchControl />
         </div>
+        
+        {layers.indicator && (
+            <div className="absolute bottom-4 left-4 z-10">
+                <LegendControl />
+            </div>
+        )}
+
         <Map
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
@@ -135,6 +153,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 </Tooltip>
             </TooltipProvider>
 
+            <LayerControl layers={layers} setLayers={setLayers} />
             <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={currentStyleKey} />
 
             <TooltipProvider>

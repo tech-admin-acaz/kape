@@ -29,30 +29,32 @@ export default function DashboardPage() {
     };
 
     return (
-        <ResizablePanelGroup 
-            ref={panelGroupRef}
-            direction="horizontal" 
-            className="flex-1"
-        >
-            <ResizablePanel defaultSize={70}>
-                <DashboardClient 
-                    onAreaSelect={setSelectedAreaId} 
-                    isPanelCollapsed={isCollapsed}
-                    onExpandClick={expandPanel}
-                />
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel 
-                id="stats-panel"
-                defaultSize={30} 
-                minSize={15} 
-                collapsible={true}
-                collapsedSize={0}
-                onCollapse={() => setIsCollapsed(true)}
-                onExpand={() => setIsCollapsed(false)}
+        <div className="flex-1 flex">
+            <ResizablePanelGroup 
+                ref={panelGroupRef}
+                direction="horizontal" 
+                className="flex-1"
             >
-                {isClient && isCollapsed ? null : <StatsPanel data={selectedData} />}
-            </ResizablePanel>
-        </ResizablePanelGroup>
+                <ResizablePanel defaultSize={70}>
+                    <DashboardClient 
+                        onAreaSelect={setSelectedAreaId} 
+                        isPanelCollapsed={isCollapsed}
+                        onExpandClick={expandPanel}
+                    />
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+                <ResizablePanel 
+                    id="stats-panel"
+                    defaultSize={30} 
+                    minSize={15} 
+                    collapsible={true}
+                    collapsedSize={0}
+                    onCollapse={() => setIsCollapsed(true)}
+                    onExpand={() => setIsCollapsed(false)}
+                >
+                    {isClient && isCollapsed ? null : <StatsPanel data={selectedData} />}
+                </ResizablePanel>
+            </ResizablePanelGroup>
+        </div>
     );
 }
