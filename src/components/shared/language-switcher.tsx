@@ -23,10 +23,10 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setLocale('en')}>
-          English
+          <span className="mr-2">🇺🇸</span> English
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLocale('pt')}>
-          Português
+          <span className="mr-2">🇧🇷</span> Português
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
