@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -109,6 +110,24 @@ function StatsPanelSkeleton() {
 
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
+  
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        setShouldAbbreviate(entry.contentRect.width <= 399);
+      }
+    });
+
+    resizeObserver.observe(panel);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
   
   if (!data) {
     return <StatsPanelSkeleton />;
@@ -120,6 +139,9 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     ranking: "Ranking de Espécies"
   }
 
+  const servicesLabel = shouldAbbreviate ? "S. Ambientais" : TABS.services;
+  const rankingLabel = shouldAbbreviate ? "R. Espécies" : TABS.ranking;
+
 
   return (
     <div ref={panelRef} className="h-full flex flex-col">
@@ -130,17 +152,39 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-              <TabsList className="w-full">
-                  <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
-                    {TABS.characterization}
-                  </TabsTrigger>
-                  <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
-                     {TABS.services}
-                  </TabsTrigger>
-                  <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
-                    {TABS.ranking}
-                  </TabsTrigger>
-              </TabsList>
+                <TooltipProvider>
+                    <TabsList className="w-full">
+                        <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
+                            {TABS.characterization}
+                        </TabsTrigger>
+                        
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
+                                    {servicesLabel}
+                                </TabsTrigger>
+                            </TooltipTrigger>
+                            {shouldAbbreviate && (
+                                <TooltipContent>
+                                    <p>{TABS.services}</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
+                                    {rankingLabel}
+                                </TabsTrigger>
+                            </TooltipTrigger>
+                            {shouldAbbreviate && (
+                                <TooltipContent>
+                                    <p>{TABS.ranking}</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                    </TabsList>
+                </TooltipProvider>
             </div>
             
             <div className="flex-1 overflow-y-auto">
