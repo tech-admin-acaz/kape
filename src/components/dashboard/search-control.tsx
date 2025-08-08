@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search as SearchIcon, X, Loader2, Trash2 } from "lucide-react"
+import { Check, Search as SearchIcon, Loader2, Trash2, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,10 +24,27 @@ import { Separator } from "../ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { territoryTypes, Location, TerritoryTypeKey } from "./mock-locations"
 import { getLocationsByType } from "@/services/map.service"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 interface SearchControlProps {
     onLocationSelect: (location: Location | null, type: TerritoryTypeKey | null) => void;
 }
+
+const InfoTooltip = ({ text }: { text: string }) => (
+    <TooltipProvider>
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground ml-1.5" onClick={(e) => e.stopPropagation()}>
+                    <Info className="h-3.5 w-3.5" />
+                </button>
+            </TooltipTrigger>
+            <TooltipContent align="start">
+                <p>{text}</p>
+            </TooltipContent>
+        </Tooltip>
+    </TooltipProvider>
+);
+
 
 export default function SearchControl({ onLocationSelect }: SearchControlProps) {
   const [selectedType, setSelectedType] = React.useState<TerritoryTypeKey | null>(null);
@@ -39,8 +56,9 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
   const handleTypeChange = async (value: string) => {
     const typeKey = value as TerritoryTypeKey;
     setSelectedType(typeKey);
+    // Reset location when type changes
     setSelectedLocation(null);
-    onLocationSelect(null, null); // Clear shape on map
+    onLocationSelect(null, null);
     setAvailableLocations([]);
     
     if (typeKey) {
@@ -49,8 +67,8 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
             const locations = await getLocationsByType(typeKey);
             setAvailableLocations(locations);
         } catch (error) {
-            console.error(error);
-            // Optionally, show a toast notification to the user
+            console.error("Failed to fetch locations by type:", error);
+            setAvailableLocations([]);
         } finally {
             setIsLoading(false);
         }
@@ -61,87 +79,113 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
     setSelectedType(null);
     setSelectedLocation(null);
     setAvailableLocations([]);
-    onLocationSelect(null, null); // Clear shape on map
+    onLocationSelect(null, null);
   };
 
-  const handleLocationSelected = (value: string) => {
-      const location = availableLocations.find(l => l.value === value) || null;
+  const handleLocationSelected = (currentValue: string) => {
+      const location = availableLocations.find(l => l.value === currentValue) || null;
       setSelectedLocation(location);
       onLocationSelect(location, selectedType);
       setPopoverOpen(false);
   }
 
+  const getLabelForType = (type: TerritoryTypeKey | null) => {
+    if (!type) return "Tipo de Território";
+    return territoryTypes.find(t => t.value === type)?.label || "Tipo de Território";
+  }
+
   return (
-    <Card className="flex items-center gap-2 p-2 bg-background/80 backdrop-blur-sm shadow-md w-96">
-      <Select onValueChange={handleTypeChange} value={selectedType || ''}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Tipo de Território" />
-        </SelectTrigger>
-        <SelectContent>
-          {territoryTypes.map((type) => (
-            <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Separator orientation="vertical" className="h-6" />
-
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            role="combobox"
-            aria-expanded={popoverOpen}
-            className="w-full justify-start font-normal text-muted-foreground"
-            disabled={!selectedType}
-          >
-            <SearchIcon className="mr-2 h-4 w-4" />
-            {selectedLocation ? selectedLocation.label : "Buscar local..."}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-          <Command>
-            <CommandInput placeholder="Buscar..." />
-            <CommandList>
-              {isLoading && (
-                 <CommandLoading>
-                    <div className="flex items-center justify-center p-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
+    <Card className="flex items-center gap-2 p-2 bg-background/80 backdrop-blur-sm shadow-md w-[450px]">
+        <div className="flex-1">
+            <Select onValueChange={handleTypeChange} value={selectedType || ''}>
+                <SelectTrigger className="w-full">
+                    <div className="flex items-center">
+                        <span className="text-xs text-muted-foreground mr-1.5">AT</span>
+                        <InfoTooltip text="Área Territorial (Estado, Município, etc.)" />
+                        <Separator orientation="vertical" className="h-4 mx-2" />
+                        <SelectValue placeholder="Selecione o tipo" />
                     </div>
-                </CommandLoading>
-              )}
-              {!isLoading && availableLocations.length === 0 && (
-                <CommandEmpty>Nenhum local encontrado.</CommandEmpty>
-              )}
-              <CommandGroup>
-                {availableLocations.map((location) => (
-                  <CommandItem
-                    key={location.value}
-                    value={location.value}
-                    onSelect={handleLocationSelected}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedLocation?.value === location.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {location.label}
-                  </CommandItem>
+                </SelectTrigger>
+                <SelectContent>
+                {territoryTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                 ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                </SelectContent>
+            </Select>
+        </div>
 
-      {(selectedType || selectedLocation) && (
-        <>
-          <Separator orientation="vertical" className="h-6" />
-          <Button variant="ghost" size="icon" onClick={handleClear} className="h-8 w-8">
-            <Trash2 className="h-4 w-4 text-muted-foreground" />
-          </Button>
-        </>
+      <div className="flex-1">
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+            <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={popoverOpen}
+                className="w-full justify-start font-normal"
+                disabled={!selectedType || isLoading}
+            >
+                <div className="flex items-center w-full">
+                    <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
+                    <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
+                    <Separator orientation="vertical" className="h-4 mx-2" />
+                    <div className="flex-1 text-left truncate">
+                        {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
+                    </div>
+                </div>
+            </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+            <Command>
+                <CommandInput placeholder="Buscar..." />
+                <CommandList>
+                {isLoading ? (
+                    <CommandLoading>
+                        <div className="flex items-center justify-center p-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="ml-2 text-sm">Carregando locais...</span>
+                        </div>
+                    </CommandLoading>
+                ) : (
+                  <>
+                    <CommandEmpty>Nenhum local encontrado.</CommandEmpty>
+                    <CommandGroup>
+                        {availableLocations.map((location) => (
+                        <CommandItem
+                            key={location.value}
+                            value={location.value}
+                            onSelect={handleLocationSelected}
+                        >
+                            <Check
+                            className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedLocation?.value === location.value ? "opacity-100" : "opacity-0"
+                            )}
+                            />
+                            {location.label}
+                        </CommandItem>
+                        ))}
+                    </CommandGroup>
+                  </>
+                )}
+                </CommandList>
+            </Command>
+            </PopoverContent>
+        </Popover>
+      </div>
+
+      {(selectedType) && (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={handleClear} className="h-9 w-9 text-muted-foreground hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Limpar seleção</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
       )}
     </Card>
   )

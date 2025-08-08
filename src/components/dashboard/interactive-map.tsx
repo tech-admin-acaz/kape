@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
 import { getIndicatorXYZ, getLocationDetails } from '@/services/map.service';
-import type { Location } from './mock-locations';
+import type { Location, TerritoryTypeKey } from "./mock-locations";
 import * as turf from '@turf/turf';
 
 const locations = [
@@ -90,7 +90,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
     setIs3D(prevIs3D => !prevIs3D);
   }
 
-  const handleLocationSelect = async (location: Location | null, type: string | null) => {
+  const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
     if (!location || !type) {
       setSelectedShape(null);
       return;
@@ -167,15 +167,15 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                   type="fill"
                   paint={{
                     'fill-color': 'hsl(var(--primary))',
-                    'fill-opacity': 0.3
+                    'fill-opacity': 0
                   }}
                 />
                  <Layer
                   id="selected-shape-layer-line"
                   type="line"
                   paint={{
-                    'line-color': 'hsl(var(--primary))',
-                    'line-width': 2
+                    'line-color': '#FFFFFF',
+                    'line-width': 1.5
                   }}
                 />
               </Source>
