@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Map, { Marker, Popup, MapRef, Source, Layer } from 'react-map-gl';
-import MapboxMap from 'mapbox-gl';
-import { MapPin, Plus, Minus, Navigation, Box, Layers2, Map as MapIcon } from 'lucide-react';
+import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike } from 'react-map-gl';
+import { MapPin, Plus, Minus, Navigation, Box, Layers2 } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
 import { Button } from '@/components/ui/button';
@@ -13,8 +12,9 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ } from '@/services/map.service';
-
+import { getIndicatorXYZ, getLocationDetails } from '@/services/map.service';
+import type { Location } from './mock-locations';
+import * as turf from '@turf/turf';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -39,6 +39,7 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
+  const [selectedShape, setSelectedShape] = useState<any>(null);
   const mapRef = useRef<MapRef>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
@@ -89,12 +90,30 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
     setIs3D(prevIs3D => !prevIs3D);
   }
 
+  const handleLocationSelect = async (location: Location | null, type: string | null) => {
+    if (!location || !type) {
+      setSelectedShape(null);
+      return;
+    }
+    try {
+      const details = await getLocationDetails(type, location.value);
+      if (details && details.geom) {
+        setSelectedShape(details.geom);
+        const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
+        mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
+      }
+    } catch (error) {
+      console.error("Failed to fetch location details", error);
+      setSelectedShape(null);
+    }
+  };
+
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
   return (
     <div className="relative w-full h-full">
         <div className="absolute top-4 left-4 z-10">
-            <SearchControl />
+            <SearchControl onLocationSelect={handleLocationSelect} />
         </div>
         
         {layers.indicator && (
@@ -106,7 +125,6 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
         <Map
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-            mapLib={MapboxMap as any}
             initialViewState={{
                 longitude: -51.9253,
                 latitude: -14.235,
@@ -140,6 +158,27 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                       paint={{'raster-opacity': 1}}
                     />
                 </Source>
+            )}
+
+            {selectedShape && (
+              <Source id="selected-shape-source" type="geojson" data={selectedShape}>
+                <Layer
+                  id="selected-shape-layer-fill"
+                  type="fill"
+                  paint={{
+                    'fill-color': 'hsl(var(--primary))',
+                    'fill-opacity': 0.3
+                  }}
+                />
+                 <Layer
+                  id="selected-shape-layer-line"
+                  type="line"
+                  paint={{
+                    'line-color': 'hsl(var(--primary))',
+                    'line-width': 2
+                  }}
+                />
+              </Source>
             )}
         
             {locations.map((loc) => (

@@ -1,11 +1,10 @@
+
 "use client";
 
-import { Location } from "@/components/dashboard/mock-locations";
+import { Location, TerritoryTypeKey } from "@/components/dashboard/mock-locations";
 
 /**
  * Fetches the XYZ tile URL for the indicator layer.
- * In a real application, this would fetch from a secure API endpoint.
- * For this example, it calls a local API route.
  */
 export async function getIndicatorXYZ(): Promise<string> {
     const response = await fetch('/api/map/indicator');
@@ -18,18 +17,27 @@ export async function getIndicatorXYZ(): Promise<string> {
 
 /**
  * Fetches locations based on the territory type.
- * It calls a local API route which then proxies the request to the external API.
  */
-export async function getLocationsByType(type: string): Promise<Location[]> {
+export async function getLocationsByType(type: TerritoryTypeKey): Promise<Location[]> {
     const response = await fetch(`/api/locations/${type}`);
     if (!response.ok) {
         throw new Error(`Failed to fetch locations for type: ${type}`);
     }
     const data = await response.json();
-    // Assuming the API returns an array of objects with `value` and `label` properties.
-    // If the structure is different, this part will need to be adjusted.
+    // API returns id as number, but CommandItem in shadcn expects string value
     return data.map((item: any) => ({
-        value: item.value || item.id, // Or whatever the unique identifier is
-        label: item.label || item.name, // Or whatever the display name is
+        value: String(item.id), 
+        label: item.name,
     }));
+}
+
+/**
+ * Fetches a single location's details, including its GeoJSON geometry.
+ */
+export async function getLocationDetails(type: TerritoryTypeKey, id: string): Promise<any> {
+    const response = await fetch(`/api/locations/${type}/${id}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch location details for ${type}/${id}`);
+    }
+    return await response.json();
 }

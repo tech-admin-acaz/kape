@@ -1,7 +1,8 @@
+
 "use client"
 
 import * as React from "react"
-import { Check, Search as SearchIcon, X, Loader2 } from "lucide-react"
+import { Check, Search as SearchIcon, X, Loader2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,7 +25,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { territoryTypes, Location, TerritoryTypeKey } from "./mock-locations"
 import { getLocationsByType } from "@/services/map.service"
 
-export default function SearchControl() {
+interface SearchControlProps {
+    onLocationSelect: (location: Location | null, type: TerritoryTypeKey | null) => void;
+}
+
+export default function SearchControl({ onLocationSelect }: SearchControlProps) {
   const [selectedType, setSelectedType] = React.useState<TerritoryTypeKey | null>(null);
   const [availableLocations, setAvailableLocations] = React.useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
@@ -35,6 +40,7 @@ export default function SearchControl() {
     const typeKey = value as TerritoryTypeKey;
     setSelectedType(typeKey);
     setSelectedLocation(null);
+    onLocationSelect(null, null); // Clear shape on map
     setAvailableLocations([]);
     
     if (typeKey) {
@@ -55,7 +61,15 @@ export default function SearchControl() {
     setSelectedType(null);
     setSelectedLocation(null);
     setAvailableLocations([]);
+    onLocationSelect(null, null); // Clear shape on map
   };
+
+  const handleLocationSelected = (value: string) => {
+      const location = availableLocations.find(l => l.value === value) || null;
+      setSelectedLocation(location);
+      onLocationSelect(location, selectedType);
+      setPopoverOpen(false);
+  }
 
   return (
     <Card className="flex items-center gap-2 p-2 bg-background/80 backdrop-blur-sm shadow-md w-96">
@@ -104,12 +118,7 @@ export default function SearchControl() {
                   <CommandItem
                     key={location.value}
                     value={location.value}
-                    onSelect={(currentValue) => {
-                      setSelectedLocation(
-                        availableLocations.find(l => l.value === currentValue) || null
-                      );
-                      setPopoverOpen(false);
-                    }}
+                    onSelect={handleLocationSelected}
                   >
                     <Check
                       className={cn(
@@ -130,7 +139,7 @@ export default function SearchControl() {
         <>
           <Separator orientation="vertical" className="h-6" />
           <Button variant="ghost" size="icon" onClick={handleClear} className="h-8 w-8">
-            <X className="h-4 w-4 text-muted-foreground" />
+            <Trash2 className="h-4 w-4 text-muted-foreground" />
           </Button>
         </>
       )}
