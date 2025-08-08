@@ -34,9 +34,9 @@ const InfoTooltip = ({ text }: { text: string }) => (
     <TooltipProvider>
         <Tooltip>
             <TooltipTrigger asChild>
-                <button type="button" className="text-muted-foreground ml-1.5" onClick={(e) => e.stopPropagation()}>
+                <span className="text-muted-foreground ml-1.5" onClick={(e) => e.stopPropagation()}>
                     <Info className="h-3.5 w-3.5" />
-                </button>
+                </span>
             </TooltipTrigger>
             <TooltipContent align="start">
                 <p>{text}</p>
