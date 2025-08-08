@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Search as SearchIcon, X } from "lucide-react"
+import { Check, Search as SearchIcon, X, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +12,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandLoading,
 } from "@/components/ui/command"
 import {
   Popover,
@@ -21,19 +22,34 @@ import {
 import { Card } from "../ui/card"
 import { Separator } from "../ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { territoryTypes, locationsData, Location, TerritoryTypeKey } from "./mock-locations"
+import { territoryTypes, Location, TerritoryTypeKey } from "./mock-locations"
+import { getLocationsByType } from "@/services/map.service"
 
 export default function SearchControl() {
   const [selectedType, setSelectedType] = React.useState<TerritoryTypeKey | null>(null);
   const [availableLocations, setAvailableLocations] = React.useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
   const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleTypeChange = (value: string) => {
+  const handleTypeChange = async (value: string) => {
     const typeKey = value as TerritoryTypeKey;
     setSelectedType(typeKey);
     setSelectedLocation(null);
-    setAvailableLocations(locationsData[typeKey] || []);
+    setAvailableLocations([]);
+    
+    if (typeKey) {
+        setIsLoading(true);
+        try {
+            const locations = await getLocationsByType(typeKey);
+            setAvailableLocations(locations);
+        } catch (error) {
+            console.error(error);
+            // Optionally, show a toast notification to the user
+        } finally {
+            setIsLoading(false);
+        }
+    }
   };
 
   const handleClear = () => {
@@ -74,7 +90,16 @@ export default function SearchControl() {
           <Command>
             <CommandInput placeholder="Buscar..." />
             <CommandList>
-              <CommandEmpty>Nenhum local encontrado.</CommandEmpty>
+              {isLoading && (
+                 <CommandLoading>
+                    <div className="flex items-center justify-center p-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                </CommandLoading>
+              )}
+              {!isLoading && availableLocations.length === 0 && (
+                <CommandEmpty>Nenhum local encontrado.</CommandEmpty>
+              )}
               <CommandGroup>
                 {availableLocations.map((location) => (
                   <CommandItem
