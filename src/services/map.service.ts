@@ -3,16 +3,57 @@
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
+const fetchXYZ = async (endpoint: string): Promise<string> => {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error fetching from ${endpoint}:`, response.status, errorText);
+        throw new Error(`Network response was not ok for ${endpoint}`);
+    }
+    const data = await response.json();
+    return data.xyz;
+};
+
 /**
  * Fetches the XYZ tile URL for the indicator layer.
  */
 export async function getIndicatorXYZ(): Promise<string> {
-    const response = await fetch('/api/map/indicator');
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data.xyz;
+    return fetchXYZ('/api/map/indicator');
+}
+
+/**
+ * Fetches the XYZ tile URL for the restored carbon layer.
+ */
+export async function getRestoredCarbonXYZ(): Promise<string> {
+    return fetchXYZ('/api/map/restored-carbon');
+}
+
+/**
+ * Fetches the XYZ tile URL for the current carbon layer.
+ */
+export async function getCurrentCarbonXYZ(): Promise<string> {
+    return fetchXYZ('/api/map/current-carbon');
+}
+
+/**
+ * Fetches the XYZ tile URL for the opportunity cost layer.
+ */
+export async function getOpportunityCostXYZ(): Promise<string> {
+    return fetchXYZ('/api/map/opportunity-cost');
+}
+
+/**
+ * Fetches the XYZ tile URL for the restoration cost layer.
+ */
+export async function getRestorationCostXYZ(): Promise<string> {
+    return fetchXYZ('/api/map/restoration-cost');
+}
+
+/**
+ * Fetches the XYZ tile URL for the mapbiomas layer.
+ */
+export async function getMapbiomasXYZ(): Promise<string> {
+    return fetchXYZ('/api/map/mapbiomas');
 }
 
 /**

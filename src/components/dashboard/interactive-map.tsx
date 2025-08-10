@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
@@ -42,9 +42,17 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
-  const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<any>(null);
   const mapRef = useRef<MapRef>(null);
+
+  // Layer XYZ URLs
+  const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
+  const [restoredCarbonXYZ, setRestoredCarbonXYZ] = useState<string | null>(null);
+  const [currentCarbonXYZ, setCurrentCarbonXYZ] = useState<string | null>(null);
+  const [opportunityCostXYZ, setOpportunityCostXYZ] = useState<string | null>(null);
+  const [restorationCostXYZ, setRestorationCostXYZ] = useState<string | null>(null);
+  const [mapbiomasXYZ, setMapbiomasXYZ] = useState<string | null>(null);
+
 
   const [layers, setLayers] = React.useState<LayerState>({
     indicator: true,
@@ -60,15 +68,34 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   const [strokeOpacity, setStrokeOpacity] = useState(1);
 
    useEffect(() => {
-        async function fetchIndicatorLayer() {
+        async function fetchAllLayers() {
             try {
-                const xyzUrl = await getIndicatorXYZ();
-                setIndicatorXYZ(xyzUrl);
+                const [
+                    indicator, 
+                    restoredCarbon, 
+                    currentCarbon,
+                    opportunityCost,
+                    restorationCost,
+                    mapbiomas
+                ] = await Promise.all([
+                    getIndicatorXYZ(),
+                    getRestoredCarbonXYZ(),
+                    getCurrentCarbonXYZ(),
+                    getOpportunityCostXYZ(),
+                    getRestorationCostXYZ(),
+                    getMapbiomasXYZ(),
+                ]);
+                setIndicatorXYZ(indicator);
+                setRestoredCarbonXYZ(restoredCarbon);
+                setCurrentCarbonXYZ(currentCarbon);
+                setOpportunityCostXYZ(opportunityCost);
+                setRestorationCostXYZ(restorationCost);
+                setMapbiomasXYZ(mapbiomas);
             } catch (error) {
-                console.error('Failed to fetch indicator layer:', error);
+                console.error('Failed to fetch one or more layers:', error);
             }
         }
-        fetchIndicatorLayer();
+        fetchAllLayers();
     }, []);
 
   useEffect(() => {
@@ -99,7 +126,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   }
 
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
-    console.log("[InteractiveMap] Received location:", location, "and type:", type);
     if (!location || !type) {
       setSelectedShape(null);
       onAreaUpdate(null);
@@ -114,7 +140,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     }
     try {
       const details = await getLocationDetails(type, location.value);
-      console.log("[InteractiveMap] Fetched location details:", details);
       
       if (details && details.geom) {
         setSelectedShape(details.geom);
@@ -153,7 +178,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
   const handleMapClick = async (event: MapLayerMouseEvent) => {
     const { lng, lat } = event.lngLat;
-    console.log(`[InteractiveMap] Map clicked at: ${lng}, ${lat}`);
     
     if (event.originalEvent.target.closest('.mapboxgl-marker')) {
         return;
@@ -162,7 +186,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     try {
         const clickedLocation = await getLocationByCoords(lat, lng);
         if (clickedLocation && clickedLocation.id) {
-            console.log("[InteractiveMap] Found location by coords:", clickedLocation);
             const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
             handleLocationSelect(location, 'municipio');
         } else {
@@ -174,6 +197,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   }
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
+
+  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
+    if (!xyzUrl) return null;
+    return (
+      <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
+        <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
+      </Source>
+    );
+  };
 
   return (
     <div className="relative w-full h-full">
@@ -212,20 +244,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 maxzoom={14}
             />
 
-            {indicatorXYZ && layers.indicator && (
-                <Source
-                    id="indicator-source"
-                    type="raster"
-                    tiles={[indicatorXYZ]}
-                    tileSize={256}
-                >
-                    <Layer 
-                      id={'indicator'}
-                      type={'raster'}
-                      paint={{'raster-opacity': indicatorOpacity}}
-                    />
-                </Source>
-            )}
+            {layers.indicator && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
+            {layers.restoredCarbon && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
+            {layers.currentCarbon && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
+            {layers.opportunityCost && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
+            {layers.restorationCost && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
+            {layers.mapbiomas && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
 
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
@@ -291,9 +315,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={toggle3D} className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}>
-                            <Box className="h-4 w-4" />
-                        </Button>
+                         <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}>
+                                <Box className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
                     </TooltipTrigger>
                     <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
                 </Tooltip>
