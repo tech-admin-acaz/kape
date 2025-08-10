@@ -19,6 +19,7 @@ import type { StatsData } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
+import { territoryTypes } from '@/models/location.model';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -160,15 +161,39 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
+        // V1 Logic for metadata processing
+        let state = 'Não definido';
+        if (details.uf && details.uf.length > 0) {
+            const ufData = details.uf[0];
+            state = `${ufData.nm_uf} (${ufData.sigla_uf})`;
+        }
+
+        let municipality = 'Não definido';
+        if (details.municipios && details.municipios.length > 0) {
+            municipality = details.municipios[0].nm_mun;
+        }
+
+        let territoryName = 'Não aplicável';
+        if (details.ti && details.ti.length > 0) {
+            territoryName = details.ti[0].terrai_nom;
+        }
+
+        let conservationUnit = 'Não aplicável';
+        if (details.uc && details.uc.length > 0) {
+            conservationUnit = details.uc[0].nome_uc1;
+        }
+        
+        const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
+
         const newArea: StatsData = {
           id: location.value,
           name: details.municipios?.[0]?.nm_mun || details.ti?.[0]?.terrai_nom || details.uc?.[0]?.nome_uc1 || details.uf?.[0]?.nm_uf || location.label,
-          type: type,
+          type: typeLabel,
           generalInfo: {
-            state: details.uf?.[0] ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : 'Não definido',
-            municipality: details.municipios?.[0]?.nm_mun || 'Não definido',
-            territoryName: type === 'ti' ? details.ti?.[0]?.terrai_nom : 'Não aplicável',
-            conservationUnit: type === 'uc' ? details.uc?.[0]?.nome_uc1 : 'Não aplicável',
+            state,
+            municipality,
+            territoryName,
+            conservationUnit,
           },
           stats: baseMockData.stats,
           environmentalServices: baseMockData.environmentalServices,

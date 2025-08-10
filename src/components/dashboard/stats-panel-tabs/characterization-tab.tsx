@@ -50,11 +50,13 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
         <div className="space-y-3">
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
             {hasGeneralInfo ? (
-                <Card className="bg-muted/30 p-4 space-y-2">
-                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                    <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
-                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                <Card className="bg-muted/30">
+                    <CardContent className="p-4 space-y-2">
+                        <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                        <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                        <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
+                        <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                    </CardContent>
                 </Card>
             ) : (
                  <Card className="bg-muted/30 p-4">
