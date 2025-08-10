@@ -46,7 +46,9 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
         console.error(`Error fetching location details for ${type}/${id}:`, response.status, errorText);
         throw new Error(`Failed to fetch location details for ${type}/${id}`);
     }
-    return await response.json();
+    const data = await response.json();
+    // The API wraps the result in an array, so we return the first element.
+    return data && data.length > 0 ? data[0] : null;
 }
 
 /**

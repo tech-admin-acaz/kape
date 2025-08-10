@@ -111,12 +111,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     try {
       const details = await getLocationDetails(type, location.value);
       console.log("[InteractiveMap] Fetched location details:", details);
-      if (details) {
-        if(details.geom) {
-            setSelectedShape(details.geom);
-            const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
-            mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
-        }
+      
+      if (details && details.geom) {
+        setSelectedShape(details.geom);
+        const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
+        mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
 
         // Use a default mock data as a base, as API for stats is not yet defined
         const baseMockData = mockData[Object.keys(mockData)[0]];
