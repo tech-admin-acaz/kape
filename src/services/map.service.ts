@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
@@ -25,10 +24,15 @@ export async function getLocationsByType(type: TerritoryTypeKey): Promise<Locati
     }
     const data = await response.json();
     // API returns id as number, but CommandItem in shadcn expects string value
-    return data.map((item: any) => ({
+    const locations = data.map((item: any) => ({
         value: String(item.id), 
         label: item.name,
     }));
+
+    // Sort locations alphabetically by label
+    locations.sort((a, b) => a.label.localeCompare(b.label));
+
+    return locations;
 }
 
 /**
