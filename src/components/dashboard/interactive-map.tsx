@@ -294,12 +294,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 maxzoom={14}
             />
 
-            {layers.indicator && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
-            {layers.restoredCarbon && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
-            {layers.currentCarbon && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
-            {layers.opportunityCost && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
-            {layers.restorationCost && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
-            {layers.mapbiomas && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
+            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
+            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
+            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
+            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
+            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
+            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
 
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
