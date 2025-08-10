@@ -200,8 +200,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
              setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
         }
     } catch(error) {
-        console.error("[InteractiveMap] Failed to get location by coords", error);
-        setPopupInfo({ lng, lat, message: "Erro ao buscar dados do local. Tente novamente." });
+        if (error instanceof Error && error.message.includes('404')) {
+             setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
+        } else {
+            console.error("[InteractiveMap] Failed to get location by coords", error);
+            setPopupInfo({ lng, lat, message: "Erro ao buscar dados do local. Tente novamente." });
+        }
     }
   }
 
@@ -362,35 +366,36 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             <LayerControl layers={layers} setLayers={setLayers} />
             <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={currentStyleKey} />
 
-            <TooltipProvider>
-                <div className="flex flex-col gap-[1px] rounded-md overflow-hidden border border-gray-300 shadow-sm bg-background/80">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleZoomIn} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left"><p>Zoom In</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleZoomOut} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left"><p>Zoom Out</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={handleResetBearing} className="w-10 h-10 rounded-none bg-background/80 hover:bg-hover hover:text-primary-foreground">
-                        <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left"><p>Orientação: {Math.abs(bearing).toFixed(0)}°</p></TooltipContent>
-                  </Tooltip>
-                </div>
-            </TooltipProvider>
+            <div className="flex flex-col gap-2">
+                 <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                            <Plus className="h-4 w-4" />
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="left"><p>Zoom In</p></TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                            <Minus className="h-4 w-4" />
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="left"><p>Zoom Out</p></TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" onClick={handleResetBearing} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                            <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="left"><p>Orientação: {Math.abs(bearing).toFixed(0)}°</p></TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
         </div>
     </div>
   );
 }
+
