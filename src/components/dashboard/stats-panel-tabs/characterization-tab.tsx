@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -30,12 +29,10 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
 );
 
 const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined }) => {
-    if (!value || value === 'Não aplicável' || value === 'Não definido') return null;
-
     return (
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">{label}:</span>
-          <span className="font-medium text-right">{value}</span>
+          <span className="font-medium text-right">{value || 'Não definido'}</span>
         </div>
     )
 };
@@ -43,26 +40,18 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 export default function CharacterizationTab({ data }: CharacterizationTabProps) {
   const { generalInfo, stats, futureClimate, correlationInsights } = data;
   
-  const hasGeneralInfo = Object.values(generalInfo).some(value => value && value !== 'Não definido' && value !== 'Não aplicável');
-
   return (
     <div className="space-y-6 p-6">
         <div className="space-y-3">
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
-            {hasGeneralInfo ? (
-                <Card className="bg-muted/30">
-                    <CardContent className="p-4 space-y-2">
-                        <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                        <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                        <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
-                        <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
-                    </CardContent>
-                </Card>
-            ) : (
-                 <Card className="bg-muted/30 p-4">
-                    <p className="text-sm text-muted-foreground text-center">Nenhuma informação geral disponível.</p>
-                 </Card>
-            )}
+            <Card className="bg-muted/30">
+                <CardContent className="p-4 space-y-2">
+                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                    <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
+                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                </CardContent>
+            </Card>
         </div>
 
         <div className="space-y-4">
