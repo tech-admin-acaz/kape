@@ -165,10 +165,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           name: details.municipios?.[0]?.nm_mun || details.ti?.[0]?.terrai_nom || details.uc?.[0]?.nome_uc1 || details.uf?.[0]?.nm_uf || location.label,
           type: type,
           generalInfo: {
-            state: details.uf?.[0] ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : 'Sem dados do Estado',
-            municipality: details.municipios?.[0]?.nm_mun || 'Sem dados de Municipio',
-            territoryName: details.ti?.[0]?.terrai_nom || 'Sem dados de TI',
-            conservationUnit: details.uc?.[0]?.nome_uc1 || 'Sem dados de UC',
+            state: details.uf?.[0] ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : 'Não definido',
+            municipality: details.municipios?.[0]?.nm_mun || 'Não definido',
+            territoryName: type === 'ti' ? details.ti?.[0]?.terrai_nom : 'Não aplicável',
+            conservationUnit: type === 'uc' ? details.uc?.[0]?.nome_uc1 : 'Não aplicável',
           },
           stats: baseMockData.stats,
           environmentalServices: baseMockData.environmentalServices,
@@ -404,5 +404,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 }
 
 
+
+    
 
     

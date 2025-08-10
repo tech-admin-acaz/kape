@@ -29,12 +29,16 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const GeneralInfoItem = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex justify-between text-sm">
-      <span className="text-muted-foreground">{label}:</span>
-      <span className="font-medium text-right">{value}</span>
-    </div>
-);
+const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined }) => {
+    if (!value || value === 'Não aplicável' || value === 'Não definido') return null;
+
+    return (
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">{label}:</span>
+          <span className="font-medium text-right">{value}</span>
+        </div>
+    )
+};
 
 export default function CharacterizationTab({ data }: CharacterizationTabProps) {
   const { generalInfo, stats, futureClimate, correlationInsights } = data;
@@ -46,7 +50,7 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             <Card className="bg-muted/30 p-4 space-y-2">
                 <GeneralInfoItem label="Estado" value={generalInfo.state} />
                 <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
                 <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
             </Card>
         </div>
@@ -102,3 +106,5 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
     </div>
   );
 }
+
+    
