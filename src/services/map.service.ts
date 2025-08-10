@@ -98,6 +98,10 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
 export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
     const response = await fetch(`/api/locations/by-coords?lat=${lat}&lng=${lng}`);
      if (!response.ok) {
+        if (response.status === 404) {
+            console.log(`Location not found for coords ${lat},${lng}`);
+            return null; // Return null specifically for 404
+        }
         const errorText = await response.text();
         console.error(`Error fetching location by coords:`, response.status, errorText);
         throw new Error(`Failed to fetch location by coords`);

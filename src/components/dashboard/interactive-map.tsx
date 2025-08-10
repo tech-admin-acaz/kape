@@ -195,7 +195,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const clickedLocation = await getLocationByCoords(lat, lng);
         if (clickedLocation && clickedLocation.id) {
             const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
-            handleLocationSelect(location, 'municipio');
+            handleLocationSelect(location, 'estado');
         } else {
              setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
         }
@@ -394,5 +394,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-    
