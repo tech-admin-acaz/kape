@@ -36,20 +36,21 @@ export default function MapSettingsControl({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-          <TooltipProvider>
-              <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
-                      <Settings className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="left">
-                      <p>Configurações do Mapa</p>
-                  </TooltipContent>
-              </Tooltip>
-          </TooltipProvider>
-      </DropdownMenuTrigger>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                            <Settings className="h-5 w-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                    <p>Configurações do Mapa</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+
       <DropdownMenuContent align="end" className="w-64 p-4 space-y-6">
         <DropdownMenuLabel>Opacidade da Camada</DropdownMenuLabel>
         <DropdownMenuSeparator />
