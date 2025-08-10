@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
-import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 interface MapSettingsControlProps {
   indicatorOpacity: number;
