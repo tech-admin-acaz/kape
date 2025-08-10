@@ -28,8 +28,6 @@ export async function GET(
         fetchType = 'estados';
     } else if (type === 'municipio') {
         fetchType = 'municipios';
-    } else if (type === 'ti') {
-        fetchType = 'estados'; // Special case for 'ti'
     }
 
     try {
