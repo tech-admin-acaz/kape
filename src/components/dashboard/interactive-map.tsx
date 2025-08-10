@@ -32,17 +32,17 @@ const basemaps = {
 const defaultBasemapKey = 'escuro';
 
 interface InteractiveMapProps {
-  onAreaUpdate: (data: StatsData) => void;
+  onAreaUpdate: (data: StatsData | null) => void;
+  selectedArea: StatsData | null;
 }
 
-export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate, selectedArea }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<any>(null);
-  const [selectedArea, setSelectedArea] = useState<StatsData | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
@@ -96,7 +96,15 @@ export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
     if (!location || !type) {
       setSelectedShape(null);
-      setSelectedArea(null);
+      onAreaUpdate(null);
+      // Reset view to default
+      mapRef.current?.flyTo({
+          center: [-51.9253, -14.235],
+          zoom: 3.5,
+          pitch: 0,
+          bearing: 0,
+          duration: 1000
+      });
       return;
     }
     try {
@@ -108,7 +116,8 @@ export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
             mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
         }
 
-        const mockStats = mockData[Object.keys(mockData)[0]];
+        // Use a default mock data as a base, as API for stats is not yet defined
+        const baseMockData = mockData[Object.keys(mockData)[0]];
 
         const newArea: StatsData = {
           id: location.value,
@@ -120,20 +129,18 @@ export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
             territoryName: details.ti?.[0]?.terrai_nom || 'Sem dados de TI',
             conservationUnit: details.uc?.[0]?.nome_uc1 || 'Sem dados de UC',
           },
-          // Placeholder data, as the API for this is not yet defined
-          stats: mockStats.stats,
-          environmentalServices: mockStats.environmentalServices,
-          correlationInsights: mockStats.correlationInsights,
-          species: mockStats.species,
-          futureClimate: mockStats.futureClimate,
+          stats: baseMockData.stats,
+          environmentalServices: baseMockData.environmentalServices,
+          correlationInsights: baseMockData.correlationInsights,
+          species: baseMockData.species,
+          futureClimate: baseMockData.futureClimate,
         };
         onAreaUpdate(newArea);
-        setSelectedArea(newArea);
       }
     } catch (error) {
       console.error("Failed to fetch location details", error);
       setSelectedShape(null);
-      setSelectedArea(null);
+      onAreaUpdate(null);
     }
   };
 
@@ -218,10 +225,7 @@ export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
                 onClick={(e) => {
                     e.originalEvent.stopPropagation();
                     const areaData = mockData[loc.id as keyof typeof mockData];
-                    if (areaData) {
-                        onAreaUpdate(areaData)
-                        setSelectedArea(areaData);
-                    };
+                    if (areaData) onAreaUpdate(areaData);
                     setSelectedLocation(loc);
                 }}
                 style={{cursor: 'pointer'}}

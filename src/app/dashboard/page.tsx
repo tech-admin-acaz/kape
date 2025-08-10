@@ -6,9 +6,7 @@ import type { PanelGroup } from "react-resizable-panels";
 import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { mockData } from "@/components/dashboard/mock-data";
 import type { StatsData } from '@/components/dashboard/stats-panel';
-
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
@@ -18,11 +16,6 @@ export default function DashboardPage() {
 
     React.useEffect(() => {
         setIsClient(true);
-        // Load initial data for the first location in mockData
-        const initialAreaId = Object.keys(mockData)[0];
-        if (initialAreaId) {
-            setSelectedArea(mockData[initialAreaId]);
-        }
     }, []);
     
     const expandPanel = () => {
@@ -44,6 +37,7 @@ export default function DashboardPage() {
                         onAreaUpdate={setSelectedArea} 
                         isPanelCollapsed={isCollapsed}
                         onExpandClick={expandPanel}
+                        selectedArea={selectedArea}
                     />
                 </ResizablePanel>
                 <ResizableHandle withHandle />
