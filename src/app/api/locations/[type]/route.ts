@@ -11,7 +11,7 @@ export async function GET(
     request: NextRequest,
     { params }: { params: { type: string } }
 ) {
-    const type = params.type;
+    let type = params.type;
 
     if (!API_BIO_URL) {
         return NextResponse.json({ error: 'API URL not configured' }, { status: 500 });
@@ -23,20 +23,29 @@ export async function GET(
         return NextResponse.json({ error: 'Invalid location type' }, { status: 400 });
     }
 
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados';
+    } else if (type === 'municipio') {
+        fetchType = 'municipios';
+    } else if (type === 'ti') {
+        fetchType = 'estados'; // Special case for 'ti'
+    }
+
     try {
-        const response = await fetch(`${API_BIO_URL}/${type}`);
+        const response = await fetch(`${API_BIO_URL}/${fetchType}`);
         
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error fetching ${type} from external API:`, response.status, errorText);
-            return NextResponse.json({ error: `Failed to fetch ${type} data from source` }, { status: response.status });
+            console.error(`Error fetching ${fetchType} from external API:`, response.status, errorText);
+            return NextResponse.json({ error: `Failed to fetch ${fetchType} data from source` }, { status: response.status });
         }
         
         const data = await response.json();
         return NextResponse.json(data);
 
     } catch (error) {
-        console.error(`Error fetching ${type} data:`, error);
-        return NextResponse.json({ error: `Failed to fetch ${type} data` }, { status: 500 });
+        console.error(`Error fetching ${fetchType} data:`, error);
+        return NextResponse.json({ error: `Failed to fetch ${fetchType} data` }, { status: 500 });
     }
 }
