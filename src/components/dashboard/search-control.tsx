@@ -100,7 +100,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                 <SelectTrigger className="w-full">
                     <div className="flex items-center">
                         <span className="text-xs text-muted-foreground mr-1.5">AT</span>
-                        <InfoTooltip text="Área Territorial (Estado, Município, etc.)" />
+                        <InfoTooltip text="Agrupamento Territorial (Estado, Município, etc.)" />
                         <Separator orientation="vertical" className="h-4 mx-2" />
                         <SelectValue placeholder="Selecione o tipo" />
                     </div>
@@ -152,7 +152,9 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                         <CommandItem
                             key={location.value}
                             value={location.value}
-                            onSelect={() => handleLocationSelected(location.value)}
+                            onSelect={(currentValue) => {
+                                handleLocationSelected(currentValue);
+                            }}
                         >
                             <Check
                             className={cn(

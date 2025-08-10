@@ -41,6 +41,8 @@ export async function getLocationsByType(type: TerritoryTypeKey): Promise<Locati
 export async function getLocationDetails(type: TerritoryTypeKey, id: string): Promise<any> {
     const response = await fetch(`/api/locations/${type}/${id}`);
     if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error fetching location details for ${type}/${id}:`, response.status, errorText);
         throw new Error(`Failed to fetch location details for ${type}/${id}`);
     }
     return await response.json();
