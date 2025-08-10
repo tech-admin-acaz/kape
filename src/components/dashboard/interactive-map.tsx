@@ -20,6 +20,7 @@ import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
+import { DropdownMenu, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -429,6 +430,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 }
 
 
+
+    
 
     
 
