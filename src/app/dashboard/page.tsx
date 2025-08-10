@@ -7,19 +7,23 @@ import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { mockData } from "@/components/dashboard/mock-data";
+import type { StatsData } from '@/components/dashboard/stats-panel';
 
 
 export default function DashboardPage() {
-    const [selectedAreaId, setSelectedAreaId] = React.useState<string | null>("1");
+    const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
 
     React.useEffect(() => {
         setIsClient(true);
+        // Load initial data for the first location in mockData
+        const initialAreaId = Object.keys(mockData)[0];
+        if (initialAreaId) {
+            setSelectedArea(mockData[initialAreaId]);
+        }
     }, []);
-
-    const selectedData = selectedAreaId ? mockData[selectedAreaId as keyof typeof mockData] : null;
     
     const expandPanel = () => {
         if (panelGroupRef.current) {
@@ -37,7 +41,7 @@ export default function DashboardPage() {
             >
                 <ResizablePanel defaultSize={70}>
                     <DashboardClient 
-                        onAreaSelect={setSelectedAreaId} 
+                        onAreaUpdate={setSelectedArea} 
                         isPanelCollapsed={isCollapsed}
                         onExpandClick={expandPanel}
                     />
@@ -52,7 +56,7 @@ export default function DashboardPage() {
                     onCollapse={() => setIsCollapsed(true)}
                     onExpand={() => setIsCollapsed(false)}
                 >
-                    {isClient && isCollapsed ? null : <StatsPanel data={selectedData} />}
+                    {isClient && isCollapsed ? null : <StatsPanel data={selectedArea} />}
                 </ResizablePanel>
             </ResizablePanelGroup>
         </div>

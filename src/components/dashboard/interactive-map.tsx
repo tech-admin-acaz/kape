@@ -15,6 +15,8 @@ import LegendControl from './legend-control';
 import { getIndicatorXYZ, getLocationDetails } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
+import type { StatsData } from './stats-panel';
+import { mockData } from './mock-data';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -30,16 +32,17 @@ const basemaps = {
 const defaultBasemapKey = 'escuro';
 
 interface InteractiveMapProps {
-  onAreaSelect: (areaId: string | null) => void;
+  onAreaUpdate: (data: StatsData) => void;
 }
 
-export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<any>(null);
+  const [selectedArea, setSelectedArea] = useState<StatsData | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
@@ -93,18 +96,44 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
     if (!location || !type) {
       setSelectedShape(null);
+      setSelectedArea(null);
       return;
     }
     try {
       const details = await getLocationDetails(type, location.value);
-      if (details && details.geom) {
-        setSelectedShape(details.geom);
-        const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
-        mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
+      if (details) {
+        if(details.geom) {
+            setSelectedShape(details.geom);
+            const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
+            mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
+        }
+
+        const mockStats = mockData[Object.keys(mockData)[0]];
+
+        const newArea: StatsData = {
+          id: location.value,
+          name: details.municipios?.[0]?.nm_mun || details.ti?.[0]?.terrai_nom || details.uc?.[0]?.nome_uc1 || details.uf?.[0]?.nm_uf || location.label,
+          type: type,
+          generalInfo: {
+            state: details.uf?.[0] ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : 'Sem dados do Estado',
+            municipality: details.municipios?.[0]?.nm_mun || 'Sem dados de Municipio',
+            territoryName: details.ti?.[0]?.terrai_nom || 'Sem dados de TI',
+            conservationUnit: details.uc?.[0]?.nome_uc1 || 'Sem dados de UC',
+          },
+          // Placeholder data, as the API for this is not yet defined
+          stats: mockStats.stats,
+          environmentalServices: mockStats.environmentalServices,
+          correlationInsights: mockStats.correlationInsights,
+          species: mockStats.species,
+          futureClimate: mockStats.futureClimate,
+        };
+        onAreaUpdate(newArea);
+        setSelectedArea(newArea);
       }
     } catch (error) {
       console.error("Failed to fetch location details", error);
       setSelectedShape(null);
+      setSelectedArea(null);
     }
   };
 
@@ -188,7 +217,11 @@ export default function InteractiveMap({ onAreaSelect }: InteractiveMapProps) {
                 latitude={loc.lat}
                 onClick={(e) => {
                     e.originalEvent.stopPropagation();
-                    onAreaSelect(loc.id);
+                    const areaData = mockData[loc.id as keyof typeof mockData];
+                    if (areaData) {
+                        onAreaUpdate(areaData)
+                        setSelectedArea(areaData);
+                    };
                     setSelectedLocation(loc);
                 }}
                 style={{cursor: 'pointer'}}

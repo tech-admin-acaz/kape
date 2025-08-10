@@ -4,17 +4,18 @@
 import React from 'react';
 import InteractiveMap from './interactive-map';
 import ExpandButton from './expand-button';
+import type { StatsData } from './stats-panel';
 
 interface DashboardClientProps {
-    onAreaSelect: (areaId: string | null) => void;
+    onAreaUpdate: (data: StatsData) => void;
     isPanelCollapsed: boolean;
     onExpandClick: () => void;
 }
 
-export default function DashboardClient({ onAreaSelect, isPanelCollapsed, onExpandClick }: DashboardClientProps) {
+export default function DashboardClient({ onAreaUpdate, isPanelCollapsed, onExpandClick }: DashboardClientProps) {
   return (
     <div className="h-full w-full relative">
-      <InteractiveMap onAreaSelect={onAreaSelect} />
+      <InteractiveMap onAreaUpdate={onAreaUpdate} />
       {isPanelCollapsed && (
         <div className="absolute top-4 right-4 z-20">
             <ExpandButton onClick={onExpandClick} />
