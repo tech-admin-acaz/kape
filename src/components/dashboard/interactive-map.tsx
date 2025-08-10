@@ -18,7 +18,6 @@ import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
-import { DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -197,6 +196,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     }
   }
 
+  const handleLegendClose = (layerId: keyof LayerState) => {
+    setLayers(prev => ({...prev, [layerId]: false}));
+  }
+
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
   const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
@@ -207,6 +210,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
       </Source>
     );
   };
+  const activeLayers = Object.entries(layers).filter(([, value]) => value).map(([key]) => key as keyof LayerState);
+
 
   return (
     <div className="relative w-full h-full">
@@ -214,11 +219,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             <SearchControl onLocationSelect={handleLocationSelect} />
         </div>
         
-        {layers.indicator && (
-            <div className="absolute bottom-4 left-4 z-10">
-                <LegendControl />
-            </div>
-        )}
+        <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2">
+            {activeLayers.map((layerId) => (
+                <LegendControl 
+                    key={layerId}
+                    layerId={layerId}
+                    onClose={() => handleLegendClose(layerId)}
+                />
+            ))}
+        </div>
 
         <Map
             ref={mapRef}
@@ -364,3 +373,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    
