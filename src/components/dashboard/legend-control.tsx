@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export default function LegendControl() {
     return (
-        <Card className="bg-background/80 backdrop-blur-sm w-56">
+        <Card className="bg-background/80 backdrop-blur-sm w-56 shadow-md">
             <CardContent className="p-3">
                 <p className="text-sm font-medium">
                     Legenda: <span className="font-bold text-primary">Indicador</span>
