@@ -17,6 +17,7 @@ import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
 import { mockData } from './mock-data';
+import MapSettingsControl from './map-settings-control';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -53,6 +54,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     restorationCost: false,
     mapbiomas: false,
   });
+
+  const [indicatorOpacity, setIndicatorOpacity] = useState(1);
+  const [fillOpacity, setFillOpacity] = useState(0.2);
+  const [strokeOpacity, setStrokeOpacity] = useState(1);
 
    useEffect(() => {
         async function fetchIndicatorLayer() {
@@ -138,9 +143,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           futureClimate: baseMockData.futureClimate,
         };
         onAreaUpdate(newArea);
-      } else {
-        setSelectedShape(null);
-        onAreaUpdate(null);
       }
     } catch (error) {
       console.error("[InteractiveMap] Failed to fetch location details", error);
@@ -220,7 +222,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                     <Layer 
                       id={'indicator'}
                       type={'raster'}
-                      paint={{'raster-opacity': 1}}
+                      paint={{'raster-opacity': indicatorOpacity}}
                     />
                 </Source>
             )}
@@ -232,7 +234,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                   type="fill"
                   paint={{
                     'fill-color': '#007bff',
-                    'fill-opacity': 0.2
+                    'fill-opacity': fillOpacity,
                   }}
                 />
                 <Layer
@@ -240,7 +242,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                   type="line"
                   paint={{
                     'line-color': '#FFFFFF',
-                    'line-width': 1.5
+                    'line-width': 1.5,
+                    'line-opacity': strokeOpacity,
                   }}
                 />
               </Source>
@@ -277,6 +280,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             )}
         </Map>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
+            <MapSettingsControl 
+              indicatorOpacity={indicatorOpacity}
+              onIndicatorOpacityChange={setIndicatorOpacity}
+              fillOpacity={fillOpacity}
+              onFillOpacityChange={setFillOpacity}
+              strokeOpacity={strokeOpacity}
+              onStrokeOpacityChange={setStrokeOpacity}
+            />
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -327,3 +338,4 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     
 
     
+
