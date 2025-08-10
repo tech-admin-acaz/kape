@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Location, TerritoryTypeKey } from "@/components/dashboard/mock-locations";
+import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
 /**
  * Fetches the XYZ tile URL for the indicator layer.

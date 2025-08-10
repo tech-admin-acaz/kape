@@ -22,7 +22,7 @@ import {
 import { Card } from "../ui/card"
 import { Separator } from "../ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { territoryTypes, Location, TerritoryTypeKey } from "./mock-locations"
+import { territoryTypes, type Location, type TerritoryTypeKey } from "@/models/location.model"
 import { getLocationsByType } from "@/services/map.service"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 

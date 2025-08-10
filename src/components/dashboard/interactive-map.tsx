@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
 import { getIndicatorXYZ, getLocationDetails } from '@/services/map.service';
-import type { Location, TerritoryTypeKey } from "./mock-locations";
+import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 
 const locations = [
