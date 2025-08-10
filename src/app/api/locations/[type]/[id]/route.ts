@@ -25,12 +25,19 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados';
+    } else if (type === 'municipio') {
+        fetchType = 'municipios';
+    }
+
     try {
-        const response = await fetch(`${API_BIO_URL}/${type}/${id}`);
+        const response = await fetch(`${API_BIO_URL}/${fetchType}/${id}`);
         
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error fetching ${type}/${id} from external API:`, response.status, errorText);
+            console.error(`Error fetching ${fetchType}/${id} from external API:`, response.status, errorText);
             return NextResponse.json({ error: `Failed to fetch location data from source` }, { status: response.status });
         }
         
@@ -38,7 +45,7 @@ export async function GET(
         return NextResponse.json(data);
 
     } catch (error) {
-        console.error(`Error fetching ${type}/${id} data:`, error);
+        console.error(`Error fetching ${fetchType}/${id} data:`, error);
         return NextResponse.json({ error: `Failed to fetch location data` }, { status: 500 });
     }
 }
