@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -153,7 +152,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                         <CommandItem
                             key={location.value}
                             value={location.value}
-                            onSelect={handleLocationSelected}
+                            onSelect={() => handleLocationSelected(location.value)}
                         >
                             <Check
                             className={cn(
