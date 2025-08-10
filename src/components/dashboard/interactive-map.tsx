@@ -181,7 +181,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 maxzoom={14}
             />
 
-            {layers.indicator && indicatorXYZ && (
+            {indicatorXYZ && layers.indicator && (
                 <Source
                     id="indicator-source"
                     type="raster"
