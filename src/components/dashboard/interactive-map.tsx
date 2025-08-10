@@ -94,6 +94,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   }
 
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
+    console.log("[InteractiveMap] Received location:", location, "and type:", type);
     if (!location || !type) {
       setSelectedShape(null);
       onAreaUpdate(null);
@@ -109,6 +110,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     }
     try {
       const details = await getLocationDetails(type, location.value);
+      console.log("[InteractiveMap] Fetched location details:", details);
       if (details) {
         if(details.geom) {
             setSelectedShape(details.geom);
@@ -138,7 +140,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         onAreaUpdate(newArea);
       }
     } catch (error) {
-      console.error("Failed to fetch location details", error);
+      console.error("[InteractiveMap] Failed to fetch location details", error);
       setSelectedShape(null);
       onAreaUpdate(null);
     }
