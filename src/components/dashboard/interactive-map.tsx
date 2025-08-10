@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike } from 'react-map-gl';
+import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike, MapLayerMouseEvent } from 'react-map-gl';
 import { MapPin, Plus, Minus, Navigation, Box, Layers2 } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
@@ -146,6 +146,30 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     }
   };
 
+  const handleMapClick = async (event: MapLayerMouseEvent) => {
+    const { lng, lat } = event.lngLat;
+    console.log(`[InteractiveMap] Map clicked at: ${lng}, ${lat}`);
+    
+    // Don't do anything if a marker was clicked
+    if (event.originalEvent.target.closest('.mapboxgl-marker')) {
+        return;
+    }
+
+    try {
+        const clickedLocation = await getLocationByCoords(lat, lng);
+        if (clickedLocation && clickedLocation.id) {
+            console.log("[InteractiveMap] Found location by coords:", clickedLocation);
+            // We found a municipality, now we can use handleLocationSelect to load it
+            const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
+            handleLocationSelect(location, 'municipio');
+        } else {
+             console.log("[InteractiveMap] No location found for the clicked coordinates.");
+        }
+    } catch(error) {
+        console.error("[InteractiveMap] Failed to get location by coords", error);
+    }
+  }
+
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
   return (
@@ -174,6 +198,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             attributionControl={false}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
+            onClick={handleMapClick}
+            cursor="pointer"
         >
             <Source
                 id="mapbox-dem"

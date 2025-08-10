@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
@@ -44,6 +45,19 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
         const errorText = await response.text();
         console.error(`Error fetching location details for ${type}/${id}:`, response.status, errorText);
         throw new Error(`Failed to fetch location details for ${type}/${id}`);
+    }
+    return await response.json();
+}
+
+/**
+ * Fetches a location based on geographic coordinates.
+ */
+export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
+    const response = await fetch(`/api/locations/by-coords?lat=${lat}&lng=${lng}`);
+     if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error fetching location by coords:`, response.status, errorText);
+        throw new Error(`Failed to fetch location by coords`);
     }
     return await response.json();
 }
