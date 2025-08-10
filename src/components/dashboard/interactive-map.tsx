@@ -138,6 +138,9 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           futureClimate: baseMockData.futureClimate,
         };
         onAreaUpdate(newArea);
+      } else {
+        setSelectedShape(null);
+        onAreaUpdate(null);
       }
     } catch (error) {
       console.error("[InteractiveMap] Failed to fetch location details", error);
