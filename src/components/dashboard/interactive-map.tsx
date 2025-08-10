@@ -18,6 +18,7 @@ import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
+import { DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -315,11 +316,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon" className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}>
-                                <Box className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            onClick={toggle3D}
+                            className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}
+                        >
+                            <Box className="h-4 w-4" />
+                        </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
                 </Tooltip>
