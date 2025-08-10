@@ -37,12 +37,19 @@ interface InteractiveMapProps {
   selectedArea: StatsData | null;
 }
 
+interface PopupInfo {
+    lng: number;
+    lat: number;
+    message: string;
+}
+
 export default function InteractiveMap({ onAreaUpdate, selectedArea }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
   const [selectedShape, setSelectedShape] = useState<any>(null);
+  const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   // Layer XYZ URLs
@@ -126,6 +133,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   }
 
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
+    setPopupInfo(null); // Close any info popup when a location is selected
     if (!location || !type) {
       setSelectedShape(null);
       onAreaUpdate(null);
@@ -189,10 +197,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
             handleLocationSelect(location, 'municipio');
         } else {
-             console.log("[InteractiveMap] No location found for the clicked coordinates.");
+             setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
         }
     } catch(error) {
         console.error("[InteractiveMap] Failed to get location by coords", error);
+        setPopupInfo({ lng, lat, message: "Erro ao buscar dados do local. Tente novamente." });
     }
   }
 
@@ -312,6 +321,18 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 <div className="text-sm font-semibold">{selectedLocation.name}</div>
                 </Popup>
             )}
+
+            {popupInfo && (
+                <Popup
+                    longitude={popupInfo.lng}
+                    latitude={popupInfo.lat}
+                    onClose={() => setPopupInfo(null)}
+                    closeOnClick={false}
+                    anchor="bottom"
+                >
+                    <p>{popupInfo.message}</p>
+                </Popup>
+            )}
         </Map>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
             <MapSettingsControl 
@@ -325,7 +346,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button 
+                         <Button 
                             variant="outline" 
                             size="icon" 
                             onClick={toggle3D}
