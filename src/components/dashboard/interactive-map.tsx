@@ -104,8 +104,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
       setSelectedShape(null);
       onAreaUpdate(null);
       mapRef.current?.flyTo({
-          center: [-51.9253, -14.235],
-          zoom: 3.5,
+          center: [-56, -6],
+          zoom: 4,
           pitch: 0,
           bearing: 0,
           duration: 1000
@@ -191,9 +191,9 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             ref={mapRef}
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
             initialViewState={{
-                longitude: -51.9253,
-                latitude: -14.235,
-                zoom: 3.5,
+                longitude: -56,
+                latitude: -6,
+                zoom: 4,
                 pitch: 0,
             }}
             style={{width: '100%', height: '100%'}}
@@ -334,8 +334,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-    
-
-    
-

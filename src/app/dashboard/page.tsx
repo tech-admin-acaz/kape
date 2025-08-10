@@ -10,7 +10,7 @@ import type { StatsData } from '@/components/dashboard/stats-panel';
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
-    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
 
@@ -31,8 +31,15 @@ export default function DashboardPage() {
                 ref={panelGroupRef}
                 direction="horizontal" 
                 className="flex-1"
+                onLayout={(sizes) => {
+                    if (sizes[1] > 0) {
+                        setIsCollapsed(false);
+                    } else {
+                        setIsCollapsed(true);
+                    }
+                }}
             >
-                <ResizablePanel defaultSize={70}>
+                <ResizablePanel defaultSize={100}>
                     <DashboardClient 
                         onAreaUpdate={setSelectedArea} 
                         isPanelCollapsed={isCollapsed}
@@ -43,7 +50,7 @@ export default function DashboardPage() {
                 <ResizableHandle withHandle />
                 <ResizablePanel 
                     id="stats-panel"
-                    defaultSize={30} 
+                    defaultSize={0} 
                     minSize={15} 
                     collapsible={true}
                     collapsedSize={0}
