@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -33,7 +34,7 @@ const InfoTooltip = ({ text }: { text: string }) => (
     <TooltipProvider>
         <Tooltip>
             <TooltipTrigger asChild>
-                <span className="text-muted-foreground ml-1.5" onClick={(e) => e.stopPropagation()}>
+                <span className="text-muted-foreground ml-1.5" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                     <Info className="h-3.5 w-3.5" />
                 </span>
             </TooltipTrigger>
@@ -191,3 +192,5 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
     </Card>
   )
 }
+
+    

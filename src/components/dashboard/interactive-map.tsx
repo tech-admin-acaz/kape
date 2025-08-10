@@ -200,14 +200,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
-                <Layer
-                  id="selected-shape-layer-fill"
-                  type="fill"
-                  paint={{
-                    'fill-color': 'hsl(var(--primary))',
-                    'fill-opacity': 0
-                  }}
-                />
                  <Layer
                   id="selected-shape-layer-line"
                   type="line"
@@ -296,3 +288,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    
