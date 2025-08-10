@@ -98,7 +98,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     if (!location || !type) {
       setSelectedShape(null);
       onAreaUpdate(null);
-      // Reset view to default
       mapRef.current?.flyTo({
           center: [-51.9253, -14.235],
           zoom: 3.5,
@@ -114,10 +113,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
       
       if (details && details.geom) {
         setSelectedShape(details.geom);
-        const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
-        mapRef.current?.fitBounds(bbox, { padding: 40, duration: 1000 });
+        
+        if (mapRef.current) {
+            const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
+            mapRef.current.fitBounds(bbox, { padding: 40, duration: 1000 });
+        }
 
-        // Use a default mock data as a base, as API for stats is not yet defined
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         const newArea: StatsData = {
@@ -149,7 +150,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     const { lng, lat } = event.lngLat;
     console.log(`[InteractiveMap] Map clicked at: ${lng}, ${lat}`);
     
-    // Don't do anything if a marker was clicked
     if (event.originalEvent.target.closest('.mapboxgl-marker')) {
         return;
     }
@@ -158,7 +158,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const clickedLocation = await getLocationByCoords(lat, lng);
         if (clickedLocation && clickedLocation.id) {
             console.log("[InteractiveMap] Found location by coords:", clickedLocation);
-            // We found a municipality, now we can use handleLocationSelect to load it
             const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
             handleLocationSelect(location, 'municipio');
         } else {
@@ -321,5 +320,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    
 
     
