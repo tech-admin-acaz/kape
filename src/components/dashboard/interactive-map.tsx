@@ -18,6 +18,7 @@ import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
+import { Separator } from '../ui/separator';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -71,7 +72,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   });
 
   const [indicatorOpacity, setIndicatorOpacity] = useState(1);
-  const [fillOpacity, setFillOpacity] = useState(0.2);
+  const [fillOpacity, setFillOpacity] = useState(0);
   const [strokeOpacity, setStrokeOpacity] = useState(1);
 
    useEffect(() => {
@@ -347,7 +348,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
               strokeOpacity={strokeOpacity}
               onStrokeOpacityChange={setStrokeOpacity}
             />
-             <TooltipProvider>
+            
+            <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
                          <Button 
@@ -366,27 +368,29 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             <LayerControl layers={layers} setLayers={setLayers} />
             <BasemapControl onStyleChange={handleStyleChange} basemaps={basemaps} currentStyleKey={currentStyleKey} />
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col bg-background/80 border border-border rounded-md shadow-md overflow-hidden">
                  <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                        <Button variant="ghost" size="icon" onClick={handleZoomIn} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
                             <Plus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
                         <TooltipContent side="left"><p>Zoom In</p></TooltipContent>
                     </Tooltip>
+                    <Separator />
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                        <Button variant="ghost" size="icon" onClick={handleZoomOut} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
                             <Minus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
                         <TooltipContent side="left"><p>Zoom Out</p></TooltipContent>
                     </Tooltip>
+                    <Separator />
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={handleResetBearing} className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                        <Button variant="ghost" size="icon" onClick={handleResetBearing} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
                             <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
                         </Button>
                         </TooltipTrigger>
@@ -399,3 +403,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   );
 }
 
+
+
+    
