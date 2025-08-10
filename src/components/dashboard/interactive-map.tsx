@@ -227,6 +227,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
                  <Layer
+                  id="selected-shape-layer-fill"
+                  type="fill"
+                  paint={{
+                    'fill-color': '#007bff',
+                    'fill-opacity': 0.2
+                  }}
+                />
+                <Layer
                   id="selected-shape-layer-line"
                   type="line"
                   paint={{
