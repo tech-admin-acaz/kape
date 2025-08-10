@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -29,10 +30,13 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
 );
 
 const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined }) => {
+    if (!value || value.toLowerCase().includes('sem dados') || value.toLowerCase().includes('undefined')) {
+        return null;
+    }
     return (
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">{label}:</span>
-          <span className="font-medium text-right">{value || 'Não definido'}</span>
+          <span className="font-medium text-right">{value}</span>
         </div>
     )
 };

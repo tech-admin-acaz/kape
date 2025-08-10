@@ -20,7 +20,6 @@ import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
-import { DropdownMenu, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -163,23 +162,23 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         // V1 Logic for metadata processing
-        let state = 'Não definido';
+        let state = 'Sem dados do Estado';
         if (details.uf && details.uf.length > 0) {
             const ufData = details.uf[0];
             state = `${ufData.nm_uf} (${ufData.sigla_uf})`;
         }
 
-        let municipality = 'Não definido';
+        let municipality = 'Sem dados de Municipio';
         if (details.municipios && details.municipios.length > 0) {
             municipality = details.municipios[0].nm_mun;
         }
 
-        let territoryName = 'Não aplicável';
+        let territoryName = 'Sem dados de TI';
         if (details.ti && details.ti.length > 0) {
             territoryName = details.ti[0].terrai_nom;
         }
 
-        let conservationUnit = 'Não aplicável';
+        let conservationUnit = 'Sem dados de UC';
         if (details.uc && details.uc.length > 0) {
             conservationUnit = details.uc[0].nome_uc1;
         }
@@ -188,7 +187,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         const newArea: StatsData = {
           id: location.value,
-          name: details.municipios?.[0]?.nm_mun || details.ti?.[0]?.terrai_nom || details.uc?.[0]?.nome_uc1 || details.uf?.[0]?.nm_uf || location.label,
+          name: details.name || location.label,
           type: typeLabel,
           generalInfo: {
             state,
@@ -428,11 +427,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-
-
-    
-
-    
-
-    
