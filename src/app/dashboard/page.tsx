@@ -17,14 +17,24 @@ export default function DashboardPage() {
     React.useEffect(() => {
         setIsClient(true);
     }, []);
-    
-    const expandPanel = () => {
-        if (panelGroupRef.current) {
-            panelGroupRef.current.setLayout([70, 30]);
-            setIsCollapsed(false);
-        }
-    };
 
+    const expandPanel = React.useCallback(() => {
+        if (panelGroupRef.current) {
+            // Check if it's already expanding or expanded to avoid unnecessary calls
+            const layout = panelGroupRef.current.getLayout();
+            if (layout[1] < 15) {
+                panelGroupRef.current.setLayout([70, 30]);
+                setIsCollapsed(false);
+            }
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (selectedArea) {
+            expandPanel();
+        }
+    }, [selectedArea, expandPanel]);
+    
     return (
         <div className="flex-1 flex">
             <ResizablePanelGroup 
@@ -32,14 +42,14 @@ export default function DashboardPage() {
                 direction="horizontal" 
                 className="flex-1"
                 onLayout={(sizes) => {
-                    if (sizes[1] > 0) {
+                    if (sizes[1] > 5) {
                         setIsCollapsed(false);
                     } else {
                         setIsCollapsed(true);
                     }
                 }}
             >
-                <ResizablePanel defaultSize={100}>
+                <ResizablePanel defaultSize={100} minSize={30}>
                     <DashboardClient 
                         onAreaUpdate={setSelectedArea} 
                         isPanelCollapsed={isCollapsed}
@@ -51,10 +61,15 @@ export default function DashboardPage() {
                 <ResizablePanel 
                     id="stats-panel"
                     defaultSize={0} 
-                    minSize={15} 
+                    minSize={25}
+                    maxSize={50}
                     collapsible={true}
                     collapsedSize={0}
-                    onCollapse={() => setIsCollapsed(true)}
+                    onCollapse={() => {
+                        setIsCollapsed(true);
+                        // When collapsing, also clear the selection
+                        setSelectedArea(null);
+                    }}
                     onExpand={() => setIsCollapsed(false)}
                 >
                     {isClient && isCollapsed ? null : <StatsPanel data={selectedArea} />}
