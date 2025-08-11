@@ -83,9 +83,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
   };
 
   const handleLocationSelected = (currentValue: string) => {
-      console.log("[SearchControl] Location selected with value:", currentValue);
-      const location = availableLocations.find(l => l.value === currentValue) || null;
-      console.log("[SearchControl] Found location object:", location);
+      const location = availableLocations.find(l => l.label.toLowerCase() === currentValue.toLowerCase()) || null;
       setSelectedLocation(location);
       onLocationSelect(location, selectedType);
       setPopoverOpen(false);
@@ -154,7 +152,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                         {availableLocations.map((location) => (
                         <CommandItem
                             key={location.value}
-                            value={location.value}
+                            value={location.label}
                             onSelect={handleLocationSelected}
                         >
                             <Check
@@ -192,5 +190,3 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
     </Card>
   )
 }
-
-    
