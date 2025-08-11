@@ -456,3 +456,4 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   );
 }
 
+
