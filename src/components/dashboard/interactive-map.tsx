@@ -151,7 +151,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     try {
       const [details, landCoverStats] = await Promise.all([
         getLocationDetails(type, location.value),
-        getLandCoverStats(type, location.value),
+        // getLandCoverStats(type, location.value),
       ]);
       
       if (details && details.geom) {
@@ -165,16 +165,16 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         let landCoverData = baseMockData.stats.landCover;
-        if (landCoverStats) {
-             landCoverData = [
-                { name: 'Formação Florestal Primária', y: parseFloat(landCoverStats['Floresta Primaria'] || 0), color: '#1f8d49' },
-                { name: 'Vegetação Secundária', y: parseFloat(landCoverStats['Vegetação Secundária'] || 0), color: '#7a5900' },
-                { name: 'Outras Formações Naturais', y: parseFloat(landCoverStats['Outras Formações Naturais'] || 0), color: '#007785' },
-                { name: 'Pastagem', y: parseFloat(landCoverStats['Pastagem'] || 0), color: '#edde8e' },
-                { name: 'Agricultura', y: parseFloat(landCoverStats['Agricultura'] || 0), color: '#E974ED' },
-                { name: 'Outros', y: parseFloat(landCoverStats['Outras'] || 0), color: '#fc8114' },
-            ].filter(item => item.y > 0);
-        }
+        // if (landCoverStats) {
+        //      landCoverData = [
+        //         { name: 'Formação Florestal Primária', y: parseFloat(landCoverStats['Floresta Primaria'] || 0), color: '#1f8d49' },
+        //         { name: 'Vegetação Secundária', y: parseFloat(landCoverStats['Vegetação Secundária'] || 0), color: '#7a5900' },
+        //         { name: 'Outras Formações Naturais', y: parseFloat(landCoverStats['Outras Formações Naturais'] || 0), color: '#007785' },
+        //         { name: 'Pastagem', y: parseFloat(landCoverStats['Pastagem'] || 0), color: '#edde8e' },
+        //         { name: 'Agricultura', y: parseFloat(landCoverStats['Agricultura'] || 0), color: '#E974ED' },
+        //         { name: 'Outros', y: parseFloat(landCoverStats['Outras'] || 0), color: '#fc8114' },
+        //     ].filter(item => item.y > 0);
+        // }
 
         let state = 'Não definido';
         if (details.uf && details.uf.length > 0) {
@@ -455,5 +455,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
 
 
