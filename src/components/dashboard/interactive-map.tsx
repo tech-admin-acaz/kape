@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLandCoverStats } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
@@ -149,7 +149,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
       return;
     }
     try {
-      const details = await getLocationDetails(type, location.value);
+      const [details, landCoverStats] = await Promise.all([
+        getLocationDetails(type, location.value),
+        getLandCoverStats(type, location.value),
+      ]);
       
       if (details && details.geom) {
         setSelectedShape(details.geom);
@@ -161,33 +164,54 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
-        // V1 Logic for metadata processing
-        let state = 'Sem dados do Estado';
+        let landCoverData = baseMockData.stats.landCover;
+        if (landCoverStats) {
+             landCoverData = [
+                { name: 'Formação Florestal Primária', y: parseFloat(landCoverStats['Floresta Primaria'] || 0), color: '#1f8d49' },
+                { name: 'Vegetação Secundária', y: parseFloat(landCoverStats['Vegetação Secundária'] || 0), color: '#7a5900' },
+                { name: 'Outras Formações Naturais', y: parseFloat(landCoverStats['Outras Formações Naturais'] || 0), color: '#007785' },
+                { name: 'Pastagem', y: parseFloat(landCoverStats['Pastagem'] || 0), color: '#edde8e' },
+                { name: 'Agricultura', y: parseFloat(landCoverStats['Agricultura'] || 0), color: '#E974ED' },
+                { name: 'Outros', y: parseFloat(landCoverStats['Outras'] || 0), color: '#fc8114' },
+            ].filter(item => item.y > 0);
+        }
+
+        let state = 'Não definido';
         if (details.uf && details.uf.length > 0) {
             const ufData = details.uf[0];
             state = `${ufData.nm_uf} (${ufData.sigla_uf})`;
         }
 
-        let municipality = 'Sem dados de Municipio';
-        if (details.municipios && details.municipios.length > 0) {
-            municipality = details.municipios[0].nm_mun;
+        let municipality = 'Não aplicável';
+        if (type === 'municipio') {
+            municipality = details.name || location.label;
+        } else if (details.municipios && details.municipios.length > 0) {
+            municipality = details.municipios.map((m: any) => m.nm_mun).join(', ');
         }
 
-        let territoryName = 'Sem dados de TI';
-        if (details.ti && details.ti.length > 0) {
-            territoryName = details.ti[0].terrai_nom;
+        let territoryName = 'Não aplicável';
+        if (type === 'ti') {
+            territoryName = details.name || location.label;
+        } else if (details.ti && details.ti.length > 0) {
+            territoryName = details.ti.map((t: any) => t.terrai_nom).join(', ');
         }
 
-        let conservationUnit = 'Sem dados de UC';
-        if (details.uc && details.uc.length > 0) {
-            conservationUnit = details.uc[0].nome_uc1;
+        let conservationUnit = 'Não aplicável';
+        if (type === 'uc') {
+            conservationUnit = details.name || location.label;
+        } else if (details.uc && details.uc.length > 0) {
+            conservationUnit = details.uc.map((u: any) => u.nome_uc1).join(', ');
         }
         
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
+        let areaName = location.label;
+        if(type === 'municipio' && details.name) areaName = `${details.name} - ${state.split(' ')[1].replace(/[\(\)]/g, '')}`;
+        if(type === 'estado' && details.name) areaName = details.name;
+
 
         const newArea: StatsData = {
           id: location.value,
-          name: details.name || location.label,
+          name: areaName,
           type: typeLabel,
           generalInfo: {
             state,
@@ -195,12 +219,16 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             territoryName,
             conservationUnit,
           },
-          stats: baseMockData.stats,
+          stats: {
+            ...baseMockData.stats,
+            landCover: landCoverData,
+          },
           environmentalServices: baseMockData.environmentalServices,
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: baseMockData.futureClimate,
         };
+        console.log("Area data being passed to panel:", newArea);
         onAreaUpdate(newArea);
       }
     } catch (error) {
@@ -427,3 +455,4 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
