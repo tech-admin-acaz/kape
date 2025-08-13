@@ -269,14 +269,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
-  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
-    if (!xyzUrl) return null;
+  const renderRasterLayer = (id: string, xyzUrl: string, opacity: number) => {
     return (
       <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
-        <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
+        <Layer id={id} type="raster" paint={{ 'raster-opacity': opacity }} />
       </Source>
     );
   };
+  
   const activeLayers = Object.entries(layers).filter(([, value]) => value).map(([key]) => key as keyof LayerState);
 
 
@@ -456,6 +456,4 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   );
 }
 
-
-
-
+    
