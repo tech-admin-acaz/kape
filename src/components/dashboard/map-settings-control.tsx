@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Image as ImageIcon, Minus, Square } from "lucide-react"
+import { Settings, Image as ImageIcon, Minus, Square, Mountain } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,21 +17,27 @@ import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 interface MapSettingsControlProps {
+  is3D: boolean;
   indicatorOpacity: number;
   onIndicatorOpacityChange: (value: number) => void;
   fillOpacity: number;
   onFillOpacityChange: (value: number) => void;
   strokeOpacity: number;
   onStrokeOpacityChange: (value: number) => void;
+  terrainExaggeration: number;
+  onTerrainExaggerationChange: (value: number) => void;
 }
 
 export default function MapSettingsControl({
+  is3D,
   indicatorOpacity,
   onIndicatorOpacityChange,
   fillOpacity,
   onFillOpacityChange,
   strokeOpacity,
   onStrokeOpacityChange,
+  terrainExaggeration,
+  onTerrainExaggerationChange,
 }: MapSettingsControlProps) {
 
   return (
@@ -52,8 +58,10 @@ export default function MapSettingsControl({
         </TooltipProvider>
 
       <DropdownMenuContent align="end" className="w-64 p-4 space-y-6">
-        <DropdownMenuLabel>Opacidade da Camada</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <div>
+          <DropdownMenuLabel>Opacidade da Camada</DropdownMenuLabel>
+          <DropdownMenuSeparator className="-mx-4 w-auto" />
+        </div>
 
         <div className="space-y-4">
           <div className="grid gap-2">
@@ -98,6 +106,30 @@ export default function MapSettingsControl({
             />
           </div>
         </div>
+
+        {is3D && (
+          <>
+            <div>
+              <DropdownMenuLabel>Opções de relevo</DropdownMenuLabel>
+              <DropdownMenuSeparator className="-mx-4 w-auto" />
+            </div>
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="terrain-exaggeration" className="flex items-center gap-2 text-sm">
+                  <Mountain className="w-4 h-4 text-primary"/> Exagero do Terreno
+                </Label>
+                <Slider
+                  id="terrain-exaggeration"
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  value={[terrainExaggeration]}
+                  onValueChange={(value) => onTerrainExaggerationChange(value[0])}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

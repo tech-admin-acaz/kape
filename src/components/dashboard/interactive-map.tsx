@@ -76,6 +76,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   const [indicatorOpacity, setIndicatorOpacity] = useState(1);
   const [fillOpacity, setFillOpacity] = useState(0);
   const [strokeOpacity, setStrokeOpacity] = useState(1);
+  const [terrainExaggeration, setTerrainExaggeration] = useState(1.5);
 
    useEffect(() => {
         async function fetchAllLayers() {
@@ -95,12 +96,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                     getRestorationCostXYZ(),
                     getMapbiomasXYZ(),
                 ]);
-                setIndicatorXYZ(indicator);
-                setRestoredCarbonXYZ(restoredCarbon);
-                setCurrentCarbonXYZ(currentCarbon);
-                setOpportunityCostXYZ(opportunityCost);
-                setRestorationCostXYZ(restorationCost);
-                setMapbiomasXYZ(mapbiomas);
+                if(indicator) setIndicatorXYZ(indicator);
+                if(restoredCarbon) setRestoredCarbonXYZ(restoredCarbon);
+                if(currentCarbon) setCurrentCarbonXYZ(currentCarbon);
+                if(opportunityCost) setOpportunityCostXYZ(opportunityCost);
+                if(restorationCost) setRestorationCostXYZ(restorationCost);
+                if(mapbiomas) setMapbiomasXYZ(mapbiomas);
             } catch (error) {
                 console.error('Failed to fetch one or more layers:', error);
             }
@@ -259,8 +260,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
-  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
-    if (!xyzUrl) return null;
+  const renderRasterLayer = (id: string, xyzUrl: string, opacity: number) => {
     return (
       <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
         <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
@@ -300,7 +300,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             mapStyle={mapStyle}
             projection={{name: projection}}
             attributionControl={false}
-            terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
+            terrain={is3D ? {source: 'mapbox-dem', exaggeration: terrainExaggeration} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
             onClick={handleMapClick}
             cursor="pointer"
@@ -387,12 +387,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         </Map>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
             <MapSettingsControl 
+              is3D={is3D}
               indicatorOpacity={indicatorOpacity}
               onIndicatorOpacityChange={setIndicatorOpacity}
               fillOpacity={fillOpacity}
               onFillOpacityChange={setFillOpacity}
               strokeOpacity={strokeOpacity}
               onStrokeOpacityChange={setStrokeOpacity}
+              terrainExaggeration={terrainExaggeration}
+              onTerrainExaggerationChange={setTerrainExaggeration}
             />
             
             <TooltipProvider>
