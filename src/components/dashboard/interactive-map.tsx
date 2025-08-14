@@ -196,8 +196,13 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
         let areaName = location.label;
-        if(type === 'municipio' && details.name) areaName = `${details.name} - ${state.split(' ')[1].replace(/[\(\)]/g, '')}`;
-        if(type === 'estado' && details.name) areaName = details.name;
+
+        if (type === 'municipio' && details.name) {
+            const stateAbbreviation = state.match(/\(([^)]+)\)/)?.[1];
+            areaName = stateAbbreviation ? `${details.name} - ${stateAbbreviation}` : details.name;
+        } else if(type === 'estado' && details.name) {
+            areaName = details.name;
+        }
 
 
         const newArea: StatsData = {
@@ -260,7 +265,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
-  const renderRasterLayer = (id: string, xyzUrl: string, opacity: number) => {
+  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
+    if (!xyzUrl) return null;
     return (
       <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
         <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
@@ -469,3 +475,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    
