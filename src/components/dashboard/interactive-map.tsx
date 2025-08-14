@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike, MapLayerMouseEvent } from 'react-map-gl';
-import { MapPin, Plus, Minus, Navigation, Box, Layers2 } from 'lucide-react';
+import { MapPin, Plus, Minus, Navigation, Box, Layers2, Globe, Map as MapIconLucide } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
 import { Button } from '@/components/ui/button';
@@ -52,6 +52,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   const [bearing, setBearing] = useState(0);
   const [selectedShape, setSelectedShape] = useState<any>(null);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
+  const [projection, setProjection] = useState<'mercator' | 'globe'>('mercator');
   const mapRef = useRef<MapRef>(null);
 
   // Layer XYZ URLs
@@ -133,6 +134,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
   const toggle3D = () => {
     setIs3D(prevIs3D => !prevIs3D);
   }
+
+  const toggleProjection = () => {
+    setProjection(current => current === 'mercator' ? 'globe' : 'mercator');
+  };
 
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
     setPopupInfo(null); // Close any info popup when a location is selected
@@ -269,10 +274,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
-  const renderRasterLayer = (id: string, xyzUrl: string, opacity: number) => {
+  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
+    if (!xyzUrl) return null;
     return (
       <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
-        <Layer id={id} type="raster" paint={{ 'raster-opacity': opacity }} />
+        <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
       </Source>
     );
   };
@@ -307,6 +313,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             }}
             style={{width: '100%', height: '100%'}}
             mapStyle={mapStyle}
+            projection={{name: projection}}
             attributionControl={false}
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: 1.5} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
@@ -321,12 +328,13 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 maxzoom={14}
             />
 
-            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
-            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
-            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
-            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
-            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
-            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
+            {layers.indicator && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
+            {layers.restoredCarbon && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
+            {layers.currentCarbon && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
+            {layers.opportunityCost && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
+            {layers.restorationCost && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
+            {layers.mapbiomas && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
+
 
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
@@ -415,6 +423,24 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left"><p>Toggle 3D View</p></TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button 
+                            variant="outline" 
+                            size="icon" 
+                            onClick={toggleProjection}
+                            className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", projection === 'globe' && "bg-accent text-accent-foreground")}
+                        >
+                            {projection === 'mercator' ? <Globe className="h-5 w-5" /> : <MapIconLucide className="h-5 w-5" />}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        <p>{projection === 'mercator' ? 'Mudar para projeção de Globo' : 'Mudar para projeção de Mercator'}</p>
+                    </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
 
