@@ -107,7 +107,7 @@ export default function FutureClimateChart({
             }
         },
         {
-            name: `${seriesName} Trend`,
+            name: 'Tendência',
             type: 'spline',
             data: data.map(d => d.trend),
             color: 'hsl(var(--destructive))',
