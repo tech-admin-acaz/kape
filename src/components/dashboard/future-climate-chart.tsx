@@ -52,7 +52,8 @@ export default function FutureClimateChart({
             align: 'left',
             style: {
                 color: 'hsl(var(--foreground))',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                fontSize: '14px'
             }
         },
         credits: {
