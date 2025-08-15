@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -83,11 +82,11 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
                 <CardContent className="pt-6">
                     <FutureClimateChart
                         title="Tendência de Temperatura da Superfície"
-                        yAxisTitle="Temperatura Média"
+                        yAxisTitle="Temperatura (°C)"
                         seriesName="Temperatura"
                         seriesType="spline"
                         color="hsl(var(--destructive))"
-                        unit="°C"
+                        unit="°"
                         data={futureClimate.temperature} 
                     />
                 </CardContent>

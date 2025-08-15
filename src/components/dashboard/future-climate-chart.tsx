@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useRef, useEffect } from 'react';
@@ -72,7 +71,7 @@ export default function FutureClimateChart({
         },
         yAxis: { 
             labels: {
-                format: `{value} ${unit}`,
+                format: `{value}${unit}`,
                 style: {
                     color: 'hsl(var(--foreground))'
                 }
@@ -93,6 +92,7 @@ export default function FutureClimateChart({
             style: {
                 color: 'hsl(var(--popover-foreground))',
             },
+            pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f} ' + (unit === '°' ? '°C' : unit) + '</b><br/>'
         },
         legend: {
            enabled: false
@@ -102,9 +102,6 @@ export default function FutureClimateChart({
             type: seriesType,
             data: data.map(d => d.value),
             color: color,
-            tooltip: {
-                valueSuffix: ` ${unit}`
-            }
         },
         {
             name: 'Tendência',
@@ -115,9 +112,6 @@ export default function FutureClimateChart({
             marker: {
                 enabled: false
             },
-            tooltip: {
-                valueSuffix: ` ${unit}`
-            }
         }
         ],
         exporting: {
