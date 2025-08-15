@@ -24,33 +24,14 @@ export async function GET(
     if (!id) {
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
-
-    // The V1 API endpoint seems to be `/area/{territoryID}/{CityID}`
-    // The current app structure only passes one ID.
-    // Based on V1 code, it seems to use territoryId and cityId.
-    // Let's assume for now the API can work with a single ID based on type.
-    // We'll use a placeholder for the second ID if needed, like '0'.
-    // The endpoint seems to be just /area/{id1}/{id2}, without type.
-    // This seems tricky. Let's assume the API is /area/{type}/{id}
-    // No, the V1 code is /area/{territoryID}/{CityID}. This implies we might need two IDs.
-    // Let's try to construct it based on what we have.
-    // Let's assume for a municipality, territoryId can be 0.
-    // For a territory (ti, uc), cityId can be 0.
-    let territoryId = type === 'municipio' ? '0' : id;
-    let cityId = type === 'municipio' ? id : '0';
-
-    // The V1 code uses territoryId and cityId. This might not map directly.
-    // The endpoint in V1 is /area/{territoryID}/{CityID}
-    // Let's assume a simplified endpoint for now, that takes the main ID.
-    // A robust solution might require changing the search to handle two IDs.
-    // Based on the new understanding, the API structure is likely different.
-    // The V1 `getStatsAreaBlocks` uses `/area/${territoryID}/${CityID}`.
-    // In our app, we have one ID. Let's assume the second ID can be 0 for simplicity.
-
-    let apiPath = `${API_BIO_URL}/area/${id}/0`;
-    if (type === 'municipio') {
-         apiPath = `${API_BIO_URL}/area/0/${id}`;
-    }
+    
+    // V1 logic suggests that for stats, we might need to send 0 for the unused ID.
+    // e.g., for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
+    const isTerritory = type === 'estado' || type === 'ti' || type === 'uc';
+    const territoryId = isTerritory ? id : '0';
+    const cityId = type === 'municipio' ? id : '0';
+    
+    const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
 
 
     try {
@@ -70,4 +51,3 @@ export async function GET(
         return NextResponse.json({ error: `Failed to fetch stats data` }, { status: 500 });
     }
 }
-
