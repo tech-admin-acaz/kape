@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLandCoverStats } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLandCoverStats, getTemperatureStats } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
@@ -167,6 +167,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
+        // Fetch dynamic data
+        const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        const formattedTempStats = tempStats.map((d: any) => ({
+            year: d.year,
+            value: parseFloat(d.value.toFixed(2)),
+            trend: parseFloat(d.trend.toFixed(2)),
+        }));
+
+
         let state = 'Não definido';
         if (details.uf && details.uf.length > 0) {
             const ufData = details.uf[0];
@@ -217,12 +226,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           },
           stats: {
             ...baseMockData.stats,
-            landCover: baseMockData.stats.landCover, // Keep mock data for now
+            // landCover: baseMockData.stats.landCover, // Keep mock data for now
           },
           environmentalServices: baseMockData.environmentalServices,
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
-          futureClimate: baseMockData.futureClimate,
+          futureClimate: {
+            temperature: formattedTempStats,
+            precipitation: baseMockData.futureClimate.precipitation,
+          },
         };
         console.log("Area data being passed to panel:", newArea);
         onAreaUpdate(newArea);
