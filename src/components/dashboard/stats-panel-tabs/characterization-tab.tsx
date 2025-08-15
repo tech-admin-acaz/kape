@@ -4,8 +4,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import LandCoverChart from '../land-cover-chart';
-import FutureClimateChart from '../future-climate-chart';
+import LandCoverChart from '../charts/land-cover-chart';
+import FutureClimateChart from '../charts/future-climate-chart';
 import type { StatsData } from '../stats-panel';
 
 interface CharacterizationTabProps {
@@ -80,13 +80,13 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             />
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <FutureClimateChart
+                     <FutureClimateChart
                         title="Tendência de Temperatura da Superfície"
                         yAxisTitle="Temperatura (°C)"
                         seriesName="Temperatura"
                         seriesType="spline"
                         color="hsl(var(--destructive))"
-                        unit="°C"
+                        unit="°"
                         data={futureClimate.temperature} 
                     />
                 </CardContent>
