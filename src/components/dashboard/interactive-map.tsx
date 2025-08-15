@@ -169,11 +169,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         // Fetch dynamic data
         const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        const formattedTempStats = tempStats.map((d: any) => ({
+        
+        const formattedTempStats = Array.isArray(tempStats) ? tempStats.map((d: any) => ({
             year: d.year,
             value: parseFloat(d.value.toFixed(2)),
             trend: parseFloat(d.trend.toFixed(2)),
-        }));
+        })) : [];
 
 
         let state = 'Não definido';
@@ -232,7 +233,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: formattedTempStats,
+            temperature: formattedTempStats.length > 0 ? formattedTempStats : baseMockData.futureClimate.temperature,
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
@@ -487,5 +488,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-    
