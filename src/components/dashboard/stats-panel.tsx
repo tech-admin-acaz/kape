@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -7,10 +6,11 @@ import { Button } from '../ui/button';
 import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { FutureClimateData } from './future-climate-chart';
+import type { FutureClimateData } from './charts/future-climate-chart';
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
+import TesteTab from './stats-panel-tabs/teste-tab';
 import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -118,7 +118,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
 
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
-        setShouldAbbreviate(entry.contentRect.width <= 399);
+        setShouldAbbreviate(entry.contentRect.width <= 450);
       }
     });
 
@@ -136,7 +136,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   const TABS = {
     characterization: "Caracterização",
     services: "Serviços Ambientais",
-    ranking: "Ranking de Espécies"
+    ranking: "Ranking de Espécies",
+    teste: "Teste Chart"
   }
 
   const servicesLabel = shouldAbbreviate ? "S. Ambientais" : TABS.services;
@@ -153,7 +154,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
                 <TooltipProvider>
-                    <TabsList className="w-full">
+                    <TabsList className="w-full grid grid-cols-4">
                         <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                             {TABS.characterization}
                         </TabsTrigger>
@@ -183,6 +184,9 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 </TooltipContent>
                             )}
                         </Tooltip>
+                         <TabsTrigger value="teste" className="flex-1 text-xs md:text-sm">
+                            {TABS.teste}
+                        </TabsTrigger>
                     </TabsList>
                 </TooltipProvider>
             </div>
@@ -196,6 +200,9 @@ export default function StatsPanel({ data }: StatsPanelProps) {
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
                   <SpeciesTab species={data.species} />
+              </TabsContent>
+               <TabsContent value="teste" className="mt-0">
+                  <TesteTab data={data.futureClimate.temperature} />
               </TabsContent>
             </div>
         </Tabs>
