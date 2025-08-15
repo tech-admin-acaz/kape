@@ -28,13 +28,14 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
-    // V1 logic suggests that for stats, we might need to send 0 for the unused ID.
-    // e.g., for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
-    const isTerritory = type === 'estado' || type === 'ti' || type === 'uc';
-    const territoryId = isTerritory ? id : '0';
-    const cityId = type === 'municipio' ? id : '0';
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados';
+    } else if (type === 'municipio') {
+        fetchType = 'municipios';
+    }
     
-    const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
+    const apiPath = `${API_BIO_URL}/graph/tas/${fetchType}/${id}/${model}/${scenario}`;
 
     try {
         const response = await fetch(apiPath);
@@ -46,6 +47,12 @@ export async function GET(
         }
         
         const data = await response.json();
+        // The V1 API returns data in a nested array, e.g. `[[{time, value}, ...]]`
+        // We will return the inner array if it exists.
+        if (Array.isArray(data) && Array.isArray(data[0])) {
+            return NextResponse.json(data[0]);
+        }
+        // If it's just a single array, return it directly.
         return NextResponse.json(data);
 
     } catch (error) {
