@@ -28,14 +28,11 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
-    let fetchType = type;
-    if (type === 'estado') {
-        fetchType = 'estados';
-    } else if (type === 'municipio') {
-        fetchType = 'municipios';
-    }
+    const isTerritory = type === 'estado' || type === 'ti' || type === 'uc';
+    const territoryId = isTerritory ? id : '0';
+    const cityId = type === 'municipio' ? id : '0';
     
-    const apiPath = `${API_BIO_URL}/graph/tas/${fetchType}/${id}/${model}/${scenario}`;
+    const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
 
     try {
         const response = await fetch(apiPath);
