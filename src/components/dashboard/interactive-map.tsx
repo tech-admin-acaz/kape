@@ -233,7 +233,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: formattedTempStats.length > 0 ? formattedTempStats : baseMockData.futureClimate.temperature,
+            temperature: formattedTempStats,
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
