@@ -78,21 +78,19 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
                 title="Clima do Futuro" 
                 tooltipText="Projeções de temperatura e precipitação para a área selecionada." 
             />
-            {futureClimate.temperature && futureClimate.temperature.length > 0 && (
-                <Card className="bg-muted/30">
-                    <CardContent className="pt-6">
-                        <FutureClimateChart
-                            title="Tendência de Temperatura da Superfície"
-                            yAxisTitle="Temperatura (°C)"
-                            seriesName="Temperatura"
-                            seriesType="spline"
-                            color="hsl(var(--destructive))"
-                            unit="°"
-                            data={futureClimate.temperature} 
-                        />
-                    </CardContent>
-                </Card>
-            )}
+            <Card className="bg-muted/30">
+                <CardContent className="pt-6">
+                    <FutureClimateChart
+                        title="Tendência de Temperatura da Superfície"
+                        yAxisTitle="Temperatura (°C)"
+                        seriesName="Temperatura"
+                        seriesType="spline"
+                        color="hsl(var(--destructive))"
+                        unit="°C"
+                        data={futureClimate.temperature} 
+                    />
+                </CardContent>
+            </Card>
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
                     <FutureClimateChart
