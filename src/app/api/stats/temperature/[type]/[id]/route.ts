@@ -73,11 +73,11 @@ export async function GET(
         }
         
         let data = await response.json();
-        // The V1 API returns data in a nested array, e.g. `[[{time, value}, ...]]`
-        const timeSeries = (Array.isArray(data) && Array.isArray(data[0])) ? data[0] : data;
+        
+        const timeSeries = (Array.isArray(data) && Array.isArray(data[0])) ? data[0] : (Array.isArray(data) ? data : []);
 
-        if (!Array.isArray(timeSeries)) {
-             return NextResponse.json({ error: 'Unexpected data format from API' }, { status: 500 });
+        if (!Array.isArray(timeSeries) || timeSeries.length === 0) {
+             return NextResponse.json([]);
         }
 
         const processedData = timeSeries.map((d: any) => ({
