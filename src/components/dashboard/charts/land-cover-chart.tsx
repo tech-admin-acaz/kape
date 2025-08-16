@@ -44,6 +44,7 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
           return;
         }
         const data = await response.json();
+        console.log('Dados do gráfico de uso e cobertura da terra:', data);
         setChartData(data);
       } catch (error) {
         console.error("Failed to fetch or process land cover stats:", error);
