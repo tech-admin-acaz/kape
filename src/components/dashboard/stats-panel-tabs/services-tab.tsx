@@ -45,15 +45,18 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
+const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps<ValueType, NameType> & { formatter?: (value: any) => string }) => {
     if (active && payload && payload.length) {
-        const data = payload[0].payload;
         return (
             <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
-                <p className="font-bold mb-1">{data.name}</p>
-                <p>
-                    Percentual de Area: {(payload[0].value as number).toFixed(1)}%
-                </p>
+                <p className="font-bold mb-1">{label}</p>
+                {payload.map((p, index) => (
+                    <div key={index} style={{ color: p.color || p.fill }}>
+                        <span className="mr-2">●</span>
+                        {`${p.name}: `}
+                        <b className="font-bold">{formatter ? formatter(p.value) : p.value}</b>
+                    </div>
+                ))}
             </div>
         );
     }
@@ -149,7 +152,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip formatter={(value) => formatNumber(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }}/>
                             <Legend wrapperStyle={{fontSize: "12px"}} />
                             <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
                             <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
@@ -167,7 +170,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                             <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
                             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }} />
                             <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
@@ -188,7 +191,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }} />
                             <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>

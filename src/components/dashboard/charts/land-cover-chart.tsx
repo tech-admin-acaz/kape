@@ -120,7 +120,12 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
         }
     },
     tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        backgroundColor: 'hsl(var(--popover))',
+        borderColor: 'hsl(var(--border))',
+        style: {
+            color: 'hsl(var(--popover-foreground))',
+        },
+        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.percentage:.1f}%</b>'
     },
   };
 
