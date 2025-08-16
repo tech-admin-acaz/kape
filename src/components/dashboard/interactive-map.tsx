@@ -12,10 +12,10 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, /* getLandCoverStats, */ getTemperatureStats } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getTemperatureStats } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
-import type { StatsData } from './stats-panel';
+import type { StatsData, FutureClimateData } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
@@ -44,6 +44,26 @@ interface PopupInfo {
     lat: number;
     message: string;
 }
+
+// Equivalent to the Angular version for calculating trend line
+const calculateTrendLine = (data: number[]): number[] => {
+    const n = data.length;
+    if (n < 2) return data;
+
+    const sumX = data.reduce((acc, _, i) => acc + i, 0);
+    const sumY = data.reduce((acc, curr) => acc + curr, 0);
+    const sumXY = data.reduce((acc, curr, i) => acc + i * curr, 0);
+    const sumXX = data.reduce((acc, _, i) => acc + i * i, 0);
+
+    const denominator = n * sumXX - sumX * sumX;
+    if (denominator === 0) return data;
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    const intercept = (sumY - slope * sumX) / n;
+
+    return data.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
+};
+
 
 export default function InteractiveMap({ onAreaUpdate, selectedArea }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
@@ -168,23 +188,22 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         // Fetch dynamic data
-        const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        const landCoverStats = null; // Temporarily disabled
+        const tempStatsRaw = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
         
-        const formattedTempStats = Array.isArray(tempStats) ? tempStats.map((d: any) => ({
-            year: d.year,
-            value: parseFloat(d.value.toFixed(2)),
-            trend: parseFloat(d.trend.toFixed(2)),
-        })) : [];
+        let tempStats: FutureClimateData[] = [];
+        if (Array.isArray(tempStatsRaw)) {
+            const values = tempStatsRaw.map(d => parseFloat(d.value.toFixed(2)));
+            const trend = calculateTrendLine(values);
+            tempStats = tempStatsRaw.map((d: any, index: number) => ({
+                year: d.year,
+                value: values[index],
+                trend: trend[index],
+            }));
+        }
+        
+        const landCoverStats = null; // Temporarily disabled
 
-        const formattedLandCoverData = landCoverStats ? [
-            { name: "Formação Florestal Primária", y: landCoverStats.vegetation, color: "hsl(var(--chart-3))" },
-            { name: "Outras Formações Naturais", y: landCoverStats.natural_formation, color: "hsl(var(--chart-2))" },
-            { name: "Pastagem", y: landCoverStats.pasture, color: "hsl(var(--chart-4))" },
-            { name: "Agricultura", y: landCoverStats.agriculture, color: "hsl(var(--chart-5))" },
-            { name: "Outros", y: landCoverStats.other, color: "hsl(var(--muted))" },
-        ] : baseMockData.stats.landCover;
-
+        const formattedLandCoverData = baseMockData.stats.landCover;
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
           if (apiData && apiData.length > 0) {
@@ -223,11 +242,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: formattedTempStats,
+            temperature: tempStats,
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
-        
+        console.log("Dados carregados para o mapa:", newArea);
         onAreaUpdate(newArea);
       }
     } catch (error) {
@@ -478,5 +497,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-    

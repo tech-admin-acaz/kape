@@ -34,6 +34,8 @@ export default function FutureClimateChart({
     color,
     unit
 }: FutureClimateChartProps) {
+    console.log(data);
+
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
     useEffect(() => {
