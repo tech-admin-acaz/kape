@@ -67,8 +67,6 @@ export default function DashboardPage() {
                     collapsedSize={0}
                     onCollapse={() => {
                         setIsCollapsed(true);
-                        // When collapsing, also clear the selection
-                        setSelectedArea(null);
                     }}
                     onExpand={() => setIsCollapsed(false)}
                 >
