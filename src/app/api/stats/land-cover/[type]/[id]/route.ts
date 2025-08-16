@@ -26,9 +26,16 @@ export async function GET(
     }
     
     // V1 logic: for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
-    const isMunicipio = type === 'municipio';
-    const territoryId = isMunicipio ? '0' : id;
-    const cityId = isMunicipio ? id : '0';
+    let territoryId: string;
+    let cityId: string;
+
+    if (type === 'municipio') {
+        territoryId = '0';
+        cityId = id;
+    } else {
+        territoryId = id;
+        cityId = '0';
+    }
     
     const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
 
