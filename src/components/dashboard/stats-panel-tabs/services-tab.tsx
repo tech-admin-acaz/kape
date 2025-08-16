@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Bird, TreeDeciduous } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart } from 'recharts';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { TooltipProps } from 'recharts';
@@ -86,7 +86,7 @@ const BiodiversityCard = ({
   category: string;
   count: number;
 }) => (
-  <div className="bg-gray-800 rounded-lg overflow-hidden flex items-center shadow-lg text-white">
+  <div className="bg-card rounded-lg overflow-hidden flex items-center shadow-lg text-card-foreground border">
     <div className="relative w-24 h-24 flex-shrink-0">
       <Image
         src={imageUrl}
@@ -99,7 +99,7 @@ const BiodiversityCard = ({
     </div>
     <div className="p-4">
       <p className="text-lg font-semibold">{category}</p>
-      <p className="text-5xl font-bold text-lime-400">{count}</p>
+      <p className="text-5xl font-bold text-primary">{count}</p>
     </div>
   </div>
 );
@@ -107,11 +107,11 @@ const BiodiversityCard = ({
 const BiodiversitySkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-gray-800 rounded-lg overflow-hidden flex items-center shadow-lg text-white">
-                <Skeleton className="w-24 h-24 bg-gray-700" />
+            <div key={i} className="bg-card rounded-lg overflow-hidden flex items-center shadow-lg text-card-foreground border">
+                <Skeleton className="w-24 h-24 bg-muted" />
                 <div className="p-4 w-full">
-                    <Skeleton className="h-6 w-3/4 mb-2 bg-gray-700" />
-                    <Skeleton className="h-12 w-1/2 bg-gray-700" />
+                    <Skeleton className="h-6 w-3/4 mb-2 bg-muted" />
+                    <Skeleton className="h-12 w-1/2 bg-muted" />
                 </div>
             </div>
         ))}
