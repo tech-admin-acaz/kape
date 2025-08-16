@@ -169,7 +169,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         // Fetch dynamic data
         const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        // const landCoverStats = await getLandCoverStats(type, location.value);
         const landCoverStats = null; // Temporarily disabled
         
         const formattedTempStats = Array.isArray(tempStats) ? tempStats.map((d: any) => ({
@@ -228,7 +227,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
-        console.log("Area data being passed to panel:", newArea);
+        
         onAreaUpdate(newArea);
       }
     } catch (error) {

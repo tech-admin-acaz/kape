@@ -40,8 +40,7 @@ export async function GET(
     }
     
     const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
-    console.log("Fetching temperature stats from URL:", apiPath);
-
+    
     try {
         const response = await fetch(apiPath);
         
