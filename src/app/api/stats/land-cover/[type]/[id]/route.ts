@@ -25,11 +25,10 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
     
-    // V1 logic suggests that for stats, we might need to send 0 for the unused ID.
-    // e.g., for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
-    const isTerritory = type === 'estado' || type === 'ti' || type === 'uc';
-    const territoryId = isTerritory ? id : '0';
-    const cityId = type === 'municipio' ? id : '0';
+    // V1 logic: for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
+    const isMunicipio = type === 'municipio';
+    const territoryId = isMunicipio ? '0' : id;
+    const cityId = isMunicipio ? id : '0';
     
     const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
 
