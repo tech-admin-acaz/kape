@@ -22,49 +22,91 @@ interface ChartDataPoint {
   color: string;
 }
 
-const mockLandCoverData: ChartDataPoint[] = [
-    { name: "Formação Florestal Primária", y: 70.06, color: "hsl(var(--chart-3))" },
-    { name: "Outras Formações Naturais", y: 13.89, color: "hsl(var(--chart-2))" },
-    { name: "Pastagem", y: 13.72, color: "hsl(var(--chart-4))" },
-    { name: "Floresta Secundária", y: 2.2, color: "#7a5900" },
-    { name: "Agricultura", y: 0.68, color: "hsl(var(--chart-5))" },
-    { name: "Outros", y: 1.21, color: "hsl(var(--muted))" },
-];
+const landCoverMapping: { [key: string]: { name: string; color: string } } = {
+    "Agricultura": { name: "Agricultura", color: "hsl(var(--chart-5))" },
+    "Pastagem": { name: "Pastagem", color: "hsl(var(--chart-4))" },
+    "Outras": { name: "Outros", color: "hsl(var(--muted))" },
+    "Floresta Secundária": { name: "Floresta Secundária", color: "#7a5900" },
+    "Outras Formações Naturais": { name: "Outras Formações Naturais", color: "hsl(var(--chart-2))" },
+    "Floresta Primaria": { name: "Formação Florestal Primária", color: "hsl(var(--chart-3))" },
+};
 
 
 const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
-  const [chartData, setChartData] = useState<ChartDataPoint[]>(mockLandCoverData);
-  const [isLoading, setIsLoading] = useState(false);
+  const [chartData, setChartData] = useState<ChartDataPoint[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
-  // useEffect(() => {
-  //   if (!id || !type) {
-  //     setIsLoading(false);
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!id || !type) {
+      setIsLoading(false);
+      return;
+    }
 
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
-  //       if (!response.ok) {
-  //         console.error(`Error fetching land cover stats: ${response.statusText}`);
-  //         setChartData([]);
-  //         return;
-  //       }
-  //       const data = await response.json();
-  //       setChartData(data);
+    const fetchData = async () => {
+      setIsLoading(true);
+      setChartData(null);
+      
+      const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
+      if (!API_BIO_URL) {
+          console.error("API URL not configured");
+          setIsLoading(false);
+          return;
+      }
+      
+      let territoryId: string;
+      let cityId: string;
+
+      if (type === 'municipio') {
+          territoryId = '0';
+          cityId = id;
+      } else {
+          territoryId = id;
+          cityId = '0';
+      }
+      
+      const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
+
+      try {
+        const response = await fetch(apiPath);
+        if (!response.ok) {
+          console.error(`Error fetching land cover stats from external API: ${response.statusText}`);
+          setChartData([]);
+          return;
+        }
         
-  //     } catch (error) {
-  //       console.error("Failed to fetch or process land cover stats:", error);
-  //       setChartData([]);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+        const rawData = await response.json();
+        const statsObject = rawData && rawData.length > 0 ? rawData[0] : {};
 
-  //   fetchData();
-  // }, [id, type]);
+        if (Object.keys(statsObject).length === 0) {
+            setChartData([]);
+        } else {
+            const formattedData = Object.entries(statsObject)
+            .map(([key, value]) => {
+                const mapping = landCoverMapping[key];
+                if (!mapping) return null;
+
+                return {
+                    name: mapping.name,
+                    y: value as number,
+                    color: mapping.color
+                };
+            })
+            .filter((item): item is ChartDataPoint => item !== null && item.y > 0);
+
+            setChartData(formattedData);
+        }
+        
+      } catch (error) {
+        console.error("Failed to fetch or process land cover stats:", error);
+        setChartData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id, type]);
 
   useEffect(() => {
     if (chartComponentRef.current && !isLoading) {
