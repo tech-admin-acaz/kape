@@ -16,7 +16,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface ServicesTabProps {
   id: string;
   typeKey: TerritoryTypeKey;
-  mockWater: { valuation: { name: string; value: number; }[] };
 }
 
 const formatNumber = (value: number) => {
@@ -99,7 +98,7 @@ const DataSkeleton = ({ children }: { children: React.ReactNode }) => (
     </div>
 );
 
-export default function ServicesTab({ id, typeKey, mockWater }: ServicesTabProps) {
+export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
     const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
     const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
     const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
@@ -249,22 +248,7 @@ export default function ServicesTab({ id, typeKey, mockWater }: ServicesTabProps
                     <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ResponsiveContainer width="100%" height={256}>
-                        <BarChart data={mockWater.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                            <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                            <Tooltip 
-                                content={
-                                    <CustomTooltip 
-                                        formatter={(value) => formatCurrency(Number(value))}
-                                    />
-                                } 
-                                cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
-                            />
-                            <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <p className="text-muted-foreground text-sm text-center py-10">Dados de valoração de água estarão disponíveis em breve.</p>
                 </CardContent>
             </Card>
         </div>

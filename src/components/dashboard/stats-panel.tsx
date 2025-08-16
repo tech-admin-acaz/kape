@@ -201,7 +201,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                   <ServicesTab 
                       id={data.id} 
                       typeKey={data.typeKey} 
-                      mockWater={data.environmentalServices.water}
                   />
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">

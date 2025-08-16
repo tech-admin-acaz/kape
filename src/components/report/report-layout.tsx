@@ -83,9 +83,7 @@ export default function ReportLayout() {
                  <h2 className="text-2xl font-bold font-headline mb-4">2. Serviços Ambientais</h2>
                 <ServicesTab 
                   id={areaId} 
-                  typeKey={typeKey} 
-                  mockCarbon={data.environmentalServices.carbon}
-                  mockWater={data.environmentalServices.water}
+                  typeKey={typeKey}
                 />
             </div>
 

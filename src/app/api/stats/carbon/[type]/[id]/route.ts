@@ -42,45 +42,54 @@ export async function GET(
         fetchType = 'municipios';
     }
     
-    const apiPath = `${API_BIO_URL}/graph/carbono/${fetchType}/${id}`;
+    const carbonStockPath = `${API_BIO_URL}/graph/carbono/${fetchType}/${id}`;
+    const valuationPath = `${API_BIO_URL}/graph/valorecossistemico/${fetchType}/${id}`;
     
     try {
-        const response = await fetch(apiPath);
+        // Fetch both endpoints in parallel
+        const [carbonStockRes, valuationRes] = await Promise.all([
+            fetch(carbonStockPath),
+            fetch(valuationPath)
+        ]);
         
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Error fetching carbon stats from external API (${apiPath}):`, response.status, errorText);
-            return NextResponse.json({ error: `Failed to fetch stats data from source: ${errorText}` }, { status: response.status });
+        // Handle Carbon Stock data
+        if (!carbonStockRes.ok) {
+            const errorText = await carbonStockRes.text();
+            console.error(`Error fetching carbon stock stats from external API (${carbonStockPath}):`, carbonStockRes.status, errorText);
+            // We can decide to return partial data or a full error. Let's return error for now.
+            return NextResponse.json({ error: `Failed to fetch carbon stock data from source: ${errorText}` }, { status: carbonStockRes.status });
         }
+        const rawCarbonStockData: {label: string, value: number}[] = await carbonStockRes.json();
         
-        const rawData: {label: string, value: number}[] = await response.json();
-
-        if (!Array.isArray(rawData) || rawData.length === 0) {
-            return NextResponse.json(null, { status: 404 });
+        // Handle Valuation data
+        if (!valuationRes.ok) {
+            const errorText = await valuationRes.text();
+            console.error(`Error fetching valuation stats from external API (${valuationPath}):`, valuationRes.status, errorText);
+            return NextResponse.json({ error: `Failed to fetch valuation data from source: ${errorText}` }, { status: valuationRes.status });
         }
+        const rawValuationData: {label: string, value: number}[] = await valuationRes.json();
 
+
+        // Process Carbon Stock data
         const currentAndRestorableMap: { [key: string]: { name: string, current: number, restorable: number } } = {};
-
-        rawData.forEach(item => {
-            const mapping = labelMapping[item.label];
-            if (mapping) {
-                if (!currentAndRestorableMap[mapping.name]) {
-                    currentAndRestorableMap[mapping.name] = { name: mapping.name, current: 0, restorable: 0 };
+        if (Array.isArray(rawCarbonStockData)) {
+            rawCarbonStockData.forEach(item => {
+                const mapping = labelMapping[item.label];
+                if (mapping) {
+                    if (!currentAndRestorableMap[mapping.name]) {
+                        currentAndRestorableMap[mapping.name] = { name: mapping.name, current: 0, restorable: 0 };
+                    }
+                    currentAndRestorableMap[mapping.name][mapping.type] = item.value;
                 }
-                currentAndRestorableMap[mapping.name][mapping.type] = item.value;
-            }
-        });
-
+            });
+        }
+        
         const currentAndRestorable = Object.values(currentAndRestorableMap);
         
-        // Assuming valuation is derived or part of another logic, we'll mock it for now
-        // based on the total current values to keep the chart functional.
-        const totalCurrent = currentAndRestorable.reduce((acc, curr) => acc + curr.current, 0);
-        const valuation = [
-            { name: "Vegetação Primária", value: currentAndRestorable.find(c => c.name === 'Vegetação Primária')?.current * 15 || 0 },
-            { name: "Vegetação Secundária", value: currentAndRestorable.find(c => c.name === 'Vegetação Secundária')?.current * 10 || 0 },
-            { name: "Agropecuária", value: currentAndRestorable.find(c => c.name === 'Agropecuária')?.current * 5 || 0 },
-        ].filter(v => v.value > 0);
+        // Process Valuation data
+        const valuation = (Array.isArray(rawValuationData)) 
+            ? rawValuationData.map(item => ({ name: item.label, value: item.value })).filter(v => v.value > 0)
+            : [];
 
 
         const formattedData: CarbonData = {
@@ -91,7 +100,7 @@ export async function GET(
         return NextResponse.json(formattedData);
 
     } catch (error) {
-        console.error(`Error fetching/processing carbon stats from ${apiPath}:`, error);
+        console.error(`Error fetching/processing carbon stats from APIs:`, error);
         return NextResponse.json({ error: `Failed to fetch or process stats data` }, { status: 500 });
     }
 }
