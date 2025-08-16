@@ -8,7 +8,7 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Cart
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import type { BiodiversityData, CarbonData } from '../stats-panel';
+import type { BiodiversityData, CarbonData, WaterData } from '../stats-panel';
 import { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -19,6 +19,7 @@ interface ServicesTabProps {
 
 const formatNumber = (value: number): string => {
     if (value === 0) return "0.00M";
+    if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
     if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
     if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(2)}k`;
     return value.toFixed(2);
@@ -45,7 +46,7 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps<ValueType, NameType> & { formatter?: (value: any, name: string) => string }) => {
+const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
@@ -54,7 +55,7 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps<Value
                     <div key={index} style={{ color: p.color || p.fill }}>
                         <span className="mr-2">●</span>
                         <span>{`${p.name}: `}</span>
-                        <span className="font-bold">{formatter ? formatter(p.value, p.name) : p.value}</span>
+                        <span className="font-bold">{p.name === 'Valor' ? formatCurrency(Number(p.value)) : `${formatNumber(Number(p.value))} tCO₂e`}</span>
                     </div>
                 ))}
             </div>
@@ -101,13 +102,16 @@ const DataSkeleton = ({ children }: { children: React.ReactNode }) => (
 export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
     const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
     const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
+    const [waterData, setWaterData] = useState<WaterData | null>(null);
     const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
     const [isCarbonLoading, setIsCarbonLoading] = useState(true);
+    const [isWaterLoading, setIsWaterLoading] = useState(true);
 
      useEffect(() => {
         if (!id || !typeKey) {
             setIsBiodiversityLoading(false);
             setIsCarbonLoading(false);
+            setIsWaterLoading(false);
             return;
         }
 
@@ -141,8 +145,24 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
             }
         };
 
+        const fetchWaterData = async () => {
+            setIsWaterLoading(true);
+            try {
+                const response = await fetch(`/api/stats/water/${typeKey}/${id}`);
+                if (!response.ok) throw new Error('Failed to fetch water data');
+                const data = await response.json();
+                setWaterData(data);
+            } catch (error) {
+                console.error("Error fetching water data:", error);
+                setWaterData(null);
+            } finally {
+                setIsWaterLoading(false);
+            }
+        };
+
         fetchBiodiversityData();
         fetchCarbonData();
+        fetchWaterData();
     }, [id, typeKey]);
     
     const biodiversityCards = biodiversity ? [
@@ -172,7 +192,7 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
             ) : biodiversity ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      {biodiversityCards.map((item) => (
-                        <BiodiversityCard key={item.category} {...item} />
+                        item.count > 0 && <BiodiversityCard key={item.category} {...item} />
                     ))}
                 </div>
             ) : (
@@ -199,11 +219,7 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
                                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                                     <YAxis tickFormatter={(value) => formatNumber(Number(value))} tick={{ fontSize: 12 }} />
                                     <Tooltip 
-                                        content={
-                                            <CustomTooltip 
-                                                formatter={(value) => `${formatNumber(Number(value))} tCO₂e`}
-                                            />
-                                        } 
+                                        content={<CustomTooltip />} 
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }}
                                     />
                                     <Legend wrapperStyle={{fontSize: "12px"}} />
@@ -224,17 +240,13 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
                                 <BarChart data={carbonData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                     <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
+                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={110} />
                                     <Tooltip 
-                                        content={
-                                            <CustomTooltip 
-                                                formatter={(value) => formatCurrency(Number(value))}
-                                            />
-                                        } 
+                                        content={<CustomTooltip />}
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
                                     />
                                     <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]}>
-                                      <LabelList dataKey="value" position="insideRight" formatter={formatCurrency} style={{ fill: '#000', fontSize: '12px', fontWeight: 'bold' }} />
+                                      <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10} />
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
@@ -249,14 +261,35 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
         {/* Water Section */}
         <div className="space-y-4">
             <SectionHeader title="Água" tooltipText="Análise de valoração de serviços hídricos." />
-            <Card className="bg-muted/30">
-                <CardHeader>
-                    <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground text-sm text-center py-10">Dados de valoração de água estarão disponíveis em breve.</p>
-                </CardContent>
-            </Card>
+            {isWaterLoading ? (
+                 <DataSkeleton>
+                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
+                </DataSkeleton>
+            ) : waterData ? (
+                 <Card className="bg-muted/30">
+                    <CardHeader>
+                        <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                       <ResponsiveContainer width="100%" height={256}>
+                            <BarChart data={waterData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
+                                <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={110} />
+                                <Tooltip 
+                                    content={<CustomTooltip />}
+                                    cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
+                                />
+                                <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[0, 4, 4, 0]}>
+                                  <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10}/>
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            ) : (
+                <p className="text-muted-foreground">Não foi possível carregar os dados de valoração de água.</p>
+            )}
         </div>
     </div>
   );

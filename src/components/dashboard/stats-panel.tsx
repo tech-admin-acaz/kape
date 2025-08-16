@@ -42,7 +42,7 @@ export interface CarbonData {
     valuation: { name: string; value: number; }[];
 }
 
-interface WaterData {
+export interface WaterData {
     valuation: { name: string; value: number; }[];
 }
 
