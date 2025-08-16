@@ -1,22 +1,52 @@
 
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
 import type { FutureClimateData } from '../stats-panel';
+import { getTemperatureStats } from '@/services/map.service';
+import type { TerritoryTypeKey } from '@/models/location.model';
+import { Skeleton } from '@/components/ui/skeleton';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
 }
 
 interface TemperatureTrendChartProps {
-    data: FutureClimateData[];
+    type: TerritoryTypeKey | undefined;
+    id: string | undefined;
 }
 
-export default function TemperatureTrendChart({ data }: TemperatureTrendChartProps) {
+export default function TemperatureTrendChart({ type, id }: TemperatureTrendChartProps) {
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+    const [data, setData] = useState<FutureClimateData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!type || !id) {
+                setData([]);
+                return;
+            };
+
+            setIsLoading(true);
+            try {
+                const stats = await getTemperatureStats(type, id, 'ipsl-cm6a-lr', 'ssp585');
+                console.log("Dados de temperatura recebidos no componente do gráfico:", stats);
+                setData(stats || []);
+            } catch (error) {
+                console.error("Erro ao buscar dados de temperatura no componente:", error);
+                setData([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [type, id]);
+
 
     useEffect(() => {
         if (chartComponentRef.current) {
@@ -121,7 +151,9 @@ export default function TemperatureTrendChart({ data }: TemperatureTrendChartPro
 
     return (
         <div className="w-full h-[320px]">
-             {data && data.length > 0 ? (
+             {isLoading ? (
+                <Skeleton className="h-full w-full" />
+             ) : data && data.length > 0 ? (
                 <HighchartsReact
                     highcharts={Highcharts}
                     options={options}
@@ -136,3 +168,5 @@ export default function TemperatureTrendChart({ data }: TemperatureTrendChartPro
         </div>
     );
 }
+
+    

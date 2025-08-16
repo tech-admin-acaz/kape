@@ -13,6 +13,7 @@ import SpeciesTab from './stats-panel-tabs/species-tab';
 import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { TerritoryTypeKey } from '@/models/location.model';
 
 
 interface LandCoverData {
@@ -64,6 +65,7 @@ export interface StatsData {
   id: string;
   name: string;
   type: string;
+  typeKey: TerritoryTypeKey;
   generalInfo: GeneralInfo;
   stats: {
     landCover: LandCoverData[];
@@ -236,3 +238,5 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </div>
   );
 }
+
+    

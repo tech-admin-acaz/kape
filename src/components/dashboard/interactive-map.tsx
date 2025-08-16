@@ -166,22 +166,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         }
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
-
-        // Fetch dynamic data
-        let tempStats: FutureClimateData[] = [];
-        try {
-            tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-            console.log("Stats de temperatura da API:", tempStats);
-        } catch(e) {
-            console.error("Could not fetch temperature stats, will use mock data as fallback.", e);
-        }
-
-        if(!Array.isArray(tempStats)) {
-            tempStats = [];
-        }
-        
         const landCoverStats = null; // Temporarily disabled
-
         const formattedLandCoverData = baseMockData.stats.landCover;
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
@@ -212,6 +197,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           id: location.value,
           name: areaName,
           type: typeLabel,
+          typeKey: type,
           generalInfo,
           stats: {
             ...baseMockData.stats,
@@ -221,7 +207,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: tempStats,
+            // Data will be fetched by child components
+            temperature: [],
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
@@ -476,3 +463,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -42,7 +43,7 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 };
 
 export default function CharacterizationTab({ data }: CharacterizationTabProps) {
-  const { generalInfo, stats, futureClimate, correlationInsights } = data;
+  const { generalInfo, stats, futureClimate, correlationInsights, id, typeKey } = data;
   
   return (
     <div className="space-y-6 p-6">
@@ -85,7 +86,7 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             />
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <TemperatureTrendChart data={futureClimate.temperature} />
+                    <TemperatureTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
             <Card className="bg-muted/30">
@@ -97,3 +98,5 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
     </div>
   );
 }
+
+    
