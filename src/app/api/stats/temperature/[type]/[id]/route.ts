@@ -28,13 +28,15 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
-    let territoryId = '0';
-    let cityId = '0';
+    let territoryId: string;
+    let cityId: string;
 
     if (type === 'municipio') {
         cityId = id;
+        territoryId = '0';
     } else { // estado, ti, uc
         territoryId = id;
+        cityId = '0';
     }
     
     const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
@@ -62,4 +64,5 @@ export async function GET(
         return NextResponse.json({ error: `Failed to fetch temperature stats` }, { status: 500 });
     }
 }
+
 
