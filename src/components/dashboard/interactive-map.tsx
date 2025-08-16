@@ -171,6 +171,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         let tempStats: FutureClimateData[] = [];
         try {
             tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+            console.log("Stats de temperatura da API:", tempStats);
         } catch(e) {
             console.error("Could not fetch temperature stats, will use mock data as fallback.", e);
         }
