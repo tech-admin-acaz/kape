@@ -15,7 +15,7 @@ const landCoverMapping: { [key: string]: { name: string; color: string } } = {
 
 
 /**
- * API route to fetch land cover statistics for a given location.
+ * API route to fetch land cover statistics for a given location using the /table/biodiversidade endpoint.
  */
 export async function GET(
     request: NextRequest,
@@ -36,20 +36,14 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
     
-    // V1 logic: for a city, territoryID is 0. For a territory (estado, ti, uc), cityID is 0.
-    let territoryId: string;
-    let cityId: string;
-
-    if (type === 'municipio') {
-        territoryId = '0';
-        cityId = id;
-    } else {
-        territoryId = id;
-        cityId = '0';
+    let apiTypePath = type;
+    if (type === 'estado') {
+        apiTypePath = 'estados';
+    } else if (type === 'municipio') {
+        apiTypePath = 'municipios';
     }
     
-    const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
-
+    const apiPath = `${API_BIO_URL}/table/biodiversidade/${apiTypePath}/${id}`;
 
     try {
         const response = await fetch(apiPath);
