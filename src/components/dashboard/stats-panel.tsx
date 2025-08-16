@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -204,7 +203,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                   />
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
-                  <SpeciesTab species={data.species} />
+                  <SpeciesTab id={data.id} typeKey={data.typeKey} />
               </TabsContent>
             </div>
         </Tabs>

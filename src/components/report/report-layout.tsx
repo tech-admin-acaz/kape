@@ -91,7 +91,7 @@ export default function ReportLayout() {
                  <div id="species-section" className="pt-8">
                     <h2 className="text-2xl font-bold font-headline mb-4">3. Ranking de Espécies</h2>
                     <div className="bg-card rounded-lg border">
-                        <SpeciesTab species={data.species} />
+                        <SpeciesTab id={areaId} typeKey={typeKey} />
                     </div>
                 </div>
             )}
