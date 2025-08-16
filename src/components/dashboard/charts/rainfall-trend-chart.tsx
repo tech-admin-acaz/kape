@@ -54,7 +54,8 @@ export default function RainfallTrendChart({ id, type }: RainfallTrendChartProps
             
             try {
                 const response = await fetch(`/api/stats/precipitation/${type}/${id}`);
-                
+  
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error(`Error fetching precipitation stats from API:`, response.status, errorText);
