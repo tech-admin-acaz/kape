@@ -52,8 +52,7 @@ export async function GET(
     }
 
     const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
-    console.log(`Buscando estatísticas de cobertura do solo em: ${apiPath}`);
-
+    
     try {
         const response = await fetch(apiPath);
         
