@@ -212,7 +212,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
             precipitation: [],
           },
         };
-        console.log("Dados carregados para o mapa:", newArea);
         onAreaUpdate(newArea);
       }
     } catch (error) {

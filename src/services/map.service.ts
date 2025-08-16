@@ -108,37 +108,3 @@ export async function getLocationByCoords(lat: number, lng: number): Promise<any
     }
     return await response.json();
 }
-
-/**
- * Fetches land cover statistics for a given location.
- */
-// export async function getLandCoverStats(type: TerritoryTypeKey, id: string): Promise<any> {
-//     const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
-//     if (!response.ok) {
-//         const errorText = await response.text();
-//         console.error(`Error fetching land cover stats for ${type}/${id}:`, response.status, errorText);
-//         throw new Error(`Failed to fetch land cover stats for ${type}/${id}`);
-//     }
-//     const data = await response.json();
-//     // The API returns an array, so we return the first element.
-//     return data && data.length > 0 ? data[0] : null;
-// }
-
-// Temperature stats are now fetched directly in the component, so this function is no longer needed here.
-// /**
-//  * Fetches temperature statistics for a given location.
-//  * @param type - The type of the territory.
-//  * @param id - The ID of the location.
-//  * @param model - The climate model to use.
-//  * @param scenario - The climate scenario to use.
-//  */
-// export async function getTemperatureStats(type: TerritoryTypeKey, id: string, model: string, scenario: string): Promise<any> {
-//     const response = await fetch(`/api/stats/temperature/${type}/${id}?model=${model}&scenario=${scenario}`);
-//     if (!response.ok) {
-//         const errorText = await response.text();
-//         console.error(`Error fetching temperature stats for ${type}/${id}:`, response.status, errorText);
-//         throw new Error(`Failed to fetch temperature stats for ${type}/${id}`);
-//     }
-//     const data = await response.json();
-//     return data;
-// }

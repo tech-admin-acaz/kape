@@ -46,30 +46,9 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // This component will now fetch its own data.
-        const NEXT_PUBLIC_API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
-        if (!NEXT_PUBLIC_API_BIO_URL) {
-            console.error("API URL not configured");
-            setIsLoading(false);
-            return;
-        }
-
-        let territoryId: string;
-        let cityId: string;
-
-        if (type === 'municipio') {
-            territoryId = '0';
-            cityId = id;
-        } else {
-            territoryId = id;
-            cityId = '0';
-        }
-    
-        const apiPath = `${NEXT_PUBLIC_API_BIO_URL}/area/${territoryId}/${cityId}`;
-        
-        const response = await fetch(apiPath);
+        const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
         if (!response.ok) {
-          console.error(`Error fetching land cover stats from external API: ${response.statusText}`);
+          console.error(`Error fetching land cover stats: ${response.statusText}`);
           setChartData([]);
           return;
         }
@@ -82,8 +61,6 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
             setChartData([]);
             return;
         }
-        
-        console.log("Raw land cover data from API:", statsObject);
 
         const formattedData = Object.entries(statsObject)
             .map(([key, value]) => {
@@ -98,7 +75,6 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
             })
             .filter(item => item !== null && item.y > 0) as ChartDataPoint[];
         
-        console.log("Formatted data for chart:", formattedData);
         setChartData(formattedData);
         
       } catch (error) {
