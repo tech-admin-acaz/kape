@@ -45,30 +45,10 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
 
     const fetchData = async () => {
       setIsLoading(true);
-      const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
-      if (!API_BIO_URL) {
-          console.error("API URL not configured");
-          setIsLoading(false);
-          return;
-      }
-      
-      let territoryId: string;
-      let cityId: string;
-
-      if (type === 'municipio') {
-          territoryId = '0';
-          cityId = id;
-      } else {
-          territoryId = id;
-          cityId = '0';
-      }
-      
-      const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
-      
       try {
-        const response = await fetch(apiPath);
+        const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
         if (!response.ok) {
-          console.error(`Error fetching land cover stats from external API: ${response.statusText}`);
+          console.error(`Error fetching land cover stats: ${response.statusText}`);
           setChartData([]);
           return;
         }
