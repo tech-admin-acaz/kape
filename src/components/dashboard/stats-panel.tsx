@@ -202,7 +202,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                   <SpeciesTab species={data.species} />
               </TabsContent>
                <TabsContent value="teste" className="mt-0">
-                  <TesteTab data={data.futureClimate.temperature} />
+                  <TesteTab />
               </TabsContent>
             </div>
         </Tabs>
