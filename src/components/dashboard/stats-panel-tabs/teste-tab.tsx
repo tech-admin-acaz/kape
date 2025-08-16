@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -23,12 +24,14 @@ export default function TesteTab() {
         // The API might return data in a nested array, e.g. `[[{time, value}, ...]]`
         const chartData = (Array.isArray(rawData) && Array.isArray(rawData[0])) ? rawData[0] : rawData;
 
-        // Ensure data is in the correct format
-        const formattedData = chartData.map((d: any) => ({
-            year: d.year,
-            value: parseFloat(d.value.toFixed(2)),
-            trend: parseFloat(d.trend.toFixed(2)),
-        }));
+        // Ensure data is in the correct format and filter out invalid entries
+        const formattedData = chartData
+          .filter((d: any) => d && typeof d.value === 'number' && typeof d.trend === 'number')
+          .map((d: any) => ({
+              year: d.year,
+              value: parseFloat(d.value.toFixed(2)),
+              trend: parseFloat(d.trend.toFixed(2)),
+          }));
 
         setData(formattedData);
       } catch (error) {
