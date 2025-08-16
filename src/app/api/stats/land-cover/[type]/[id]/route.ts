@@ -40,18 +40,15 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
-    let territoryId: string;
-    let cityId: string;
-
-    if (type === 'municipio') {
-        territoryId = '0';
-        cityId = id;
-    } else {
-        territoryId = id;
-        cityId = '0';
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados';
+    } else if (type === 'municipio') {
+        fetchType = 'municipios';
     }
-
-    const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
+    
+    // Corrected API path construction
+    const apiPath = `${API_BIO_URL}/area/${fetchType}/${id}`;
     
     try {
         const response = await fetch(apiPath);
