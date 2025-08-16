@@ -40,6 +40,7 @@ export async function GET(
     }
     
     const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
+    console.log(`URL da API TAS: ${apiPath}`);
     
     try {
         const response = await fetch(apiPath);
