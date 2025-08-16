@@ -188,7 +188,16 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         // Fetch dynamic data
-        const tempStatsRaw = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        // const tempStatsRaw = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        const tempStatsRaw = [
+            {"year":"2020","value":25.35,"trend":25.35},
+            {"year":"2021","value":25.82,"trend":25.82},
+            {"year":"2022","value":25.76,"trend":25.76},
+            {"year":"2023","value":26.11,"trend":26.11},
+            {"year":"2024","value":25.99,"trend":25.99},
+            {"year":"2025","value":26.23,"trend":26.23},
+        ];
+
         
         let tempStats: FutureClimateData[] = [];
         if (Array.isArray(tempStatsRaw)) {
