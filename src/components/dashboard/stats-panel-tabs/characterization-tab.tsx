@@ -51,16 +51,16 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             <Card className="bg-muted/30">
                 <CardContent className="p-4 space-y-2">
                     <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                    <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
-                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                    <GeneralInfoItem label="Município(s)" value={generalInfo.municipality} />
+                    <GeneralInfoItem label="Terra(s) Indígena(s)" value={generalInfo.territoryName} />
+                    <GeneralInfoItem label="Unidade(s) de Conservação" value={generalInfo.conservationUnit} />
                 </CardContent>
             </Card>
         </div>
 
         <div className="space-y-4">
             <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
-            <div className="h-80 w-full">
+             <div className="h-80 w-full">
                 <LandCoverChart data={stats.landCover} />
             </div>
         </div>
@@ -109,3 +109,5 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
     </div>
   );
 }
+
+    

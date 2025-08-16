@@ -186,39 +186,25 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         ] : baseMockData.stats.landCover;
 
 
-        let state = 'Não definido';
-        if (details.uf && details.uf.length > 0) {
-            const ufData = details.uf[0];
-            state = `${ufData.nm_uf} (${ufData.sigla_uf})`;
-        }
-
-        let municipality = 'Não aplicável';
-        if (type === 'municipio') {
-            municipality = details.name || location.label;
-        } else if (details.municipios && details.municipios.length > 0) {
-            municipality = details.municipios.map((m: any) => m.nm_mun).join(', ');
-        }
-
-        let territoryName = 'Não aplicável';
-        if (type === 'ti') {
-            territoryName = details.name || location.label;
-        } else if (details.ti && details.ti.length > 0) {
-            territoryName = details.ti.map((t: any) => t.terrai_nom).join(', ');
-        }
-
-        let conservationUnit = 'Não aplicável';
-        if (type === 'uc') {
-            conservationUnit = details.name || location.label;
-        } else if (details.uc && details.uc.length > 0) {
-            conservationUnit = details.uc.map((u: any) => u.nome_uc1).join(', ');
-        }
+        const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
+          if (apiData && apiData.length > 0) {
+            return apiData.map((item: any) => item[nameKey]).join(', ');
+          }
+          return fallback || 'Sem dados';
+        };
         
+        const generalInfo = {
+            state: getGeneralInfoValue(details.uf, 'nm_uf', type === 'estado' ? details.name : undefined),
+            municipality: getGeneralInfoValue(details.municipios, 'nm_mun', type === 'municipio' ? details.name : undefined),
+            territoryName: getGeneralInfoValue(details.ti, 'terrai_nom', type === 'ti' ? details.name : undefined),
+            conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1', type === 'uc' ? details.name : undefined)
+        };
+
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
         let areaName = location.label;
 
-        if (type === 'municipio' && details.name) {
-            const stateAbbreviation = state.match(/\(([^)]+)\)/)?.[1];
-            areaName = stateAbbreviation ? `${details.name} - ${stateAbbreviation}` : details.name;
+        if (type === 'municipio' && details.name && details.uf?.[0]?.sigla_uf) {
+            areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
         } else if(type === 'estado' && details.name) {
             areaName = details.name;
         }
@@ -228,12 +214,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           id: location.value,
           name: areaName,
           type: typeLabel,
-          generalInfo: {
-            state,
-            municipality,
-            territoryName,
-            conservationUnit,
-          },
+          generalInfo,
           stats: {
             ...baseMockData.stats,
             landCover: formattedLandCoverData,
@@ -497,3 +478,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
+
+    
