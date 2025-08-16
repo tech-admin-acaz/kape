@@ -53,19 +53,17 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
         const fetchData = async () => {
             setIsLoading(true);
             
-            const model = 'ipsl-cm6a-lr';
-            const scenario = 'ssp585';
-            
-            let territoryId: string;
-            let cityId: string;
+            const model = 'CESM2';
+            const scenario = 'ssp245';
 
-            if (type === 'municipio') {
-                territoryId = '0';
-                cityId = id;
-            } else {
-                territoryId = id;
-                cityId = '0';
+            let apiTypePath = type;
+            if (type === 'estado') {
+                apiTypePath = 'estados';
+            } else if (type === 'municipio') {
+                apiTypePath = 'municipios';
             }
+            
+            const territoryId = id;
 
             const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
             if (!API_BIO_URL) {
@@ -74,7 +72,7 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                 return;
             }
 
-            const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
+            const apiPath = `${API_BIO_URL}/graph/tas/${apiTypePath}/${territoryId}/${model}/${scenario}`;
             console.log(`Fetching temperature stats from: ${apiPath}`);
 
             try {
