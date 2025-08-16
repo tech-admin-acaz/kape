@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -18,7 +17,6 @@ interface TemperatureTrendChartProps {
     type: TerritoryTypeKey;
 }
 
-// Equivalent to the Angular version for calculating trend line
 const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
     const values = data.map(d => d.value);
     const n = values.length;
@@ -53,9 +51,6 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
         const fetchData = async () => {
             setIsLoading(true);
             
-            const model = 'CESM2';
-            const scenario = 'ssp245';
-
             let apiTypePath = type;
             if (type === 'estado') {
                 apiTypePath = 'estados';
@@ -63,6 +58,8 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                 apiTypePath = 'municipios';
             }
             
+            const model = 'CESM2';
+            const scenario = 'ssp245';
             const territoryId = id;
 
             const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
@@ -71,9 +68,9 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                 setIsLoading(false);
                 return;
             }
-
+            
             const apiPath = `${API_BIO_URL}/graph/tas/${apiTypePath}/${territoryId}/${model}/${scenario}`;
-            console.log(`Fetching temperature stats from: ${apiPath}`);
+            console.log(`Buscando estatísticas de temperatura em: ${apiPath}`);
 
             try {
                 const response = await fetch(apiPath);
@@ -107,7 +104,6 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                     trend: trendLine[index]
                 }));
 
-                console.log("Data processed for chart:", finalData);
                 setChartData(finalData);
 
             } catch (error) {
@@ -181,16 +177,23 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
             pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f} °C</b><br/>'
         },
         legend: {
-           enabled: false
+           enabled: true,
+           itemStyle: {
+                color: 'hsl(var(--foreground))',
+                fontWeight: 'normal',
+           },
+           itemHoverStyle: {
+               color: 'hsl(var(--primary))'
+           }
         },
         series: [{
-            name: "Temperatura",
+            name: "Temperatura Superficial",
             type: 'spline',
             data: chartData.map(d => d.value),
-            color: 'hsl(var(--destructive))',
+            color: 'hsl(var(--chart-1))',
         },
         {
-            name: 'Tendência',
+            name: 'Linha de tendencia',
             type: 'spline',
             data: chartData.map(d => d.trend),
             color: 'hsl(var(--destructive))',
