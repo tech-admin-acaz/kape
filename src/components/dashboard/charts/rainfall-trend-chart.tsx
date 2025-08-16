@@ -1,33 +1,111 @@
-
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
 import type { FutureClimateData } from '../stats-panel';
-
+import type { TerritoryTypeKey } from '@/models/location.model';
+import { Skeleton } from '@/components/ui/skeleton';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
 }
 
 interface RainfallTrendChartProps {
-    data: FutureClimateData[];
+    id: string;
+    type: TerritoryTypeKey;
 }
 
-export default function RainfallTrendChart({ data }: RainfallTrendChartProps) {
+const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
+    const values = data.map(d => d.value);
+    const n = values.length;
+    if (n < 2) return values;
+
+    const sumX = values.reduce((acc, _, i) => acc + i, 0);
+    const sumY = values.reduce((acc, curr) => acc + curr, 0);
+    const sumXY = values.reduce((acc, curr, i) => acc + i * curr, 0);
+    const sumXX = values.reduce((acc, _, i) => acc + i * i, 0);
+
+    const denominator = n * sumXX - sumX * sumX;
+    if (denominator === 0) return values;
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    const intercept = (sumY - slope * sumX) / n;
+
+    return values.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
+};
+
+
+export default function RainfallTrendChart({ id, type }: RainfallTrendChartProps) {
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+    const chartContainerRef = useRef<HTMLDivElement>(null);
+    const [chartData, setChartData] = useState<FutureClimateData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (chartComponentRef.current) {
+        if (!id || !type) {
+            setIsLoading(false);
+            return;
+        }
+
+        const fetchData = async () => {
+            setIsLoading(true);
+            
+            try {
+                const response = await fetch(`/api/stats/precipitation/${type}/${id}`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Error fetching precipitation stats from API:`, response.status, errorText);
+                    setChartData([]);
+                    return;
+                }
+                
+                const apiData = await response.json();
+                
+                if (!apiData || apiData.length === 0) {
+                  setChartData([]);
+                  return;
+                }
+                
+                setChartData(apiData);
+
+            } catch (error) {
+                console.error(`Error processing precipitation stats:`, error);
+                setChartData([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id, type]);
+
+    useEffect(() => {
+        if (chartComponentRef.current && !isLoading) {
             chartComponentRef.current.chart.reflow();
         }
-    }, [data]);
+    }, [chartData, isLoading]);
+
+    useEffect(() => {
+      const container = chartContainerRef.current;
+      if (!container) return;
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (chartComponentRef.current) {
+          chartComponentRef.current.chart.reflow();
+        }
+      });
+      resizeObserver.observe(container);
+
+      return () => resizeObserver.disconnect();
+    }, []);
 
     const options: Highcharts.Options = {
         chart: {
             backgroundColor: 'transparent',
+            type: 'spline',
             zoomType: 'x',
         },
         title: {
@@ -43,7 +121,7 @@ export default function RainfallTrendChart({ data }: RainfallTrendChartProps) {
             enabled: false
         },
         xAxis: {
-            categories: data.map(d => d.year),
+            categories: chartData.map(d => d.year),
             crosshair: true,
             labels: {
                 style: {
@@ -54,13 +132,13 @@ export default function RainfallTrendChart({ data }: RainfallTrendChartProps) {
         },
         yAxis: { 
             labels: {
-                format: '{value}mm',
+                format: '{value} mm',
                 style: {
                     color: 'hsl(var(--foreground))'
                 }
             },
             title: {
-                text: 'Precipitação Média',
+                text: 'Chuva Média Anual (mm/ano)',
                 style: {
                     color: 'hsl(var(--foreground))'
                 }
@@ -78,18 +156,25 @@ export default function RainfallTrendChart({ data }: RainfallTrendChartProps) {
             pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f} mm</b><br/>'
         },
         legend: {
-           enabled: false
+           enabled: true,
+           itemStyle: {
+                color: 'hsl(var(--foreground))',
+                fontWeight: 'normal',
+           },
+           itemHoverStyle: {
+               color: 'hsl(var(--primary))'
+           }
         },
         series: [{
             name: "Precipitação",
-            type: 'column',
-            data: data.map(d => d.value),
+            type: 'spline',
+            data: chartData.map(d => d.value),
             color: 'hsl(var(--chart-2))',
         },
         {
-            name: 'Tendência',
+            name: 'Linha de tendencia',
             type: 'spline',
-            data: data.map(d => d.trend),
+            data: chartData.map(d => d.trend),
             color: 'hsl(var(--destructive))',
             dashStyle: 'Dash',
             marker: {
@@ -120,8 +205,10 @@ export default function RainfallTrendChart({ data }: RainfallTrendChartProps) {
     };
 
     return (
-        <div className="w-full h-[320px]">
-             {data && data.length > 0 ? (
+        <div ref={chartContainerRef} className="w-full h-[320px]">
+             {isLoading ? (
+                <Skeleton className="w-full h-full" />
+             ) : chartData && chartData.length > 0 ? (
                 <HighchartsReact
                     highcharts={Highcharts}
                     options={options}

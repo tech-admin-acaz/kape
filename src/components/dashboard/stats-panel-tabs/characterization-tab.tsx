@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -91,7 +90,7 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             </Card>
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <RainfallTrendChart data={futureClimate.precipitation} />
+                    <RainfallTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
         </div>
