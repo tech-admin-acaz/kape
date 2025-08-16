@@ -3,6 +3,27 @@ import { NextResponse, NextRequest } from 'next/server';
 
 const API_BIO_URL = process.env.API_BIO_URL;
 
+// Equivalent to the Angular version for calculating trend line
+const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
+    const values = data.map(d => d.value);
+    const n = values.length;
+    if (n < 2) return values;
+
+    const sumX = values.reduce((acc, _, i) => acc + i, 0);
+    const sumY = values.reduce((acc, curr) => acc + curr, 0);
+    const sumXY = values.reduce((acc, curr, i) => acc + i * curr, 0);
+    const sumXX = values.reduce((acc, _, i) => acc + i * i, 0);
+
+    const denominator = n * sumXX - sumX * sumX;
+    if (denominator === 0) return values;
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    const intercept = (sumY - slope * sumX) / n;
+
+    return values.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
+};
+
+
 /**
  * API route to fetch temperature statistics for a given location.
  */
@@ -51,14 +72,28 @@ export async function GET(
             return NextResponse.json({ error: `Failed to fetch temperature stats from source` }, { status: response.status });
         }
         
-        const data = await response.json();
+        let data = await response.json();
         // The V1 API returns data in a nested array, e.g. `[[{time, value}, ...]]`
-        // We will return the inner array if it exists.
-        if (Array.isArray(data) && Array.isArray(data[0])) {
-            return NextResponse.json(data[0]);
+        const timeSeries = (Array.isArray(data) && Array.isArray(data[0])) ? data[0] : data;
+
+        if (!Array.isArray(timeSeries)) {
+             return NextResponse.json({ error: 'Unexpected data format from API' }, { status: 500 });
         }
-        // If it's just a single array, return it directly.
-        return NextResponse.json(data);
+
+        const processedData = timeSeries.map((d: any) => ({
+            year: new Date(d.time).getFullYear().toString(),
+            value: parseFloat(d.value.toFixed(2))
+        }));
+
+        const trendLine = calculateTrendLine(processedData);
+
+        const finalData = processedData.map((d, index) => ({
+            year: d.year,
+            value: d.value, // Already a float
+            trend: trendLine[index] // Already a float
+        }));
+
+        return NextResponse.json(finalData);
 
     } catch (error) {
         console.error(`Error fetching temperature stats from ${apiPath}:`, error);

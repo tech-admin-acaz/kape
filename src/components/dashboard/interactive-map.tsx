@@ -45,26 +45,6 @@ interface PopupInfo {
     message: string;
 }
 
-// Equivalent to the Angular version for calculating trend line
-const calculateTrendLine = (data: number[]): number[] => {
-    const n = data.length;
-    if (n < 2) return data;
-
-    const sumX = data.reduce((acc, _, i) => acc + i, 0);
-    const sumY = data.reduce((acc, curr) => acc + curr, 0);
-    const sumXY = data.reduce((acc, curr, i) => acc + i * curr, 0);
-    const sumXX = data.reduce((acc, _, i) => acc + i * i, 0);
-
-    const denominator = n * sumXX - sumX * sumX;
-    if (denominator === 0) return data;
-
-    const slope = (n * sumXY - sumX * sumY) / denominator;
-    const intercept = (sumY - slope * sumX) / n;
-
-    return data.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
-};
-
-
 export default function InteractiveMap({ onAreaUpdate, selectedArea }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
@@ -188,27 +168,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         // Fetch dynamic data
-        // const tempStatsRaw = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        const tempStatsRaw = [
-            {"year":"2020","value":25.35,"trend":25.35},
-            {"year":"2021","value":25.82,"trend":25.82},
-            {"year":"2022","value":25.76,"trend":25.76},
-            {"year":"2023","value":26.11,"trend":26.11},
-            {"year":"2024","value":25.99,"trend":25.99},
-            {"year":"2025","value":26.23,"trend":26.23},
-        ];
-
-        
-        let tempStats: FutureClimateData[] = [];
-        if (Array.isArray(tempStatsRaw)) {
-            const values = tempStatsRaw.map(d => parseFloat(d.value.toFixed(2)));
-            const trend = calculateTrendLine(values);
-            tempStats = tempStatsRaw.map((d: any, index: number) => ({
-                year: d.year,
-                value: values[index],
-                trend: trend[index],
-            }));
-        }
+        const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
         
         const landCoverStats = null; // Temporarily disabled
 
@@ -251,7 +211,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: tempStats,
+            temperature: Array.isArray(tempStats) ? tempStats : [],
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
