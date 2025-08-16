@@ -169,12 +169,21 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         // Fetch dynamic data
         const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        const landCoverStats = await getLandCoverStats(type, location.value);
         
         const formattedTempStats = Array.isArray(tempStats) ? tempStats.map((d: any) => ({
             year: d.year,
             value: parseFloat(d.value.toFixed(2)),
             trend: parseFloat(d.trend.toFixed(2)),
         })) : [];
+
+        const formattedLandCoverData = landCoverStats ? [
+            { name: "Formação Florestal Primária", y: landCoverStats.vegetation, color: "hsl(var(--chart-3))" },
+            { name: "Outras Formações Naturais", y: landCoverStats.natural_formation, color: "hsl(var(--chart-2))" },
+            { name: "Pastagem", y: landCoverStats.pasture, color: "hsl(var(--chart-4))" },
+            { name: "Agricultura", y: landCoverStats.agriculture, color: "hsl(var(--chart-5))" },
+            { name: "Outros", y: landCoverStats.other, color: "hsl(var(--muted))" },
+        ] : baseMockData.stats.landCover;
 
 
         let state = 'Não definido';
@@ -227,7 +236,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           },
           stats: {
             ...baseMockData.stats,
-            // landCover: baseMockData.stats.landCover, // Keep mock data for now
+            landCover: formattedLandCoverData,
           },
           environmentalServices: baseMockData.environmentalServices,
           correlationInsights: baseMockData.correlationInsights,

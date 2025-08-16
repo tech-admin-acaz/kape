@@ -141,4 +141,3 @@ export async function getTemperatureStats(type: TerritoryTypeKey, id: string, mo
     const data = await response.json();
     return data;
 }
-
