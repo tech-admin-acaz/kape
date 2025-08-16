@@ -166,8 +166,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         }
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
-        const landCoverStats = null; // Temporarily disabled
-        const formattedLandCoverData = baseMockData.stats.landCover;
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
           if (apiData && apiData.length > 0) {
@@ -200,15 +198,18 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           typeKey: type,
           generalInfo,
           stats: {
-            ...baseMockData.stats,
-            landCover: formattedLandCoverData,
+            // Land cover data will be fetched by its own component
+            landCover: [],
+            waterQuality: baseMockData.stats.waterQuality,
+            vegetationIndex: baseMockData.stats.vegetationIndex,
           },
           environmentalServices: baseMockData.environmentalServices,
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: [], // Temperature data will be fetched by its own component
-            precipitation: baseMockData.futureClimate.precipitation,
+            // Temperature and precipitation data will be fetched by their own components
+            temperature: [],
+            precipitation: [],
           },
         };
         console.log("Dados carregados para o mapa:", newArea);

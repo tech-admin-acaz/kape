@@ -1,20 +1,66 @@
 
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
+import type { TerritoryTypeKey } from '@/models/location.model';
+import { Skeleton } from '@/components/ui/skeleton';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
 }
 
 interface LandCoverChartProps {
-  data: { name: string; y: number; color: string; }[];
+  id: string;
+  type: TerritoryTypeKey;
 }
 
-const LandCoverChart: React.FC<LandCoverChartProps> = ({ data }) => {
+interface ChartDataPoint {
+  name: string;
+  y: number;
+  color: string;
+}
+
+const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+
+  useEffect(() => {
+    if (!id || !type) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
+        if (!response.ok) {
+          console.error(`Error fetching land cover stats: ${response.statusText}`);
+          setChartData([]);
+          return;
+        }
+        const data = await response.json();
+        setChartData(data);
+      } catch (error) {
+        console.error("Failed to fetch or process land cover stats:", error);
+        setChartData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id, type]);
+
+  useEffect(() => {
+    if (chartComponentRef.current && !isLoading) {
+      chartComponentRef.current.chart.reflow();
+    }
+  }, [chartData, isLoading]);
 
   const options: Highcharts.Options = {
     chart: {
@@ -47,7 +93,7 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ data }) => {
     series: [{
       type: 'pie',
       name: 'Uso da Terra',
-      data: data,
+      data: chartData,
     }],
     exporting: {
         enabled: true,
@@ -75,10 +121,22 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ data }) => {
   };
 
   return (
-    <HighchartsReact
-      highcharts={Highcharts}
-      options={options}
-    />
+    <div className="w-full h-80">
+      {isLoading ? (
+        <Skeleton className="w-full h-full" />
+      ) : chartData && chartData.length > 0 ? (
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={options}
+          ref={chartComponentRef}
+          containerProps={{ style: { height: "100%", width: "100%" } }}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full text-muted-foreground">
+          Nenhum dado de uso e cobertura da terra disponível.
+        </div>
+      )}
+    </div>
   );
 };
 

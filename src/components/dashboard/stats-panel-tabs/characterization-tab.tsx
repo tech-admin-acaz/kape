@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -62,9 +63,7 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
              <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <div className="h-80 w-full">
-                        <LandCoverChart data={stats.landCover} />
-                    </div>
+                    <LandCoverChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
         </div>
