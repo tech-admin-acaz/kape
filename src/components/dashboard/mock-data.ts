@@ -51,6 +51,7 @@ export const mockData: Record<string, StatsData> = {
     id: "1",
     name: "T.I. Yanomami",
     type: "Indigenous Territory",
+    typeKey: "ti",
     generalInfo: {
         state: "Roraima (RR)",
         municipality: "Undefined",
@@ -69,24 +70,9 @@ export const mockData: Record<string, StatsData> = {
       vegetationIndex: 92,
     },
     environmentalServices: {
-      biodiversity: {
-        amphibians: 53,
-        birds: 470,
-        mammals: 129,
-        trees: 73,
-        reptiles: 131,
-      },
       carbon: {
-        currentAndRestorable: [
-            { name: "Vegetação Primária", current: 348210000, restorable: 0 },
-            { name: "Floresta Secundária", current: 0, restorable: 5490000 },
-            { name: "Agropecuária", current: 325930000, restorable: 26030000 },
-        ],
-        valuation: [
-            { name: "Vegetação Primária", value: 5000000000 },
-            { name: "Floresta Secundária", value: 285000000 },
-            { name: "Agropecuária", value: 14000000000 },
-        ],
+        currentAndRestorable: [], // This will be fetched dynamically
+        valuation: [], // This will be fetched dynamically
       },
       water: {
         valuation: [
@@ -107,6 +93,7 @@ export const mockData: Record<string, StatsData> = {
     id: "2",
     name: "Serra da Canastra",
     type: "National Park",
+    typeKey: 'uc',
     generalInfo: {
         state: "Minas Gerais (MG)",
         municipality: "Undefined",
@@ -125,24 +112,9 @@ export const mockData: Record<string, StatsData> = {
       vegetationIndex: 88,
     },
     environmentalServices: {
-      biodiversity: {
-        amphibians: 40,
-        birds: 350,
-        mammals: 100,
-        trees: 150,
-        reptiles: 90,
-      },
       carbon: {
-        currentAndRestorable: [
-          { name: "Vegetação Primária", current: 450000000, restorable: 1000000 },
-          { name: "Floresta Secundária", current: 10000000, restorable: 15000000 },
-          { name: "Agropecuária", current: 100000000, restorable: 50000000 },
-        ],
-        valuation: [
-            { name: "Vegetação Primária", value: 8000000000 },
-            { name: "Floresta Secundária", value: 500000000 },
-            { name: "Agropecuária", value: 8000000000 },
-        ],
+        currentAndRestorable: [], // This will be fetched dynamically
+        valuation: [], // This will be fetched dynamically
       },
        water: {
         valuation: [

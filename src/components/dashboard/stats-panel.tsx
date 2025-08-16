@@ -37,7 +37,7 @@ export interface BiodiversityData {
     reptiles: number;
 }
 
-interface CarbonData {
+export interface CarbonData {
     currentAndRestorable: { name: string; current: number; restorable: number; }[];
     valuation: { name: string; value: number; }[];
 }
@@ -73,8 +73,7 @@ export interface StatsData {
     vegetationIndex: number;
   };
   environmentalServices: {
-    biodiversity: BiodiversityData;
-    carbon: CarbonData;
+    carbon: CarbonData; // This will now be fetched dynamically
     water: WaterData;
   };
   correlationInsights: string;
@@ -202,7 +201,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                   <ServicesTab 
                       id={data.id} 
                       typeKey={data.typeKey} 
-                      mockCarbon={data.environmentalServices.carbon}
                       mockWater={data.environmentalServices.water}
                   />
               </TabsContent>

@@ -9,24 +9,14 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Cart
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import type { BiodiversityData } from '../stats-panel';
+import type { BiodiversityData, CarbonData } from '../stats-panel';
 import { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface CarbonData {
-    currentAndRestorable: { name: string; current: number; restorable: number; }[];
-    valuation: { name: string; value: number; }[];
-}
-
-interface WaterData {
-    valuation: { name: string; value: number; }[];
-}
 
 interface ServicesTabProps {
   id: string;
   typeKey: TerritoryTypeKey;
-  mockCarbon: CarbonData;
-  mockWater: WaterData;
+  mockWater: { valuation: { name: string; value: number; }[] };
 }
 
 const formatNumber = (value: number) => {
@@ -104,82 +94,65 @@ const BiodiversityCard = ({
   </div>
 );
 
-const BiodiversitySkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-card rounded-lg overflow-hidden flex items-center shadow-lg text-card-foreground border">
-                <Skeleton className="w-24 h-24 bg-muted" />
-                <div className="p-4 w-full">
-                    <Skeleton className="h-6 w-3/4 mb-2 bg-muted" />
-                    <Skeleton className="h-12 w-1/2 bg-muted" />
-                </div>
-            </div>
-        ))}
+const DataSkeleton = ({ children }: { children: React.ReactNode }) => (
+    <div className="space-y-4">
+        {children}
     </div>
 );
 
-
-export default function ServicesTab({ id, typeKey, mockCarbon, mockWater }: ServicesTabProps) {
+export default function ServicesTab({ id, typeKey, mockWater }: ServicesTabProps) {
     const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
+    const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
+    const [isCarbonLoading, setIsCarbonLoading] = useState(true);
 
      useEffect(() => {
         if (!id || !typeKey) {
-            setIsLoading(false);
+            setIsBiodiversityLoading(false);
+            setIsCarbonLoading(false);
             return;
         }
 
         const fetchBiodiversityData = async () => {
-            setIsLoading(true);
+            setIsBiodiversityLoading(true);
             try {
                 const response = await fetch(`/api/stats/biodiversity/${typeKey}/${id}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch biodiversity data');
-                }
+                if (!response.ok) throw new Error('Failed to fetch biodiversity data');
                 const data = await response.json();
                 setBiodiversity(data);
             } catch (error) {
                 console.error("Error fetching biodiversity data:", error);
                 setBiodiversity(null);
             } finally {
-                setIsLoading(false);
+                setIsBiodiversityLoading(false);
+            }
+        };
+
+        const fetchCarbonData = async () => {
+            setIsCarbonLoading(true);
+            try {
+                const response = await fetch(`/api/stats/carbon/${typeKey}/${id}`);
+                if (!response.ok) throw new Error('Failed to fetch carbon data');
+                const data = await response.json();
+                setCarbonData(data);
+            } catch (error) {
+                console.error("Error fetching carbon data:", error);
+                setCarbonData(null);
+            } finally {
+                setIsCarbonLoading(false);
             }
         };
 
         fetchBiodiversityData();
+        fetchCarbonData();
     }, [id, typeKey]);
     
-    const biodiversityData = biodiversity ? [
-      {
-        category: 'Anfíbios',
-        count: biodiversity.amphibians,
-        imageUrl: 'https://placehold.co/100x100.png',
-        imageHint: 'frog tree',
-      },
-      {
-        category: 'Aves',
-        count: biodiversity.birds,
-        imageUrl: 'https://placehold.co/100x100.png',
-        imageHint: 'macaw bird',
-      },
-      {
-        category: 'Mamíferos',
-        count: biodiversity.mammals,
-        imageUrl: 'https://placehold.co/100x100.png',
-        imageHint: 'jaguar animal',
-      },
-      {
-        category: 'Árvores',
-        count: biodiversity.trees,
-        imageUrl: 'https://placehold.co/100x100.png',
-        imageHint: 'brazil nut tree',
-      },
-      {
-        category: 'Répteis',
-        count: biodiversity.reptiles,
-        imageUrl: 'https://placehold.co/100x100.png',
-        imageHint: 'green snake',
-      },
+    const biodiversityCards = biodiversity ? [
+      { category: 'Anfíbios', count: biodiversity.amphibians, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'frog tree' },
+      { category: 'Aves', count: biodiversity.birds, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'macaw bird' },
+      { category: 'Mamíferos', count: biodiversity.mammals, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'jaguar animal' },
+      { category: 'Árvores', count: biodiversity.trees, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'brazil nut tree' },
+      { category: 'Répteis', count: biodiversity.reptiles, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'green snake' },
     ] : [];
 
   return (
@@ -187,11 +160,20 @@ export default function ServicesTab({ id, typeKey, mockCarbon, mockWater }: Serv
         {/* Biodiversity Section */}
         <div className="space-y-4">
             <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
-             {isLoading ? (
-                <BiodiversitySkeleton />
+             {isBiodiversityLoading ? (
+                <DataSkeleton>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="bg-card rounded-lg overflow-hidden flex items-center shadow-lg text-card-foreground border">
+                                <Skeleton className="w-24 h-24 bg-muted" />
+                                <div className="p-4 w-full"><Skeleton className="h-6 w-3/4 mb-2 bg-muted" /><Skeleton className="h-12 w-1/2 bg-muted" /></div>
+                            </div>
+                        ))}
+                    </div>
+                </DataSkeleton>
             ) : biodiversity ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {biodiversityData.map((item) => (
+                     {biodiversityCards.map((item) => (
                         <BiodiversityCard key={item.category} {...item} />
                     ))}
                 </div>
@@ -203,40 +185,47 @@ export default function ServicesTab({ id, typeKey, mockCarbon, mockWater }: Serv
         {/* Carbon Section */}
         <div className="space-y-4">
             <SectionHeader title="Carbono" tooltipText="Análise de estoque e valoração de serviços de carbono." />
-            <Card className="bg-muted/30">
-                <CardHeader>
-                    <CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ResponsiveContainer width="100%" height={256}>
-                        <ComposedChart data={mockCarbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                            <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
-                            <Tooltip content={<CustomTooltip formatter={(value) => formatNumber(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }}/>
-                            <Legend wrapperStyle={{fontSize: "12px"}} />
-                            <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
-                            <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
-                        </ComposedChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
-            <Card className="bg-muted/30">
-                <CardHeader>
-                    <CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ResponsiveContainer width="100%" height={256}>
-                        <BarChart data={mockCarbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                            <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                            <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
-                            <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }} />
-                            <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
+            {isCarbonLoading ? (
+                 <DataSkeleton>
+                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
+                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
+                </DataSkeleton>
+            ) : carbonData ? (
+                <>
+                    <Card className="bg-muted/30">
+                        <CardHeader><CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle></CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={256}>
+                                <ComposedChart data={carbonData.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                    <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
+                                    <Tooltip content={<CustomTooltip formatter={(value) => formatNumber(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent) / 0.5)' }}/>
+                                    <Legend wrapperStyle={{fontSize: "12px"}} />
+                                    <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
+                                    <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-muted/30">
+                        <CardHeader><CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle></CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={256}>
+                                <BarChart data={carbonData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                    <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
+                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
+                                    <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent) / 0.5)' }} />
+                                    <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </>
+            ) : (
+                 <p className="text-muted-foreground">Não foi possível carregar os dados de carbono.</p>
+            )}
         </div>
 
         {/* Water Section */}
@@ -252,7 +241,7 @@ export default function ServicesTab({ id, typeKey, mockCarbon, mockWater }: Serv
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                            <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent))' }} />
+                            <Tooltip content={<CustomTooltip formatter={(value) => formatCurrency(Number(value))}/>} cursor={{ fill: 'hsl(var(--accent) / 0.5)' }} />
                             <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
