@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
-import TesteTab from './stats-panel-tabs/teste-tab';
 import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -143,7 +142,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     characterization: "Caracterização",
     services: "Serviços Ambientais",
     ranking: "Ranking de Espécies",
-    teste: "Teste Chart"
   }
 
   const servicesLabel = shouldAbbreviate ? "S. Ambientais" : TABS.services;
@@ -160,7 +158,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
                 <TooltipProvider>
-                    <TabsList className="w-full grid grid-cols-4">
+                    <TabsList className="w-full grid grid-cols-3">
                         <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                             {TABS.characterization}
                         </TabsTrigger>
@@ -190,9 +188,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 </TooltipContent>
                             )}
                         </Tooltip>
-                         <TabsTrigger value="teste" className="flex-1 text-xs md:text-sm">
-                            {TABS.teste}
-                        </TabsTrigger>
                     </TabsList>
                 </TooltipProvider>
             </div>
@@ -206,9 +201,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
                   <SpeciesTab species={data.species} />
-              </TabsContent>
-               <TabsContent value="teste" className="mt-0">
-                  <TesteTab />
               </TabsContent>
             </div>
         </Tabs>

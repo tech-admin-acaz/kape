@@ -168,7 +168,16 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         // Fetch dynamic data
-        const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        let tempStats: FutureClimateData[] = [];
+        try {
+            tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        } catch(e) {
+            console.error("Could not fetch temperature stats, will use mock data as fallback.", e);
+        }
+
+        if(!Array.isArray(tempStats)) {
+            tempStats = [];
+        }
         
         const landCoverStats = null; // Temporarily disabled
 
@@ -211,7 +220,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: Array.isArray(tempStats) ? tempStats : [],
+            temperature: tempStats,
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
