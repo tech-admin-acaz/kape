@@ -36,7 +36,7 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ data }) => {
           format: '<b>{point.name}</b>: {point.percentage:.1f} %',
           distance: 20,
           style: {
-            color: 'var(--foreground)',
+            color: 'hsl(var(--foreground))',
             textOutline: 'none',
             fontWeight: 'normal',
           }
