@@ -168,6 +168,9 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
         const landCoverStats = null; // Temporarily disabled
         const formattedLandCoverData = baseMockData.stats.landCover;
+        const temperatureStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
+        console.log("Stats de temperatura da API:", temperatureStats);
+
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
           if (apiData && apiData.length > 0) {
@@ -207,8 +210,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            // Data will be fetched by child components
-            temperature: [],
+            temperature: temperatureStats || [],
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };
@@ -463,5 +465,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
     </div>
   );
 }
-
-    
