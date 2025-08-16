@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLandCoverStats, getTemperatureStats } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, /* getLandCoverStats, */ getTemperatureStats } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData } from './stats-panel';
@@ -169,7 +169,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
 
         // Fetch dynamic data
         const tempStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        const landCoverStats = await getLandCoverStats(type, location.value);
+        // const landCoverStats = await getLandCoverStats(type, location.value);
+        const landCoverStats = null; // Temporarily disabled
         
         const formattedTempStats = Array.isArray(tempStats) ? tempStats.map((d: any) => ({
             year: d.year,

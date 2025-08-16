@@ -112,17 +112,17 @@ export async function getLocationByCoords(lat: number, lng: number): Promise<any
 /**
  * Fetches land cover statistics for a given location.
  */
-export async function getLandCoverStats(type: TerritoryTypeKey, id: string): Promise<any> {
-    const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error fetching land cover stats for ${type}/${id}:`, response.status, errorText);
-        throw new Error(`Failed to fetch land cover stats for ${type}/${id}`);
-    }
-    const data = await response.json();
-    // The API returns an array, so we return the first element.
-    return data && data.length > 0 ? data[0] : null;
-}
+// export async function getLandCoverStats(type: TerritoryTypeKey, id: string): Promise<any> {
+//     const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
+//     if (!response.ok) {
+//         const errorText = await response.text();
+//         console.error(`Error fetching land cover stats for ${type}/${id}:`, response.status, errorText);
+//         throw new Error(`Failed to fetch land cover stats for ${type}/${id}`);
+//     }
+//     const data = await response.json();
+//     // The API returns an array, so we return the first element.
+//     return data && data.length > 0 ? data[0] : null;
+// }
 
 /**
  * Fetches temperature statistics for a given location.
