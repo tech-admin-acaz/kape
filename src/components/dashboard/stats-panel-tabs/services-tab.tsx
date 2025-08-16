@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Bird, TreeDeciduous } from 'lucide-react';
@@ -9,12 +9,24 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Cart
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import type { StatsData } from '../stats-panel';
+import type { BiodiversityData } from '../stats-panel';
+import { TerritoryTypeKey } from '@/models/location.model';
+import { Skeleton } from '@/components/ui/skeleton';
 
-type EnvironmentalServicesData = StatsData['environmentalServices'];
+interface CarbonData {
+    currentAndRestorable: { name: string; current: number; restorable: number; }[];
+    valuation: { name: string; value: number; }[];
+}
+
+interface WaterData {
+    valuation: { name: string; value: number; }[];
+}
 
 interface ServicesTabProps {
-  data: EnvironmentalServicesData;
+  id: string;
+  typeKey: TerritoryTypeKey;
+  mockCarbon: CarbonData;
+  mockWater: WaterData;
 }
 
 const formatNumber = (value: number) => {
@@ -92,9 +104,52 @@ const BiodiversityCard = ({
   </div>
 );
 
-export default function ServicesTab({ data }: ServicesTabProps) {
-    const { biodiversity, carbon, water } = data;
-    const biodiversityData = [
+const BiodiversitySkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-gray-800 rounded-lg overflow-hidden flex items-center shadow-lg text-white">
+                <Skeleton className="w-24 h-24 bg-gray-700" />
+                <div className="p-4 w-full">
+                    <Skeleton className="h-6 w-3/4 mb-2 bg-gray-700" />
+                    <Skeleton className="h-12 w-1/2 bg-gray-700" />
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+
+export default function ServicesTab({ id, typeKey, mockCarbon, mockWater }: ServicesTabProps) {
+    const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+     useEffect(() => {
+        if (!id || !typeKey) {
+            setIsLoading(false);
+            return;
+        }
+
+        const fetchBiodiversityData = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch(`/api/stats/biodiversity/${typeKey}/${id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch biodiversity data');
+                }
+                const data = await response.json();
+                setBiodiversity(data);
+            } catch (error) {
+                console.error("Error fetching biodiversity data:", error);
+                setBiodiversity(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBiodiversityData();
+    }, [id, typeKey]);
+    
+    const biodiversityData = biodiversity ? [
       {
         category: 'Anfíbios',
         count: biodiversity.amphibians,
@@ -125,18 +180,24 @@ export default function ServicesTab({ data }: ServicesTabProps) {
         imageUrl: 'https://placehold.co/100x100.png',
         imageHint: 'green snake',
       },
-    ];
+    ] : [];
 
   return (
     <div className="p-6 space-y-8">
         {/* Biodiversity Section */}
         <div className="space-y-4">
             <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 {biodiversityData.map((item) => (
-                    <BiodiversityCard key={item.category} {...item} />
-                ))}
-            </div>
+             {isLoading ? (
+                <BiodiversitySkeleton />
+            ) : biodiversity ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     {biodiversityData.map((item) => (
+                        <BiodiversityCard key={item.category} {...item} />
+                    ))}
+                </div>
+            ) : (
+                <p className="text-muted-foreground">Não foi possível carregar os dados de biodiversidade.</p>
+            )}
         </div>
 
         {/* Carbon Section */}
@@ -148,7 +209,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={256}>
-                        <ComposedChart data={carbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                        <ComposedChart data={mockCarbon.currentAndRestorable} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
@@ -166,7 +227,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={256}>
-                        <BarChart data={carbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <BarChart data={mockCarbon.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                             <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
                             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
@@ -187,7 +248,7 @@ export default function ServicesTab({ data }: ServicesTabProps) {
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={256}>
-                        <BarChart data={water.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <BarChart data={mockWater.valuation} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />

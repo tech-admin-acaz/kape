@@ -29,7 +29,7 @@ interface GeneralInfo {
     conservationUnit: string;
 }
 
-interface BiodiversityData {
+export interface BiodiversityData {
     amphibians: number;
     birds: number;
     mammals: number;
@@ -199,7 +199,12 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                   <CharacterizationTab data={data} />
               </TabsContent>
               <TabsContent value="services" className="mt-0">
-                  <ServicesTab data={data.environmentalServices} />
+                  <ServicesTab 
+                      id={data.id} 
+                      typeKey={data.typeKey} 
+                      mockCarbon={data.environmentalServices.carbon}
+                      mockWater={data.environmentalServices.water}
+                  />
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
                   <SpeciesTab species={data.species} />
@@ -223,7 +228,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 variant="outline" 
                                 size="icon" 
                                 className="flex-shrink-0 bg-white hover:bg-gray-50 border-gray-300 shadow-sm" 
-                                onClick={() => window.open(`/report?areaId=${data.id}`, '_blank')}
+                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}`, '_blank')}
                             >
                                 <FileText className="w-5 h-5 text-primary" />
                             </Button>
@@ -238,5 +243,3 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </div>
   );
 }
-
-    

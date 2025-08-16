@@ -9,16 +9,29 @@ import SpeciesTab from '@/components/dashboard/stats-panel-tabs/species-tab';
 import { Button } from '../ui/button';
 import { Download, FilePlus2 } from 'lucide-react';
 import { Separator } from '../ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { TerritoryTypeKey } from '@/models/location.model';
+import { StatsData } from '../dashboard/stats-panel';
 
 export default function ReportLayout() {
   const searchParams = useSearchParams();
   const areaId = searchParams.get('areaId');
-  const data = areaId ? mockData[areaId] : null;
+  const typeKey = searchParams.get('typeKey') as TerritoryTypeKey | null;
+
+  // For this report, we'll continue using mockData for simplicity,
+  // but in a real app, you might fetch fresh data.
+  const data: StatsData | null = areaId ? mockData[areaId] : null;
 
   const [includeSpecies, setIncludeSpecies] = useState(false);
 
-  if (!data) {
+  // Update the document title when data is available
+  useEffect(() => {
+    if (data) {
+      document.title = `Relatório - ${data.name}`;
+    }
+  }, [data]);
+
+  if (!data || !areaId || !typeKey) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Selecione uma área no painel para ver o relatório.</p>
@@ -29,7 +42,7 @@ export default function ReportLayout() {
   const handleDownloadPDF = (includeSpeciesData: boolean) => {
     setIncludeSpecies(includeSpeciesData);
     // This is a placeholder for the print functionality
-    // In a real app, this would likely trigger a library like jsPDF or a browser print dialog
+    // A short delay ensures state is set before printing
     setTimeout(() => {
         window.print();
     }, 100);
@@ -68,7 +81,12 @@ export default function ReportLayout() {
             
             <div id="services-section" className="pt-8">
                  <h2 className="text-2xl font-bold font-headline mb-4">2. Serviços Ambientais</h2>
-                <ServicesTab data={data.environmentalServices} />
+                <ServicesTab 
+                  id={areaId} 
+                  typeKey={typeKey} 
+                  mockCarbon={data.environmentalServices.carbon}
+                  mockWater={data.environmentalServices.water}
+                />
             </div>
 
             {includeSpecies && (
