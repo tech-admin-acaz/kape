@@ -23,15 +23,6 @@ interface ChartDataPoint {
   color: string;
 }
 
-const landCoverMapping: { [key: string]: { name: string; color: string } } = {
-    "Agricultura": { name: "Agricultura", color: "hsl(var(--chart-5))" },
-    "Pastagem": { name: "Pastagem", color: "hsl(var(--chart-4))" },
-    "Outras": { name: "Outros", color: "hsl(var(--muted))" },
-    "Floresta Secundária": { name: "Floresta Secundária", color: "#7a5900" },
-    "Outras Formações Naturais": { name: "Outras Formações Naturais", color: "hsl(var(--chart-2))" },
-    "Floresta Primaria": { name: "Formação Florestal Primária", color: "hsl(var(--chart-3))" },
-};
-
 const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,57 +36,15 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
 
     const fetchData = async () => {
       setIsLoading(true);
-
-      const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
-      if (!API_BIO_URL) {
-          console.error("API URL not configured");
-          setIsLoading(false);
-          return;
-      }
-
-      let territoryId: string;
-      let cityId: string;
-
-      if (type === 'municipio') {
-          territoryId = '0';
-          cityId = id;
-      } else {
-          territoryId = id;
-          cityId = '0';
-      }
-    
-      const apiPath = `${API_BIO_URL}/area/${territoryId}/${cityId}`;
-
       try {
-        const response = await fetch(apiPath);
+        const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
         if (!response.ok) {
-          console.error(`Error fetching land cover stats from external API: ${response.statusText}`);
+          console.error(`Error fetching land cover stats: ${response.statusText}`);
           setChartData([]);
           return;
         }
-        const rawData = await response.json();
-        
-        const statsObject = rawData && rawData.length > 0 ? rawData[0] : {};
-
-        if (Object.keys(statsObject).length === 0) {
-            setChartData([]);
-            return;
-        }
-
-        const formattedData = Object.entries(statsObject)
-            .map(([key, value]) => {
-                const mapping = landCoverMapping[key];
-                if (!mapping) return null;
-
-                return {
-                    name: mapping.name,
-                    y: value as number,
-                    color: mapping.color
-                };
-            })
-            .filter(item => item !== null && item.y > 0) as ChartDataPoint[];
-        
-        setChartData(formattedData);
+        const data = await response.json();
+        setChartData(data);
         
       } catch (error) {
         console.error("Failed to fetch or process land cover stats:", error);
