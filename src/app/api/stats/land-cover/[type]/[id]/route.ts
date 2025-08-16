@@ -8,7 +8,7 @@ const landCoverMapping: { [key: string]: { name: string; color: string } } = {
     "Agricultura": { name: "Agricultura", color: "hsl(var(--chart-5))" },
     "Pastagem": { name: "Pastagem", color: "hsl(var(--chart-4))" },
     "Outras": { name: "Outros", color: "hsl(var(--muted))" },
-    "Floresta Secundária": { name: "Floresta Secundária", color: "#7a5900" }, // Corrected key
+    "Floresta Secundária": { name: "Floresta Secundária", color: "#7a5900" },
     "Outras Formações Naturais": { name: "Outras Formações Naturais", color: "hsl(var(--chart-2))" },
     "Floresta Primaria": { name: "Formação Florestal Primária", color: "hsl(var(--chart-3))" },
 };
