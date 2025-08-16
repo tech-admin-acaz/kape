@@ -65,6 +65,7 @@ export async function GET(
         
         const apiData = await response.json();
 
+        // The API returns data in a nested array, e.g. `[[{time, value}, ...]]`
         const timeSeries = (Array.isArray(apiData) && Array.isArray(apiData[0])) ? apiData[0] : (Array.isArray(apiData) ? apiData : []);
 
         if (!Array.isArray(timeSeries) || timeSeries.length === 0) {
