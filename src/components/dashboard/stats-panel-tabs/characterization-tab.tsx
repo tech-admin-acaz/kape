@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LandCoverChart from '../charts/land-cover-chart';
-import FutureClimateChart from '../charts/future-climate-chart';
+import TemperatureTrendChart from '../charts/temperature-trend-chart';
+import RainfallTrendChart from '../charts/rainfall-trend-chart';
 import type { StatsData } from '../stats-panel';
 
 interface CharacterizationTabProps {
@@ -81,33 +82,15 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             />
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                     <FutureClimateChart
-                        title="Tendência de Temperatura da Superfície"
-                        yAxisTitle="Temperatura (°C)"
-                        seriesName="Temperatura"
-                        seriesType="spline"
-                        color="hsl(var(--destructive))"
-                        unit="°"
-                        data={futureClimate.temperature} 
-                    />
+                    <TemperatureTrendChart data={futureClimate.temperature} />
                 </CardContent>
             </Card>
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <FutureClimateChart
-                        title="Tendência da Chuva Média Anual"
-                        yAxisTitle="Precipitação Média"
-                        seriesName="Precipitação"
-                        seriesType="column"
-                        color="hsl(var(--chart-2))"
-                        unit="mm"
-                        data={futureClimate.precipitation} 
-                    />
+                    <RainfallTrendChart data={futureClimate.precipitation} />
                 </CardContent>
             </Card>
         </div>
     </div>
   );
 }
-
-    
