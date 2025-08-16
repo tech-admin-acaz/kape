@@ -1,10 +1,11 @@
+
 "use client";
 
 import React, { useRef, useEffect } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
-import type { FutureClimateData } from './future-climate-chart';
+import type { FutureClimateData } from '../stats-panel';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);

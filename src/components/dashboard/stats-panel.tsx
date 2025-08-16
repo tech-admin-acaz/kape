@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -6,7 +7,6 @@ import { Button } from '../ui/button';
 import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { FutureClimateData } from './charts/future-climate-chart';
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
@@ -53,6 +53,12 @@ export interface SpeciesData {
     potential: boolean;
     domestication: boolean;
     availability: boolean;
+}
+
+export interface FutureClimateData {
+    year: string;
+    value: number;
+    trend: number;
 }
 
 export interface StatsData {

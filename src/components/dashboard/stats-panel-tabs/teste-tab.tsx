@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import TesteChart from '../charts/teste-chart';
-import type { FutureClimateData } from '../charts/future-climate-chart';
+import type { FutureClimateData } from '../stats-panel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
