@@ -36,45 +36,11 @@ export async function GET(
     const model = searchParams.get('model') || 'ipsl-cm6a-lr';
     const scenario = searchParams.get('scenario') || 'ssp585';
 
-    if (!API_BIO_URL) {
-        return NextResponse.json({ error: 'API URL not configured' }, { status: 500 });
-    }
-
-    const allowedTypes = ['estado', 'municipio', 'ti', 'uc'];
-    if (!allowedTypes.includes(type)) {
-        return NextResponse.json({ error: 'Invalid location type' }, { status: 400 });
-    }
-
-    if (!id) {
-        return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
-    }
-
-    let territoryId: string;
-    let cityId: string;
-
-    if (type === 'municipio') {
-        cityId = id;
-        territoryId = '0';
-    } else { // estado, ti, uc
-        territoryId = id;
-        cityId = '0';
-    }
-    
-    const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
-    console.log(`URL da API TAS: ${apiPath}`);
-    
     try {
-        const response = await fetch(apiPath);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Error fetching temperature stats from external API (${apiPath}):`, response.status, errorText);
-            return NextResponse.json({ error: `Failed to fetch temperature stats from source` }, { status: response.status });
-        }
-        
-        let data = await response.json();
-        
-        const timeSeries = (Array.isArray(data) && Array.isArray(data[0])) ? data[0] : (Array.isArray(data) ? data : []);
+        // MOCK DATA
+        const mockApiData = [[{"time":"2015-01-01","value":26.3292359183172},{"time":"2016-01-01","value":26.854070037476},{"time":"2017-01-01","value":27.4597286780739},{"time":"2018-01-01","value":27.8141677415853},{"time":"2019-01-01","value":26.6047018751686},{"time":"2020-01-01","value":26.7625132245806},{"time":"2021-01-01","value":27.4328980956096},{"time":"2022-01-01","value":27.668321273673},{"time":"2023-01-01","value":27.1593507278599},{"time":"2024-01-01","value":28.2237743615496},{"time":"2025-01-01","value":27.1709299705776},{"time":"2026-01-01","value":26.9960987879697},{"time":"2027-01-01","value":27.6815462165202},{"time":"2028-01-01","value":27.9553835031744},{"time":"2029-01-01","value":27.2293525289382},{"time":"2030-01-01","value":27.9543370657532},{"time":"2031-01-01","value":27.7915139196641},{"time":"2032-01-01","value":27.782268356349},{"time":"2033-01-01","value":26.5258014583807},{"time":"2034-01-01","value":27.2254072737216},{"time":"2035-01-01","value":28.2856271739091},{"time":"2036-01-01","value":27.1013558632084},{"time":"2037-01-01","value":28.3420062429672},{"time":"2038-01-01","value":28.4929043882112},{"time":"2039-01-01","value":27.87507423465},{"time":"2040-01-01","value":28.76241478008},{"time":"2041-01-01","value":27.7887562764415},{"time":"2042-01-01","value":27.6885088429891},{"time":"2043-01-01","value":28.547778054589},{"time":"2044-01-01","value":27.6487095373339}]];
+
+        const timeSeries = (Array.isArray(mockApiData) && Array.isArray(mockApiData[0])) ? mockApiData[0] : (Array.isArray(mockApiData) ? mockApiData : []);
 
         if (!Array.isArray(timeSeries) || timeSeries.length === 0) {
              return NextResponse.json([]);
@@ -89,14 +55,14 @@ export async function GET(
 
         const finalData = processedData.map((d, index) => ({
             year: d.year,
-            value: d.value, // Already a float
-            trend: trendLine[index] // Already a float
+            value: d.value,
+            trend: trendLine[index]
         }));
 
         return NextResponse.json(finalData);
 
     } catch (error) {
-        console.error(`Error fetching temperature stats from ${apiPath}:`, error);
-        return NextResponse.json({ error: `Failed to fetch temperature stats` }, { status: 500 });
+        console.error(`Error processing temperature stats:`, error);
+        return NextResponse.json({ error: `Failed to process temperature stats` }, { status: 500 });
     }
 }
