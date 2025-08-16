@@ -40,6 +40,7 @@ export async function GET(
     }
     
     const apiPath = `${API_BIO_URL}/graph/tas/${territoryId}/${cityId}/${model}/${scenario}`;
+    console.log("Fetching temperature stats from URL:", apiPath);
 
     try {
         const response = await fetch(apiPath);
@@ -64,6 +65,3 @@ export async function GET(
         return NextResponse.json({ error: `Failed to fetch temperature stats` }, { status: 500 });
     }
 }
-
-
-
