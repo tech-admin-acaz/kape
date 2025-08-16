@@ -60,9 +60,9 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
 
         <div className="space-y-4">
             <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
-             {/* <div className="h-80 w-full">
+             <div className="h-80 w-full">
                 <LandCoverChart data={stats.landCover} />
-            </div> */}
+            </div>
         </div>
         
         <Card className="bg-muted/30">
