@@ -1,11 +1,10 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from 'lucide-react';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, LabelList } from 'recharts';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
@@ -18,15 +17,16 @@ interface ServicesTabProps {
   typeKey: TerritoryTypeKey;
 }
 
-const formatNumber = (value: number) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
-    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k`;
-    return value.toFixed(0);
+const formatNumber = (value: number): string => {
+    if (value === 0) return "0.00M";
+    if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(2)}k`;
+    return value.toFixed(2);
 };
 
 const formatCurrency = (value: number) => {
-    const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' }).format(value);
-    return formatted.replace(/\s/g, '');
+    const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', compactDisplay: 'short' }).format(value);
+    return formatted.replace(/\s/g, '').replace('.',',');
 };
 
 const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: string }) => (
@@ -201,14 +201,18 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
                                     <Tooltip 
                                         content={
                                             <CustomTooltip 
-                                                formatter={(value, name) => `${formatNumber(Number(value))} tCO₂e`}
+                                                formatter={(value) => `${formatNumber(Number(value))} tCO₂e`}
                                             />
                                         } 
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }}
                                     />
                                     <Legend wrapperStyle={{fontSize: "12px"}} />
-                                    <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))" />
-                                    <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))">
+                                      <LabelList dataKey="current" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
+                                    </Bar>
+                                    <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]}>
+                                      <LabelList dataKey="restorable" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
+                                    </Bar>
                                 </ComposedChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -229,7 +233,9 @@ export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
                                         } 
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
                                     />
-                                    <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]} />
+                                    <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]}>
+                                      <LabelList dataKey="value" position="insideRight" formatter={formatCurrency} style={{ fill: '#000', fontSize: '12px', fontWeight: 'bold' }} />
+                                    </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
