@@ -33,6 +33,8 @@ interface SpeciesRankingTableProps {
 
 const ITEMS_PER_PAGE = 15;
 
+type SortKey = keyof SpeciesData;
+
 const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tooltipText: string }) => (
   <div className="flex items-center gap-1">
     <span>{children}</span>
@@ -54,25 +56,75 @@ const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tool
 export default function SpeciesRankingTable({ species }: SpeciesRankingTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' } | null>(null);
 
   const filteredSpecies = useMemo(() =>
     species.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase())),
     [species, searchTerm]
   );
+  
+  const sortedSpecies = useMemo(() => {
+    let sortableItems = [...filteredSpecies];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
 
-  const totalPages = Math.ceil(filteredSpecies.length / ITEMS_PER_PAGE);
+        if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+            if (aValue === bValue) return 0;
+             if (sortConfig.direction === 'asc') {
+                return aValue ? -1 : 1;
+            }
+            return aValue ? 1 : -1;
+        }
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            if (sortConfig.direction === 'asc') {
+                return aValue.localeCompare(bValue);
+            }
+            return bValue.localeCompare(aValue);
+        }
+        
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [filteredSpecies, sortConfig]);
+
+
+  const totalPages = Math.ceil(sortedSpecies.length / ITEMS_PER_PAGE);
 
   const paginatedSpecies = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredSpecies.slice(startIndex, endIndex);
-  }, [filteredSpecies, currentPage]);
+    return sortedSpecies.slice(startIndex, endIndex);
+  }, [sortedSpecies, currentPage]);
+
+  const requestSort = (key: SortKey) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
+  
+  const SortableHeader = ({ sortKey, children, tooltipText, className }: { sortKey: SortKey, children: React.ReactNode, tooltipText: string, className?: string }) => (
+      <TableHead className={className}>
+          <Button variant="ghost" onClick={() => requestSort(sortKey)} className="px-2 py-1 h-auto">
+             <div className="flex items-center gap-1">
+                <InfoHeader tooltipText={tooltipText}>{children}</InfoHeader>
+                <ArrowUpDown className="h-4 w-4" />
+            </div>
+          </Button>
+      </TableHead>
+  );
+
 
   return (
     <div className="flex flex-col h-full space-y-4 bg-background p-6">
@@ -110,16 +162,11 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
         <Table>
           <TableHeader className="bg-muted/50 sticky top-0">
             <TableRow>
-              <TableHead>Espécie</TableHead>
-              <TableHead>
-                <button className="flex items-center gap-1">
-                  <InfoHeader tooltipText="Nível de resiliência da espécie às mudanças climáticas.">Resiliência Climática</InfoHeader>
-                  <ArrowUpDown className="h-4 w-4" />
-                </button>
-              </TableHead>
-              <TableHead><InfoHeader tooltipText="Potencial de uso econômico ou ecológico.">Potencial de Uso</InfoHeader></TableHead>
-              <TableHead><InfoHeader tooltipText="Espécie domesticada para cultivo.">Domesticação</InfoHeader></TableHead>
-              <TableHead><InfoHeader tooltipText="Disponibilidade de sementes no mercado.">Disponibilidade</InfoHeader></TableHead>
+              <SortableHeader sortKey="name" tooltipText="Nome científico da espécie.">Espécie</SortableHeader>
+              <SortableHeader sortKey="resilience" tooltipText="Nível de resiliência da espécie às mudanças climáticas.">Resiliência Climática</SortableHeader>
+              <SortableHeader sortKey="potential" tooltipText="Potencial de uso econômico ou ecológico.">Potencial de Uso</SortableHeader>
+              <SortableHeader sortKey="domestication" tooltipText="Espécie domesticada para cultivo.">Domesticação</SortableHeader>
+              <SortableHeader sortKey="availability" tooltipText="Disponibilidade de sementes no mercado.">Disponibilidade</SortableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
