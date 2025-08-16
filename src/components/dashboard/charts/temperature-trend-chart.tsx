@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -169,12 +170,28 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
         },
         tooltip: {
             shared: true,
+            useHTML: true,
             backgroundColor: 'hsl(var(--popover))',
             borderColor: 'hsl(var(--border))',
             style: {
                 color: 'hsl(var(--popover-foreground))',
+                fontWeight: 'normal'
             },
-            pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f} °C</b><br/>'
+            formatter: function () {
+                let points = this.points;
+                if (!points) return '';
+
+                let s = `<div style="font-weight: bold; margin-bottom: 5px;">${this.x}</div>`;
+                points.forEach(point => {
+                    s += `
+                        <div style="display: flex; align-items: center;">
+                            <span style="color:${point.color}; font-size: 1.5em; margin-right: 5px;">●</span>
+                            <span>${point.series.name}: <b>${point.y?.toFixed(2)} °C</b></span>
+                        </div>
+                    `;
+                });
+                return s;
+            }
         },
         legend: {
            enabled: true,

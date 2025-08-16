@@ -53,8 +53,8 @@ const CustomTooltip = ({ active, payload, label, formatter }: TooltipProps<Value
                 {payload.map((p, index) => (
                     <div key={index} style={{ color: p.color || p.fill }}>
                         <span className="mr-2">●</span>
-                        {`${p.name}: `}
-                        <b className="font-bold">{formatter ? formatter(p.value) : p.value}</b>
+                        <span>{`${p.name}: `}</span>
+                        <span className="font-bold">{formatter ? formatter(p.value) : p.value}</span>
                     </div>
                 ))}
             </div>

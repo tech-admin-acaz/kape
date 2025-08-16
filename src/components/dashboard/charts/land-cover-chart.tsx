@@ -124,8 +124,14 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
         borderColor: 'hsl(var(--border))',
         style: {
             color: 'hsl(var(--popover-foreground))',
+            fontWeight: 'normal'
         },
-        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.percentage:.1f}%</b>'
+        formatter: function () {
+            return `
+                <div style="font-weight: bold; margin-bottom: 5px;">${this.point.name}</div>
+                <div>Percentual de Area: ${this.percentage.toFixed(2)}%</div>
+            `;
+        }
     },
   };
 
