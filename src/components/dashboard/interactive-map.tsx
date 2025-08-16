@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getTemperatureStats } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData, FutureClimateData } from './stats-panel';
@@ -168,9 +168,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
         const baseMockData = mockData[Object.keys(mockData)[0]];
         const landCoverStats = null; // Temporarily disabled
         const formattedLandCoverData = baseMockData.stats.landCover;
-        const temperatureStats = await getTemperatureStats(type, location.value, 'ipsl-cm6a-lr', 'ssp585');
-        console.log("Stats de temperatura da API:", temperatureStats);
-
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
           if (apiData && apiData.length > 0) {
@@ -210,7 +207,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
           correlationInsights: baseMockData.correlationInsights,
           species: baseMockData.species,
           futureClimate: {
-            temperature: temperatureStats || [],
+            temperature: [], // Temperature data will be fetched by its own component
             precipitation: baseMockData.futureClimate.precipitation,
           },
         };

@@ -86,7 +86,7 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             />
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">
-                    <TemperatureTrendChart data={futureClimate.temperature} />
+                    <TemperatureTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
             <Card className="bg-muted/30">
