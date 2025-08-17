@@ -30,14 +30,12 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined }) => {
-    if (!value || value.toLowerCase().includes('sem dados') || value.toLowerCase().includes('undefined')) {
-        return null;
-    }
+const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined | null }) => {
+    const displayValue = value || `Sem dados de ${label.replace(':', '')}`;
     return (
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">{label}:</span>
-          <span className="font-medium text-right">{value}</span>
+          <span className="font-medium text-right">{displayValue}</span>
         </div>
     )
 };
@@ -51,10 +49,10 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
             <Card className="bg-muted/30">
                 <CardContent className="p-4 space-y-2">
-                    <GeneralInfoItem label="Estados" value={generalInfo.state} />
-                    <GeneralInfoItem label="Municípios" value={generalInfo.municipality} />
-                    <GeneralInfoItem label="Terras Indígenas" value={generalInfo.territoryName} />
-                    <GeneralInfoItem label="Unidades de Conservação" value={generalInfo.conservationUnit} />
+                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                    <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
                 </CardContent>
             </Card>
         </div>
