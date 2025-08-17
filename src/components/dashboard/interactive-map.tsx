@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike, MapLayerMouseEvent } from 'react-map-gl';
-import { MapPin, Plus, Minus, Navigation, Box, Layers2, Globe, Map as MapIconLucide } from 'lucide-react';
+import { MapPin, Plus, Minus, Navigation, Box, Layers2, Globe, Map as MapIconLucide, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import BasemapControl from './basemap-control';
 import SearchControl from './search-control';
 import { Button } from '@/components/ui/button';
@@ -206,9 +206,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             waterQuality: baseMockData.stats.waterQuality,
             vegetationIndex: baseMockData.stats.vegetationIndex,
           },
-          environmentalServices: baseMockData.environmentalServices,
+          environmentalServices: {
+            carbon: { currentAndRestorable: [], valuation: [] },
+            water: { valuation: [] }
+          },
           correlationInsights: baseMockData.correlationInsights,
-          species: baseMockData.species,
+          species: [],
           futureClimate: {
             // Temperature and precipitation data will be fetched by their own components
             temperature: [],
@@ -381,9 +384,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 </Popup>
             )}
         </Map>
+
         <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
              <ExpandButton onClick={togglePanel} isCollapsed={isPanelCollapsed} />
         </div>
+        
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
             <MapSettingsControl 
               is3D={is3D}

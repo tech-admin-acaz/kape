@@ -83,7 +83,7 @@ export const mockData: Record<string, StatsData> = {
       }
     },
     correlationInsights: "Recent satellite data shows a 2% increase in deforestation on the eastern border, likely linked to illegal mining activities.",
-    species: mockSpecies,
+    species: [],
     futureClimate: {
       temperature: generateFutureClimateData(2014, 2042, 26.5, 2, 26.2, 27.5),
       precipitation: generateFutureClimateData(2014, 2042, 1450, 400, 1450, 1350),
@@ -125,7 +125,7 @@ export const mockData: Record<string, StatsData> = {
       }
     },
     correlationInsights: "The park's water sources remain pristine, showing high resilience to surrounding agricultural activities.",
-    species: mockSpecies.slice().reverse(), // just to show different data
+    species: [], // just to show different data
     futureClimate: {
       temperature: generateFutureClimateData(2014, 2042, 22, 2.5, 21.8, 24.5),
       precipitation: generateFutureClimateData(2014, 2042, 1300, 350, 1300, 1200),
