@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PanelLeftClose, PanelRightOpen } from "lucide-react";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 
 interface ExpandButtonProps {
     onClick: () => void;
@@ -11,7 +11,7 @@ interface ExpandButtonProps {
 }
 
 export default function ExpandButton({ onClick, isCollapsed }: ExpandButtonProps) {
-    const Icon = isCollapsed ? PanelRightOpen : PanelLeftClose;
+    const Icon = isCollapsed ? PanelRightOpen : PanelRightClose;
     const tooltipText = isCollapsed ? "Expandir painel" : "Recolher painel";
     
     return (
