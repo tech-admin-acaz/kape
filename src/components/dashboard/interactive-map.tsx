@@ -171,8 +171,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
         const getGeneralInfoValue = (apiData: any[], nameKey: string) => {
-            if (apiData && apiData.length > 0) {
-              return apiData.map((item: any) => item[nameKey]).join(', ');
+            if (apiData && Array.isArray(apiData) && apiData.length > 0) {
+              return apiData.map((item: any) => item[nameKey]).filter(Boolean).join(', ');
+            }
+            if (typeof apiData === 'string') { // Handle cases where a single string is returned
+                return apiData;
             }
             return undefined;
         };
@@ -184,28 +187,32 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1')
         };
         
-        // Contextual adjustments based on selection type
         let areaName = location.label;
-        if (type === 'estado') {
-            areaName = details.name;
-            generalInfo.state = details.name; // Set state name from main details
-            generalInfo.municipality = undefined;
-            generalInfo.territoryName = undefined;
-            generalInfo.conservationUnit = undefined;
-        } else if (type === 'municipio') {
-             areaName = `${details.name} - ${details.uf?.[0]?.sigla_uf || ''}`;
-             generalInfo.municipality = details.name;
-             generalInfo.territoryName = undefined;
-             generalInfo.conservationUnit = undefined;
-        } else if (type === 'ti') {
-             areaName = details.name;
-             generalInfo.territoryName = details.name;
-        } else if (type === 'uc') {
-             areaName = details.name;
-             generalInfo.conservationUnit = details.name;
-             generalInfo.territoryName = undefined;
+        switch (type) {
+            case 'estado':
+                areaName = details.name;
+                generalInfo.state = details.name;
+                generalInfo.municipality = undefined;
+                generalInfo.territoryName = undefined;
+                generalInfo.conservationUnit = undefined;
+                break;
+            case 'municipio':
+                areaName = `${details.name} - ${details.uf?.[0]?.sigla_uf || ''}`;
+                generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf');
+                generalInfo.municipality = details.name;
+                generalInfo.territoryName = undefined;
+                generalInfo.conservationUnit = undefined;
+                break;
+            case 'ti':
+                areaName = details.name;
+                generalInfo.territoryName = details.name;
+                break;
+            case 'uc':
+                areaName = details.name;
+                generalInfo.conservationUnit = details.name;
+                generalInfo.territoryName = undefined;
+                break;
         }
-
 
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
        
