@@ -21,6 +21,7 @@ import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
 import ExpandButton from './expand-button';
+import type { PanelGroup } from "react-resizable-panels";
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -40,6 +41,7 @@ interface InteractiveMapProps {
   selectedArea: StatsData | null;
   isPanelCollapsed: boolean;
   togglePanel: () => void;
+  panelGroupRef: React.RefObject<PanelGroup>;
 }
 
 interface PopupInfo {
@@ -48,7 +50,7 @@ interface PopupInfo {
     message: string;
 }
 
-export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
@@ -171,9 +173,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         const baseMockData = mockData[Object.keys(mockData)[0]];
         
         let areaName = details.name;
-        if (type === 'municipio' && details.uf && details.uf.length > 0) {
-            areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
-        }
         
         const getGeneralInfoValue = (apiData: any[], nameKey: string, propKey = 'name') => {
             if (apiData && Array.isArray(apiData) && apiData.length > 0) {
@@ -182,29 +181,27 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             return undefined;
         };
 
-        const generalInfo: GeneralInfo = {
-            state: details.uf && details.uf.length > 0 ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : undefined,
-            municipality: getGeneralInfoValue(details.municipios, 'municipio_'),
-            territoryName: getGeneralInfoValue(details.ti, 'terrai_nom'),
-            conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1')
-        };
-        
+        const generalInfo: GeneralInfo = {};
+
         switch (type) {
             case 'estado':
                 generalInfo.state = `${details.name} (${details.sigla})`;
-                generalInfo.municipality = undefined;
-                generalInfo.territoryName = undefined;
-                generalInfo.conservationUnit = undefined;
                 break;
             case 'municipio':
+                areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
+                generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
                 generalInfo.municipality = details.name;
-                generalInfo.territoryName = undefined;
-                generalInfo.conservationUnit = undefined;
                 break;
             case 'ti':
+                generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
+                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio_', 'municipio_');
                 generalInfo.territoryName = details.name;
+                generalInfo.conservationUnit = getGeneralInfoValue(details.uc, 'nome_uc1', 'nome_uc1');
                 break;
             case 'uc':
+                generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
+                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio_', 'municipio_');
+                generalInfo.territoryName = getGeneralInfoValue(details.ti, 'terrai_nom', 'terrai_nom');
                 generalInfo.conservationUnit = details.name;
                 break;
         }
@@ -234,6 +231,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           },
         };
         onAreaUpdate(newArea);
+
+        if (isPanelCollapsed) {
+          panelGroupRef.current?.setLayout([70, 30]);
+        }
       }
     } catch (error) {
       console.error("[InteractiveMap] Failed to fetch location details", error);

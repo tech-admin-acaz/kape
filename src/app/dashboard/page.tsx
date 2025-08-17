@@ -30,15 +30,6 @@ export default function DashboardPage() {
         setIsCollapsed(prev => !prev);
     }, [isCollapsed]);
 
-    React.useEffect(() => {
-        if (selectedArea && isCollapsed) {
-             if (panelGroupRef.current) {
-                panelGroupRef.current.setLayout([70, 30]);
-                setIsCollapsed(false);
-            }
-        }
-    }, [selectedArea, isCollapsed]);
-    
     return (
         <div className="flex-1 flex relative">
             <ResizablePanelGroup 
@@ -56,6 +47,7 @@ export default function DashboardPage() {
                         selectedArea={selectedArea}
                         isPanelCollapsed={isCollapsed}
                         togglePanel={togglePanel}
+                        panelGroupRef={panelGroupRef}
                     />
                 </ResizablePanel>
                 <ResizableHandle withHandle />
