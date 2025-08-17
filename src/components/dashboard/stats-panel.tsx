@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -5,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/comp
 import { Button } from '../ui/button';
 import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
@@ -157,7 +158,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                <TabsList className="w-full">
+                <TabsList className="w-full grid grid-cols-3">
                     <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                         {TABS.characterization}
                     </TabsTrigger>
