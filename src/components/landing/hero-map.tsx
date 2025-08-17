@@ -39,23 +39,21 @@ export default function HeroMap() {
       };
 
     return (
-        <div className="absolute inset-0">
-            <Map
-                ref={mapRef}
-                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-                initialViewState={{
-                    longitude: -56,
-                    latitude: -6,
-                    zoom: 2.5,
-                }}
-                style={{width: '100%', height: '100%'}}
-                mapStyle={mapStyle}
-                projection={{name: 'globe'}}
-                attributionControl={false}
-                interactive={true}
-            >
-               {indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ)}
-            </Map>
-        </div>
+        <Map
+            ref={mapRef}
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+            initialViewState={{
+                longitude: -56,
+                latitude: -6,
+                zoom: 2.5,
+            }}
+            style={{width: '100%', height: '100%', background: 'transparent'}}
+            mapStyle={mapStyle}
+            projection={{name: 'globe'}}
+            attributionControl={false}
+            interactive={true}
+        >
+            {indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ)}
+        </Map>
     );
 }
