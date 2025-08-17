@@ -146,7 +146,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>{searchTrigger}</TooltipTrigger>
-                            <TooltipContent>
+                            <TooltipContent side="bottom">
                                 <p>{selectedLocation.label}</p>
                             </TooltipContent>
                         </Tooltip>
