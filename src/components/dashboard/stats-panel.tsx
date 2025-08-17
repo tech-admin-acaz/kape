@@ -21,11 +21,11 @@ interface LandCoverData {
   color: string;
 }
 
-interface GeneralInfo {
-    state: string;
-    municipality: string;
-    territoryName: string;
-    conservationUnit: string;
+export interface GeneralInfo {
+    state?: string;
+    municipality?: string;
+    territoryName?: string;
+    conservationUnit?: string;
 }
 
 export interface BiodiversityData {

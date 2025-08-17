@@ -15,7 +15,7 @@ import LegendControl from './legend-control';
 import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
-import type { StatsData, FutureClimateData } from './stats-panel';
+import type { StatsData, FutureClimateData, GeneralInfo } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
@@ -169,31 +169,44 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         }
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
-
-        const getGeneralInfoValue = (apiData: any[], nameKey: string) => {
-            if (apiData && Array.isArray(apiData) && apiData.length > 0) {
-              return apiData.map((item: any) => item[nameKey]).filter(Boolean).join(', ');
-            }
-            return undefined;
-        };
-
+        
         let areaName = details.name;
         if (type === 'municipio' && details.uf && details.uf.length > 0) {
             areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
         }
         
-        const generalInfo = {
-            state: getGeneralInfoValue(details.uf, 'nm_uf'),
-            municipality: type === 'municipio' ? details.name : getGeneralInfoValue(details.municipios, 'nm_mun'),
-            territoryName: type === 'ti' ? details.name : getGeneralInfoValue(details.ti, 'terrai_nom'),
-            conservationUnit: type === 'uc' ? details.name : getGeneralInfoValue(details.uc, 'nome_uc1')
+        const getGeneralInfoValue = (apiData: any[], nameKey: string, propKey = 'name') => {
+            if (apiData && Array.isArray(apiData) && apiData.length > 0) {
+              return apiData.map((item: any) => item[propKey]).filter(Boolean).join(', ');
+            }
+            return undefined;
+        };
+
+        const generalInfo: GeneralInfo = {
+            state: details.uf && details.uf.length > 0 ? `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})` : undefined,
+            municipality: getGeneralInfoValue(details.municipios, 'municipio_'),
+            territoryName: getGeneralInfoValue(details.ti, 'terrai_nom'),
+            conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1')
         };
         
-        if (type === 'estado') {
-            generalInfo.state = details.name;
-            generalInfo.municipality = undefined;
-            generalInfo.territoryName = undefined;
-            generalInfo.conservationUnit = undefined;
+        switch (type) {
+            case 'estado':
+                generalInfo.state = `${details.name} (${details.sigla})`;
+                generalInfo.municipality = undefined;
+                generalInfo.territoryName = undefined;
+                generalInfo.conservationUnit = undefined;
+                break;
+            case 'municipio':
+                generalInfo.municipality = details.name;
+                generalInfo.territoryName = undefined;
+                generalInfo.conservationUnit = undefined;
+                break;
+            case 'ti':
+                generalInfo.territoryName = details.name;
+                break;
+            case 'uc':
+                generalInfo.conservationUnit = details.name;
+                break;
         }
 
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
