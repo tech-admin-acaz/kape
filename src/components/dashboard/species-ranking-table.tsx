@@ -207,7 +207,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
     `;
   };
 
-  const handleDownload = (format: 'pdf' | 'csv' | 'xlsx' | 'html') => {
+  const handleDownload = (format: 'csv' | 'xlsx' | 'html') => {
     const dataToExport = sortedSpecies.map(s => ({
       'Espécie': s.name,
       'Resiliência Climática': s.resilience,
@@ -231,8 +231,6 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
         const workbook = utils.book_new();
         utils.book_append_sheet(workbook, worksheet, 'Species');
         writeFile(workbook, 'species_ranking.xlsx');
-    } else if (format === 'pdf') {
-        window.print();
     } else if (format === 'html') {
         const htmlContent = getTableHtml();
         const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
@@ -354,7 +352,6 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => handleDownload('pdf')}>PDF</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('csv')}>CSV</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('xlsx')}>XLSX</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('html')}>HTML</DropdownMenuItem>
