@@ -22,7 +22,7 @@ export default function ExpandButton({ onClick, isCollapsed }: ExpandButtonProps
                         variant="outline" 
                         size="icon" 
                         onClick={onClick} 
-                        className="bg-hover hover:bg-hover/80 rounded-full h-10 w-10 shadow-md"
+                        className="bg-background/80 hover:bg-hover rounded-full h-10 w-10 shadow-md"
                     >
                         <Icon className="h-5 w-5" />
                     </Button>
