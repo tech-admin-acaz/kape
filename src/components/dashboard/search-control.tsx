@@ -130,7 +130,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                     )}
                     onClick={() => !isSearchDisabled && setPopoverOpen(true)}
                 >
-                     <div className="flex items-center w-full">
+                     <div className="flex items-center w-full min-w-0">
                         <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
                         <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
                         <Separator orientation="vertical" className="h-4 mx-2" />
