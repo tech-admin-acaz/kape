@@ -142,18 +142,36 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
       <div className="flex-1 min-w-0">
         <Popover open={popoverOpen} onOpenChange={isSearchDisabled ? undefined : setPopoverOpen}>
             <PopoverTrigger asChild>
-                {selectedLocation ? (
+                 <div
+                    role="combobox"
+                    aria-expanded={popoverOpen}
+                    className={cn(
+                        "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                        "font-normal justify-start",
+                        isSearchDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                    )}
+                    onClick={() => !isSearchDisabled && setPopoverOpen(true)}
+                >
                     <TooltipProvider>
                         <Tooltip>
-                            <TooltipTrigger asChild>{searchTrigger}</TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                <p>{selectedLocation.label}</p>
-                            </TooltipContent>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center w-full min-w-0">
+                                    <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
+                                    <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
+                                    <Separator orientation="vertical" className="h-4 mx-2" />
+                                    <div className="flex-1 text-left truncate min-w-0">
+                                        {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
+                                    </div>
+                                </div>
+                            </TooltipTrigger>
+                            {selectedLocation && (
+                                <TooltipContent side="bottom">
+                                    <p>{selectedLocation.label}</p>
+                                </TooltipContent>
+                            )}
                         </Tooltip>
                     </TooltipProvider>
-                ) : (
-                    searchTrigger
-                )}
+                </div>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
