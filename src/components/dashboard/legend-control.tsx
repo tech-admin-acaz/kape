@@ -74,11 +74,11 @@ const legendData: Record<keyof LayerState, { title: string; content: React.React
         title: 'Mapbiomas Categorizado',
         content: (
             <div className="mt-2 space-y-1">
-                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#1f8d49]"></div><span>Formação Florestal</span></div>
-                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#4169E1]"></div><span>Outra Formações Naturais</span></div>
-                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#FFA500]"></div><span>Outros</span></div>
-                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#FF00FF]"></div><span>Agricultura</span></div>
-                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#FFFF00]"></div><span>Pastagem</span></div>
+                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#3AA462]"></div><span>Formação Florestal</span></div>
+                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#007785]"></div><span>Outra Formações Naturais</span></div>
+                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#FC8114]"></div><span>Outros</span></div>
+                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#E974ED]"></div><span>Agricultura</span></div>
+                <div className="flex items-center gap-2 text-xs"><div className="w-4 h-4 rounded-sm bg-[#EADB89]"></div><span>Pastagem</span></div>
             </div>
         )
     }
