@@ -44,21 +44,26 @@ export function TimelineNav() {
   
   return (
     <nav className="fixed left-8 top-1/2 z-50 hidden -translate-y-1/2 transform md:block">
-      <ul className="space-y-6">
+      <ul className="relative flex flex-col items-start space-y-8">
+         <div className="absolute left-[4.5px] top-2 h-[calc(100%-1rem)] w-0.5 bg-muted-foreground/30" />
         {sections.map((section) => (
-          <li key={section.id} className="group flex items-center gap-3">
+          <li key={section.id} className="group flex items-center gap-4">
              <a
               href={`#${section.id}`}
               className={cn(
-                "block h-2.5 w-2.5 rounded-full transition-all duration-300",
-                activeSection === section.id ? "bg-primary scale-125" : "bg-muted-foreground/50 group-hover:bg-primary"
+                "z-10 block rounded-full border-2 transition-all duration-300",
+                 activeSection === section.id 
+                    ? "w-3 h-3 border-primary bg-primary scale-110" 
+                    : "w-3 h-3 border-muted-foreground/50 bg-background group-hover:border-primary"
               )}
               aria-label={`Go to ${section.key} section`}
             />
             <a href={`#${section.id}`}
                className={cn(
                 "text-sm font-medium transition-all duration-300",
-                activeSection === section.id ? "text-primary opacity-100" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                activeSection === section.id 
+                    ? "text-primary opacity-100" 
+                    : "text-muted-foreground opacity-0 group-hover:opacity-100"
                )}
             >
               {t(section.key)}
