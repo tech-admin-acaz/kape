@@ -157,12 +157,12 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                <TooltipProvider>
-                    <TabsList className="w-full grid grid-cols-3">
-                        <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
-                            {TABS.characterization}
-                        </TabsTrigger>
-                        
+                <TabsList className="w-full grid grid-cols-3">
+                    <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
+                        {TABS.characterization}
+                    </TabsTrigger>
+                    
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
@@ -175,8 +175,10 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 </TooltipContent>
                             )}
                         </Tooltip>
+                    </TooltipProvider>
 
-                        <Tooltip>
+                    <TooltipProvider>
+                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
                                     {rankingLabel}
@@ -188,8 +190,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 </TooltipContent>
                             )}
                         </Tooltip>
-                    </TabsList>
-                </TooltipProvider>
+                    </TooltipProvider>
+                </TabsList>
             </div>
             
             <div className="flex-1 overflow-y-auto">
