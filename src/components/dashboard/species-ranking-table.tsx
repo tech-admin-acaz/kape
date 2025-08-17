@@ -90,6 +90,15 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
     availability: 'any',
   });
 
+  const isFilterActive = useMemo(() => {
+    return (
+      filters.resilience.length > 0 ||
+      filters.potential !== 'any' ||
+      filters.domestication !== 'any' ||
+      filters.availability !== 'any'
+    );
+  }, [filters]);
+
   const handleFilterChange = <K extends keyof AdvancedFilters>(key: K, value: AdvancedFilters[K]) => {
       setFilters(prev => ({ ...prev, [key]: value }));
       setCurrentPage(1);
@@ -216,7 +225,14 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
           />
           <Popover>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-muted">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={cn(
+                    "absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    isFilterActive && "bg-accent text-accent-foreground"
+                  )}
+                >
                     <Filter className="h-4 w-4" />
                 </Button>
             </PopoverTrigger>
