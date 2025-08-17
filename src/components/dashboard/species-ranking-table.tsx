@@ -35,6 +35,7 @@ import { Search, Download, Info, ChevronDown, Check, X, ArrowUpDown, ChevronLeft
 import type { SpeciesData } from './stats-panel';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
+import { utils, writeFile } from 'xlsx';
 
 interface SpeciesRankingTableProps {
   species: SpeciesData[];
@@ -181,6 +182,68 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
       setCurrentPage(page);
     }
   };
+
+  const getTableHtml = () => {
+    const table = document.querySelector('#species-table-container table');
+    if (!table) return '';
+    const html = table.outerHTML;
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Species Ranking</title>
+          <style>
+            body { font-family: sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h1>Ranking de Espécies</h1>
+          ${html}
+        </body>
+      </html>
+    `;
+  };
+
+  const handleDownload = (format: 'pdf' | 'csv' | 'xlsx' | 'html') => {
+    const dataToExport = sortedSpecies.map(s => ({
+      'Espécie': s.name,
+      'Resiliência Climática': s.resilience,
+      'Potencial de Uso': s.potential ? 'Sim' : 'Não',
+      'Domesticação': s.domestication ? 'Sim' : 'Não',
+      'Disponibilidade': s.availability ? 'Sim' : 'Não',
+    }));
+
+    if (format === 'csv') {
+      const worksheet = utils.json_to_sheet(dataToExport);
+      const csv = utils.sheet_to_csv(worksheet);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'species_ranking.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === 'xlsx') {
+        const worksheet = utils.json_to_sheet(dataToExport);
+        const workbook = utils.book_new();
+        utils.book_append_sheet(workbook, worksheet, 'Species');
+        writeFile(workbook, 'species_ranking.xlsx');
+    } else if (format === 'pdf') {
+        window.print();
+    } else if (format === 'html') {
+        const htmlContent = getTableHtml();
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', 'species_ranking.html');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+  };
   
   const SortableHeader = ({ sortKey, children, tooltipText, className }: { sortKey: SortKey, children: React.ReactNode, tooltipText: string, className?: string }) => (
       <TableHead className={className}>
@@ -229,9 +292,9 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
                   variant="ghost" 
                   size="icon" 
                   className={cn(
-                    "absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                    isFilterActive && "bg-accent text-accent-foreground"
-                  )}
+                    "absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:bg-accent",
+                    isFilterActive ? "bg-blue-500/20 text-blue-600 hover:bg-blue-500/30 hover:text-blue-700" : "hover:text-accent-foreground"
+                   )}
                 >
                     <Filter className="h-4 w-4" />
                 </Button>
@@ -291,15 +354,15 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>PDF</DropdownMenuItem>
-            <DropdownMenuItem>CSV</DropdownMenuItem>
-            <DropdownMenuItem>XLSX</DropdownMenuItem>
-            <DropdownMenuItem>HTML</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleDownload('pdf')}>PDF</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleDownload('csv')}>CSV</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleDownload('xlsx')}>XLSX</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleDownload('html')}>HTML</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      <div className="flex-grow overflow-auto border rounded-md">
+      <div id="species-table-container" className="flex-grow overflow-auto border rounded-md">
         <Table>
           <TableHeader className="bg-muted/50 sticky top-0">
             <TableRow>
