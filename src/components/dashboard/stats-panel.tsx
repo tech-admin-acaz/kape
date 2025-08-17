@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -152,18 +151,17 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   return (
     <div ref={panelRef} className="h-full flex flex-col">
         <CardHeader>
-            <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
             <CardDescription>{data.type}</CardDescription>
+            <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
         </CardHeader>
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                <TabsList className="w-full grid grid-cols-3">
+                 <TabsList className="w-full grid grid-cols-3">
                     <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                         {TABS.characterization}
                     </TabsTrigger>
-                    
-                    <TooltipProvider>
+                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <TabsTrigger value="services" className="flex-1 text-xs md:text-sm">
@@ -177,8 +175,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             )}
                         </Tooltip>
                     </TooltipProvider>
-
-                    <TooltipProvider>
+                     <TooltipProvider>
                          <Tooltip>
                             <TooltipTrigger asChild>
                                 <TabsTrigger value="ranking" className="flex-1 text-xs md:text-sm">
