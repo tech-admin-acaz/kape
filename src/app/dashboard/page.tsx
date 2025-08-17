@@ -7,7 +7,6 @@ import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import type { StatsData } from '@/components/dashboard/stats-panel';
-import ExpandButton from '@/components/dashboard/expand-button';
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
@@ -59,6 +58,8 @@ export default function DashboardPage() {
                     <DashboardClient 
                         onAreaUpdate={setSelectedArea} 
                         selectedArea={selectedArea}
+                        isPanelCollapsed={isCollapsed}
+                        togglePanel={togglePanel}
                     />
                 </ResizablePanel>
                 <ResizableHandle withHandle />
@@ -77,9 +78,6 @@ export default function DashboardPage() {
                     {isClient && isCollapsed ? null : <StatsPanel data={selectedArea} />}
                 </ResizablePanel>
             </ResizablePanelGroup>
-             <div className="absolute top-4 right-4 z-20">
-                <ExpandButton onClick={togglePanel} isCollapsed={isCollapsed} />
-            </div>
         </div>
     );
 }

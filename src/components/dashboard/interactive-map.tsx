@@ -20,6 +20,7 @@ import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
+import ExpandButton from './expand-button';
 
 const locations = [
   { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
@@ -37,6 +38,8 @@ const defaultBasemapKey = 'escuro';
 interface InteractiveMapProps {
   onAreaUpdate: (data: StatsData | null) => void;
   selectedArea: StatsData | null;
+  isPanelCollapsed: boolean;
+  togglePanel: () => void;
 }
 
 interface PopupInfo {
@@ -45,7 +48,7 @@ interface PopupInfo {
     message: string;
 }
 
-export default function InteractiveMap({ onAreaUpdate, selectedArea }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel }: InteractiveMapProps) {
   const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
@@ -378,6 +381,9 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea }: Interacti
                 </Popup>
             )}
         </Map>
+        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+             <ExpandButton onClick={togglePanel} isCollapsed={isPanelCollapsed} />
+        </div>
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
             <MapSettingsControl 
               is3D={is3D}
