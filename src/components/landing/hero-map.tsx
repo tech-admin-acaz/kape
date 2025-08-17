@@ -11,6 +11,7 @@ import { useTheme } from 'next-themes';
 export default function HeroMap() {
     const { theme } = useTheme();
     const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef<MapRef>(null);
 
     const mapStyle = theme === 'dark' 
@@ -52,8 +53,9 @@ export default function HeroMap() {
             projection={{name: 'globe'}}
             attributionControl={false}
             interactive={true}
+            onLoad={() => setMapLoaded(true)}
         >
-            {indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ)}
+            {mapLoaded && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ)}
         </Map>
     );
 }
