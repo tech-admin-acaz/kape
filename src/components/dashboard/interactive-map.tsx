@@ -170,30 +170,45 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
 
         const baseMockData = mockData[Object.keys(mockData)[0]];
 
-        const getGeneralInfoValue = (apiData: any[], nameKey: string, fallback?: string) => {
-          if (apiData && apiData.length > 0) {
-            return apiData.map((item: any) => item[nameKey]).join(', ');
-          }
-          return fallback || 'Sem dados';
+        const getGeneralInfoValue = (apiData: any[], nameKey: string) => {
+            if (apiData && apiData.length > 0) {
+              return apiData.map((item: any) => item[nameKey]).join(', ');
+            }
+            return undefined;
+        };
+
+        const generalInfo = {
+            state: getGeneralInfoValue(details.uf, 'nm_uf'),
+            municipality: getGeneralInfoValue(details.municipios, 'nm_mun'),
+            territoryName: getGeneralInfoValue(details.ti, 'terrai_nom'),
+            conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1')
         };
         
-        const generalInfo = {
-            state: getGeneralInfoValue(details.uf, 'nm_uf', type === 'estado' ? details.name : undefined),
-            municipality: getGeneralInfoValue(details.municipios, 'nm_mun', type === 'municipio' ? details.name : undefined),
-            territoryName: getGeneralInfoValue(details.ti, 'terrai_nom', type === 'ti' ? details.name : undefined),
-            conservationUnit: getGeneralInfoValue(details.uc, 'nome_uc1', type === 'uc' ? details.name : undefined)
-        };
-
-        const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
+        // Contextual adjustments based on selection type
         let areaName = location.label;
-
-        if (type === 'municipio' && details.name && details.uf?.[0]?.sigla_uf) {
-            areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
-        } else if(type === 'estado' && details.name) {
+        if (type === 'estado') {
             areaName = details.name;
+            generalInfo.state = details.name; // Set state name from main details
+            generalInfo.municipality = undefined;
+            generalInfo.territoryName = undefined;
+            generalInfo.conservationUnit = undefined;
+        } else if (type === 'municipio') {
+             areaName = `${details.name} - ${details.uf?.[0]?.sigla_uf || ''}`;
+             generalInfo.municipality = details.name;
+             generalInfo.territoryName = undefined;
+             generalInfo.conservationUnit = undefined;
+        } else if (type === 'ti') {
+             areaName = details.name;
+             generalInfo.territoryName = details.name;
+        } else if (type === 'uc') {
+             areaName = details.name;
+             generalInfo.conservationUnit = details.name;
+             generalInfo.territoryName = undefined;
         }
 
 
+        const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
+       
         const newArea: StatsData = {
           id: location.value,
           name: areaName,
@@ -201,7 +216,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           typeKey: type,
           generalInfo,
           stats: {
-            // Land cover data will be fetched by its own component
             landCover: [],
             waterQuality: baseMockData.stats.waterQuality,
             vegetationIndex: baseMockData.stats.vegetationIndex,
@@ -213,7 +227,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           correlationInsights: baseMockData.correlationInsights,
           species: [],
           futureClimate: {
-            // Temperature and precipitation data will be fetched by their own components
             temperature: [],
             precipitation: [],
           },
