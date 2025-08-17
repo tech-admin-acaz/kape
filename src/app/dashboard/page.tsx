@@ -21,7 +21,7 @@ export default function DashboardPage() {
     const togglePanel = React.useCallback(() => {
         if (panelGroupRef.current) {
             const layout = panelGroupRef.current.getLayout();
-            if (layout[1] > 5) {
+            if (layout[1] > 2) {
                 // Collapse
                 panelGroupRef.current.setLayout([100, 0]);
                 setIsCollapsed(true);
@@ -47,10 +47,11 @@ export default function DashboardPage() {
                 direction="horizontal" 
                 className="flex-1"
                 onLayout={(sizes) => {
-                    if (sizes[1] > 5) {
-                        setIsCollapsed(false);
-                    } else {
+                    document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
+                    if (sizes[1] < 2) {
                         setIsCollapsed(true);
+                    } else {
+                        setIsCollapsed(false);
                     }
                 }}
             >
