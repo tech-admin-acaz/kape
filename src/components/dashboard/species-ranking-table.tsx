@@ -183,31 +183,80 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
     }
   };
 
-  const getTableHtml = () => {
-    const table = document.querySelector('#species-table-container table');
-    if (!table) return '';
-    const html = table.outerHTML;
+  const getTableHtml = (data: SpeciesData[]) => {
+    const tableHeaders = `
+        <tr>
+            <th>Espécie</th>
+            <th>Resiliência Climática</th>
+            <th>Potencial de Uso</th>
+            <th>Domesticação</th>
+            <th>Disponibilidade</th>
+        </tr>
+    `;
+
+    const tableRows = data.map(s => `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.resilience}</td>
+            <td>${s.potential ? 'Sim' : 'Não'}</td>
+            <td>${s.domestication ? 'Sim' : 'Não'}</td>
+            <td>${s.availability ? 'Sim' : 'Não'}</td>
+        </tr>
+    `).join('');
+
     return `
       <!DOCTYPE html>
       <html>
         <head>
           <title>Species Ranking</title>
           <style>
-            body { font-family: sans-serif; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
-            th { background-color: #f2f2f2; }
+            @media print {
+              @page {
+                size: A4 landscape;
+                margin: 20mm;
+              }
+            }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              font-size: 10pt;
+            }
+            table { 
+              border-collapse: collapse; 
+              width: 100%; 
+              table-layout: auto;
+            }
+            th, td { 
+              border: 1px solid #dddddd; 
+              text-align: left; 
+              padding: 8px; 
+              page-break-inside: avoid;
+            }
+            th { 
+              background-color: #f2f2f2; 
+              font-weight: bold;
+            }
+            h1 {
+              font-size: 16pt;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
           <h1>Ranking de Espécies</h1>
-          ${html}
+          <table>
+            <thead>
+                ${tableHeaders}
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+          </table>
         </body>
       </html>
     `;
   };
 
-  const handleDownload = (format: 'csv' | 'xlsx' | 'html') => {
+  const handleDownload = (format: 'csv' | 'xlsx' | 'html' | 'pdf') => {
     const dataToExport = sortedSpecies.map(s => ({
       'Espécie': s.name,
       'Resiliência Climática': s.resilience,
@@ -216,10 +265,27 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
       'Disponibilidade': s.availability ? 'Sim' : 'Não',
     }));
 
+    if (format === 'pdf') {
+        const tableHtml = getTableHtml(sortedSpecies);
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(tableHtml);
+            printWindow.document.close();
+            printWindow.focus();
+            // A small delay can help ensure content is loaded before print dialog opens
+            setTimeout(() => {
+                printWindow.print();
+                // We might not want to close it immediately to allow user interaction
+                // printWindow.close(); 
+            }, 250);
+        }
+        return;
+    }
+
     if (format === 'csv') {
       const worksheet = utils.json_to_sheet(dataToExport);
       const csv = utils.sheet_to_csv(worksheet);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' }); // Add BOM for Excel
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.setAttribute('download', 'species_ranking.csv');
@@ -232,7 +298,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
         utils.book_append_sheet(workbook, worksheet, 'Species');
         writeFile(workbook, 'species_ranking.xlsx');
     } else if (format === 'html') {
-        const htmlContent = getTableHtml();
+        const htmlContent = getTableHtml(sortedSpecies);
         const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -352,6 +418,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem onSelect={() => handleDownload('pdf')}>PDF</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('csv')}>CSV</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('xlsx')}>XLSX</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleDownload('html')}>HTML</DropdownMenuItem>
