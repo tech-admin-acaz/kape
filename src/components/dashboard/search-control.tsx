@@ -112,7 +112,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
             <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
             <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
             <Separator orientation="vertical" className="h-4 mx-2" />
-            <div className="flex-1 text-left truncate">
+            <div className="flex-1 text-left truncate min-w-0">
                 {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
             </div>
         </div>
@@ -139,7 +139,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
             </Select>
         </div>
 
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <Popover open={popoverOpen} onOpenChange={isSearchDisabled ? undefined : setPopoverOpen}>
             <PopoverTrigger asChild>
                 {selectedLocation ? (
