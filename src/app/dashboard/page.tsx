@@ -7,6 +7,7 @@ import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import type { StatsData } from '@/components/dashboard/stats-panel';
+import ExpandButton from '@/components/dashboard/expand-button';
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
@@ -18,25 +19,30 @@ export default function DashboardPage() {
         setIsClient(true);
     }, []);
 
-    const expandPanel = React.useCallback(() => {
+    const togglePanel = React.useCallback(() => {
         if (panelGroupRef.current) {
-            // Check if it's already expanding or expanded to avoid unnecessary calls
             const layout = panelGroupRef.current.getLayout();
-            if (layout[1] < 15) {
+            if (layout[1] > 5) {
+                // Collapse
+                panelGroupRef.current.setLayout([100, 0]);
+                setIsCollapsed(true);
+            } else {
+                // Expand
                 panelGroupRef.current.setLayout([70, 30]);
                 setIsCollapsed(false);
             }
         }
     }, []);
 
+
     React.useEffect(() => {
-        if (selectedArea) {
-            expandPanel();
+        if (selectedArea && isCollapsed) {
+            togglePanel();
         }
-    }, [selectedArea, expandPanel]);
+    }, [selectedArea, isCollapsed, togglePanel]);
     
     return (
-        <div className="flex-1 flex">
+        <div className="flex-1 flex relative">
             <ResizablePanelGroup 
                 ref={panelGroupRef}
                 direction="horizontal" 
@@ -52,8 +58,6 @@ export default function DashboardPage() {
                 <ResizablePanel defaultSize={100} minSize={30}>
                     <DashboardClient 
                         onAreaUpdate={setSelectedArea} 
-                        isPanelCollapsed={isCollapsed}
-                        onExpandClick={expandPanel}
                         selectedArea={selectedArea}
                     />
                 </ResizablePanel>
@@ -73,6 +77,9 @@ export default function DashboardPage() {
                     {isClient && isCollapsed ? null : <StatsPanel data={selectedArea} />}
                 </ResizablePanel>
             </ResizablePanelGroup>
+             <div className="absolute top-4 right-4 z-20">
+                <ExpandButton onClick={togglePanel} isCollapsed={isCollapsed} />
+            </div>
         </div>
     );
 }
