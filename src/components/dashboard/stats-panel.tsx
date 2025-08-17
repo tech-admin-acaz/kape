@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/comp
 import { Button } from '../ui/button';
 import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
@@ -151,13 +151,13 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   return (
     <div ref={panelRef} className="h-full flex flex-col">
         <CardHeader>
-            <CardTitle className="font-headline text-2xl">{data.name}</CardTitle>
+            <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
             <CardDescription>{data.type}</CardDescription>
         </CardHeader>
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                <TabsList className="w-full grid grid-cols-3">
+                <TabsList className="w-full">
                     <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                         {TABS.characterization}
                     </TabsTrigger>
