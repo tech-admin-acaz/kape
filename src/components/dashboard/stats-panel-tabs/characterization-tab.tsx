@@ -43,7 +43,6 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 };
 
 export default function CharacterizationTab({ data }: CharacterizationTabProps) {
-  console.log("Dados recebidos no Panorama Geral:", data);
   const { generalInfo, stats, futureClimate, correlationInsights, id, typeKey } = data;
   
   return (
