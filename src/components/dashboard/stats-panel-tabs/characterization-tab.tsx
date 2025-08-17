@@ -51,10 +51,10 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
             <Card className="bg-muted/30">
                 <CardContent className="p-4 space-y-2">
-                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                    <GeneralInfoItem label="Município(s)" value={generalInfo.municipality} />
-                    <GeneralInfoItem label="Terra(s) Indígena(s)" value={generalInfo.territoryName} />
-                    <GeneralInfoItem label="Unidade(s) de Conservação" value={generalInfo.conservationUnit} />
+                    <GeneralInfoItem label="Estados" value={generalInfo.state} />
+                    <GeneralInfoItem label="Municípios" value={generalInfo.municipality} />
+                    <GeneralInfoItem label="Terras Indígenas" value={generalInfo.territoryName} />
+                    <GeneralInfoItem label="Unidades de Conservação" value={generalInfo.conservationUnit} />
                 </CardContent>
             </Card>
         </div>
