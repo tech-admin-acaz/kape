@@ -97,6 +97,28 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
   
   const isSearchDisabled = !selectedType || isLoading;
 
+  const searchTrigger = (
+    <div
+        role="combobox"
+        aria-expanded={popoverOpen}
+        className={cn(
+            "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+            "font-normal justify-start",
+            isSearchDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+        )}
+        onClick={() => !isSearchDisabled && setPopoverOpen(true)}
+    >
+         <div className="flex items-center w-full min-w-0">
+            <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
+            <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
+            <Separator orientation="vertical" className="h-4 mx-2" />
+            <div className="flex-1 text-left truncate">
+                {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
+            </div>
+        </div>
+    </div>
+  );
+
   return (
     <Card className="flex items-center gap-2 p-2 bg-background/80 backdrop-blur-sm shadow-md w-[450px]">
         <div className="flex-1">
@@ -120,25 +142,18 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
       <div className="flex-1">
         <Popover open={popoverOpen} onOpenChange={isSearchDisabled ? undefined : setPopoverOpen}>
             <PopoverTrigger asChild>
-                <div
-                    role="combobox"
-                    aria-expanded={popoverOpen}
-                    className={cn(
-                        "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-                        "font-normal justify-start",
-                        isSearchDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-                    )}
-                    onClick={() => !isSearchDisabled && setPopoverOpen(true)}
-                >
-                     <div className="flex items-center w-full min-w-0">
-                        <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
-                        <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
-                        <Separator orientation="vertical" className="h-4 mx-2" />
-                        <div className="flex-1 text-left truncate">
-                            {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
-                        </div>
-                    </div>
-                </div>
+                {selectedLocation ? (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>{searchTrigger}</TooltipTrigger>
+                            <TooltipContent>
+                                <p>{selectedLocation.label}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                ) : (
+                    searchTrigger
+                )}
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
