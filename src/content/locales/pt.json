@@ -28,5 +28,8 @@
   "signupButton": "Criar Conta",
   "googleSignup": "Cadastrar com o Google",
   "hasAccount": "Já tem uma conta?",
-  "about": "Sobre"
+  "about": "Sobre",
+  "navBiodiversity": "Biodiversidade",
+  "biodiversityTitle": "Biodiversidade Global na Ponta dos Seus Dedos",
+  "biodiversityDesc": "Interaja com nosso globo para explorar áreas prioritárias para conservação e entender a distribuição geográfica da biodiversidade. Rotacione e aplique zoom para descobrir insights sobre diferentes regiões."
 }

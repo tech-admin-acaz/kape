@@ -5,6 +5,7 @@ import { TimelineNav } from '@/components/landing/timeline-nav';
 import { Footer } from '@/components/landing/footer';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 import Link from 'next/link';
+import { BiodiversitySection } from '@/components/landing/biodiversity-section';
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
       <main className="flex-1">
         <HeroSection />
         <FeaturesSection />
+        <BiodiversitySection />
       </main>
       <Footer />
     </div>

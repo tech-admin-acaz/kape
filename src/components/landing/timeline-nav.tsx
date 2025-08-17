@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
 import { useI18n } from "@/hooks/use-i18n";
 
-const sections: { id: string, key: 'navIntro' | 'navFeatures' }[] = [
+const sections: { id: string, key: 'navIntro' | 'navFeatures' | 'navBiodiversity' }[] = [
     { id: 'hero', key: 'navIntro' },
     { id: 'features', key: 'navFeatures' },
+    { id: 'biodiversity', key: 'navBiodiversity' },
 ];
 
 export function TimelineNav() {
