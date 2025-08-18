@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Map, { Marker, Popup, MapRef, Source, Layer, LngLatBoundsLike, MapLayerMouseEvent } from 'react-map-gl';
 import { MapPin, Plus, Minus, Navigation, Box, Layers2, Globe, Map as MapIconLucide, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import BasemapControl from './basemap-control';
@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ } from '@/services/map.service';
+import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLocationsByType } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData, FutureClimateData, GeneralInfo } from './stats-panel';
@@ -22,6 +22,7 @@ import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
 import ExpandButton from './expand-button';
 import type { PanelGroup } from "react-resizable-panels";
+import type { FeatureCollection, Geometry } from 'geojson';
 
 const basemaps = {
     'satélite': 'mapbox://styles/mapbox/satellite-streets-v12',
@@ -62,6 +63,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [restorationCostXYZ, setRestorationCostXYZ] = useState<string | null>(null);
   const [mapbiomasXYZ, setMapbiomasXYZ] = useState<string | null>(null);
 
+  const [statesGeoJSON, setStatesGeoJSON] = useState<FeatureCollection<Geometry> | null>(null);
+  const [hoveredStateId, setHoveredStateId] = useState<string | number | null>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
     indicator: true,
@@ -86,7 +89,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     currentCarbon,
                     opportunityCost,
                     restorationCost,
-                    mapbiomas
+                    mapbiomas,
+                    states,
                 ] = await Promise.all([
                     getIndicatorXYZ(),
                     getRestoredCarbonXYZ(),
@@ -94,6 +98,25 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     getOpportunityCostXYZ(),
                     getRestorationCostXYZ(),
                     getMapbiomasXYZ(),
+                    getLocationsByType('estado').then(locations => {
+                        const geojson: FeatureCollection<Geometry> = {
+                            type: 'FeatureCollection',
+                            features: []
+                        };
+                        const promises = locations.map(loc => 
+                            getLocationDetails('estado', loc.value).then(detail => {
+                                if (detail && detail.geom) {
+                                    geojson.features.push({
+                                        type: 'Feature',
+                                        geometry: detail.geom,
+                                        properties: { name: detail.name, id: detail.id },
+                                        id: detail.id
+                                    })
+                                }
+                            })
+                        );
+                        return Promise.all(promises).then(() => geojson);
+                    })
                 ]);
                 if(indicator) setIndicatorXYZ(indicator);
                 if(restoredCarbon) setRestoredCarbonXYZ(restoredCarbon);
@@ -101,6 +124,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 if(opportunityCost) setOpportunityCostXYZ(opportunityCost);
                 if(restorationCost) setRestorationCostXYZ(restorationCost);
                 if(mapbiomas) setMapbiomasXYZ(mapbiomas);
+                if(states) setStatesGeoJSON(states);
             } catch (error) {
                 console.error('Failed to fetch one or more layers:', error);
             }
@@ -182,8 +206,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.state = `${details.name} (${details.sigla})`;
                 break;
             case 'municipio':
-                areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
-                generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
+                if (details.uf && details.uf.length > 0) {
+                    areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
+                    generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
+                }
                 generalInfo.municipality = details.name;
                 break;
             case 'ti':
@@ -244,6 +270,18 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         return;
     }
 
+    const features = event.features?.filter(f => f.layer.id === 'states-fill');
+    if (features && features.length > 0) {
+        const feature = features[0];
+        if (feature && feature.properties) {
+            const { id, name } = feature.properties;
+            const location: Location = { value: String(id), label: name };
+            handleLocationSelect(location, 'estado');
+            return;
+        }
+    }
+
+    // Fallback to coordinate-based search if no feature was clicked (e.g., clicking on the sea)
     try {
         const clickedLocation = await getLocationByCoords(lat, lng);
         if (clickedLocation && clickedLocation.id) {
@@ -261,6 +299,49 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         }
     }
   }
+
+  const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded() || !map.getSource('states-source')) {
+      return;
+    }
+    const features = map.queryRenderedFeatures(e.point, { layers: ['states-fill'] });
+    map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+
+    if (features.length > 0) {
+        const featureId = features[0].id;
+        if (featureId !== hoveredStateId) {
+            if (hoveredStateId !== null) {
+                map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
+            }
+            map.setFeatureState({ source: 'states-source', id: featureId }, { hover: true });
+            setHoveredStateId(featureId);
+        }
+        setPopupInfo({
+            lng: e.lngLat.lng,
+            lat: e.lngLat.lat,
+            message: features[0].properties?.name
+        });
+    } else {
+        if (hoveredStateId !== null) {
+            map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
+        }
+        setHoveredStateId(null);
+        setPopupInfo(null);
+    }
+}, [hoveredStateId]);
+
+const onMouseLeave = useCallback(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded() || !map.getSource('states-source')) {
+        return;
+    }
+    if (hoveredStateId !== null) {
+        map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
+    }
+    setHoveredStateId(null);
+    setPopupInfo(null);
+}, [hoveredStateId]);
 
   const handleLegendClose = (layerId: keyof LayerState) => {
     setLayers(prev => ({...prev, [layerId]: false}));
@@ -312,6 +393,9 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: terrainExaggeration} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
             onClick={handleMapClick}
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
+            interactiveLayerIds={['states-fill']}
             cursor="pointer"
         >
             <Source
@@ -321,6 +405,27 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 tileSize={512}
                 maxzoom={14}
             />
+
+            {statesGeoJSON && (
+                 <Source id="states-source" type="geojson" data={statesGeoJSON} generateId={true}>
+                    <Layer
+                        id="states-fill"
+                        type="fill"
+                        paint={{
+                           'fill-color': 'transparent',
+                        }}
+                    />
+                    <Layer
+                        id="states-hover"
+                        type="fill"
+                        paint={{
+                            'fill-color': 'hsl(var(--primary))',
+                            'fill-opacity': 0.3,
+                        }}
+                        filter={['==', ['feature-state', 'hover'], true]}
+                    />
+                </Source>
+            )}
 
             {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
             {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
@@ -358,9 +463,13 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     latitude={popupInfo.lat}
                     onClose={() => setPopupInfo(null)}
                     closeOnClick={false}
+                    closeButton={false}
                     anchor="bottom"
+                    className="bg-transparent shadow-none"
                 >
-                    <p>{popupInfo.message}</p>
+                     <div className="bg-popover text-popover-foreground rounded-md p-2 shadow-md text-sm">
+                        {popupInfo.message}
+                    </div>
                 </Popup>
             )}
         </Map>
