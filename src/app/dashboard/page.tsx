@@ -18,10 +18,9 @@ export default function DashboardPage() {
 
     React.useEffect(() => {
         setIsClient(true);
-        const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcomeDialog');
-        if (!hasSeenWelcome) {
+        const hideDialog = localStorage.getItem('hideWelcomeDialog');
+        if (hideDialog !== 'true') {
             setShowWelcomeDialog(true);
-            sessionStorage.setItem('hasSeenWelcomeDialog', 'true');
         }
     }, []);
 
@@ -37,9 +36,16 @@ export default function DashboardPage() {
         setIsCollapsed(prev => !prev);
     }, [isCollapsed]);
 
+    const handleDialogClose = (dontShowAgain: boolean) => {
+        if (dontShowAgain) {
+            localStorage.setItem('hideWelcomeDialog', 'true');
+        }
+        setShowWelcomeDialog(false);
+    };
+
     return (
         <div className="flex-1 flex relative">
-            <WelcomeDialog open={showWelcomeDialog} onOpenChange={setShowWelcomeDialog} />
+            <WelcomeDialog open={showWelcomeDialog} onOpenChange={setShowWelcomeDialog} onDialogClose={handleDialogClose} />
             <ResizablePanelGroup 
                 ref={panelGroupRef}
                 direction="horizontal" 

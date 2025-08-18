@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '../ui/button';
@@ -17,16 +18,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
 
 interface WelcomeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDialogClose: (dontShowAgain: boolean) => void;
 }
 
-export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps) {
+export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: WelcomeDialogProps) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [dontShowAgain, setDontShowAgain] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -36,13 +41,17 @@ export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps
         return () => unsubscribe();
     }, []);
 
+    const handleClose = () => {
+        onDialogClose(dontShowAgain);
+    }
+
     const handleLoginRedirect = () => {
+        handleClose();
         router.push('/login');
-        onOpenChange(false);
     }
     
     const handleExplore = () => {
-        onOpenChange(false);
+        handleClose();
     }
 
     const AuthButton = () => {
@@ -102,7 +111,7 @@ export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full" onClick={() => onOpenChange(false)}>
+                            <Button className="w-full" onClick={handleExplore}>
                                 Explorar <ArrowRight className="ml-2"/>
                             </Button>
                         </CardFooter>
@@ -132,6 +141,12 @@ export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps
                         </CardFooter>
                     </Card>
                 </div>
+                 <DialogFooter className="sm:justify-center pt-6">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox id="dont-show-again" checked={dontShowAgain} onCheckedChange={(checked) => setDontShowAgain(!!checked)} />
+                        <Label htmlFor="dont-show-again" className="text-sm font-normal">Não mostrar novamente</Label>
+                    </div>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
