@@ -11,6 +11,8 @@ import { useI18n } from '@/hooks/use-i18n';
 import { Chrome, TriangleAlert, Eye, EyeOff } from 'lucide-react';
 import { Logo } from '../shared/logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export function LoginForm() {
   const { t } = useI18n();
@@ -20,14 +22,19 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'acaz.dev@gmail.com' && password === 'qazx74123') {
-      setError('');
-      router.push('/dashboard');
-    } else {
-      setError('Credenciais inválidas. Use o e-mail acaz.dev@gmail.com e a senha qazx74123 para entrar.');
-    }
+    setError('Login com e-mail e senha não implementado. Use o login com Google.');
   };
 
   return (
@@ -82,7 +89,7 @@ export function LoginForm() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full">{t('loginButton')}</Button>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" type="button" onClick={handleGoogleLogin}>
             <Chrome className="mr-2 h-4 w-4" />
             {t('googleLogin')}
           </Button>

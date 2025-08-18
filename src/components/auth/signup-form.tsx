@@ -8,9 +8,28 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/use-i18n';
 import { Chrome } from 'lucide-react';
 import { Logo } from '../shared/logo';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { TriangleAlert } from 'lucide-react';
+
 
 export function SignupForm() {
   const { t } = useI18n();
+  const router = useRouter();
+  const [error, setError] = useState('');
+
+  const handleGoogleSignup = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
 
   return (
     <Card>
@@ -22,6 +41,13 @@ export function SignupForm() {
         <CardDescription>{t('signupSubtitle')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+            <Alert variant="destructive">
+              <TriangleAlert className="h-4 w-4" />
+              <AlertTitle>Erro de Cadastro</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
         <div className="space-y-2">
           <Label htmlFor="name">{t('nameLabel')}</Label>
           <Input id="name" required />
@@ -37,7 +63,7 @@ export function SignupForm() {
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
         <Button className="w-full" asChild><Link href="/dashboard">{t('signupButton')}</Link></Button>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignup}>
           <Chrome className="mr-2 h-4 w-4" />
           {t('googleSignup')}
         </Button>
