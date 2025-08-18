@@ -11,7 +11,7 @@ import { useI18n } from '@/hooks/use-i18n';
 import { Chrome, TriangleAlert, Eye, EyeOff } from 'lucide-react';
 import { Logo } from '../shared/logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 export function LoginForm() {
@@ -32,9 +32,19 @@ export function LoginForm() {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('Login com e-mail e senha não implementado. Use o login com Google.');
+    setError('');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/dashboard');
+    } catch (error: any) {
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            setError('E-mail ou senha inválidos. Por favor, tente novamente.');
+        } else {
+            setError(error.message);
+        }
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,11 @@ import {
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '../ui/button';
 import { Logo } from '../shared/logo';
-import { Map, Database, ArrowRight, UserCheck } from 'lucide-react';
+import { Map, Database, ArrowRight, UserCheck, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useRouter } from 'next/navigation';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 interface WelcomeDialogProps {
   open: boolean;
@@ -23,11 +25,50 @@ interface WelcomeDialogProps {
 
 export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps) {
     const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleLoginRedirect = () => {
         router.push('/login');
         onOpenChange(false);
     }
+    
+    const handleExplore = () => {
+        onOpenChange(false);
+    }
+
+    const AuthButton = () => {
+        if (loading) {
+            return (
+                <Button className="w-full" variant="default" disabled>
+                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                   Carregando...
+                </Button>
+            );
+        }
+
+        if (user) {
+            return (
+                <Button className="w-full" variant="default" onClick={handleExplore}>
+                    Explorar <ArrowRight className="ml-2"/>
+                </Button>
+            );
+        }
+
+        return (
+            <Button className="w-full" variant="default" onClick={handleLoginRedirect}>
+                Fazer Login ou Cadastrar <ArrowRight className="ml-2"/>
+            </Button>
+        );
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,8 +111,8 @@ export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps
                      <Card className="flex flex-col border-primary/50 shadow-lg">
                         <CardHeader className="items-center text-center">
                             <Avatar className="w-16 h-16 mb-2">
-                                <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="logged in user avatar" />
-                                <AvatarFallback>U</AvatarFallback>
+                                <AvatarImage src={user?.photoURL || 'https://placehold.co/100x100.png'} data-ai-hint="logged in user avatar" />
+                                <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <CardTitle>Acesso com Login</CardTitle>
                             <CardDescription>Desbloqueie todo o potencial</CardDescription>
@@ -87,9 +128,7 @@ export default function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full" variant="default" onClick={handleLoginRedirect}>
-                                Fazer Login ou Cadastrar <ArrowRight className="ml-2"/>
-                            </Button>
+                           <AuthButton />
                         </CardFooter>
                     </Card>
                 </div>
