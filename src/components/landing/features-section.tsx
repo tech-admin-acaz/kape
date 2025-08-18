@@ -34,16 +34,14 @@ export function FeaturesSection() {
                 </div>
                 <div className="mx-auto mt-12 grid max-w-5xl gap-8 sm:grid-cols-1 md:grid-cols-3">
                     {features.map((feature) => (
-                        <Card key={feature.titleKey}>
-                            <CardHeader>
-                                <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                        <feature.icon className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <CardTitle className="font-headline text-xl font-semibold">
-                                        {t(feature.titleKey as any)}
-                                    </CardTitle>
+                        <Card key={feature.titleKey} className="text-center">
+                            <CardHeader className="items-center">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                                    <feature.icon className="h-8 w-8 text-primary" />
                                 </div>
+                                <CardTitle className="font-headline text-xl font-semibold">
+                                    {t(feature.titleKey as any)}
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-muted-foreground">{t(feature.descriptionKey as any)}</p>
