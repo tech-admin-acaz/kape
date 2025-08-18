@@ -64,7 +64,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [mapbiomasXYZ, setMapbiomasXYZ] = useState<string | null>(null);
 
   const [statesGeoJSON, setStatesGeoJSON] = useState<FeatureCollection<Geometry> | null>(null);
-  const [hoveredStateId, setHoveredStateId] = useState<string | number | null>(null);
 
   const [layers, setLayers] = React.useState<LayerState>({
     indicator: true,
@@ -300,48 +299,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
     }
   }
 
-  const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getSource('states-source')) {
-      return;
-    }
-    const features = map.queryRenderedFeatures(e.point, { layers: ['states-fill'] });
-    map.getCanvas().style.cursor = features.length ? 'pointer' : '';
-
-    if (features.length > 0) {
-        const featureId = features[0].id;
-        if (featureId !== hoveredStateId) {
-            if (hoveredStateId !== null) {
-                map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
-            }
-            map.setFeatureState({ source: 'states-source', id: featureId }, { hover: true });
-            setHoveredStateId(featureId);
-        }
-        setPopupInfo({
-            lng: e.lngLat.lng,
-            lat: e.lngLat.lat,
-            message: features[0].properties?.name
-        });
-    } else {
-        if (hoveredStateId !== null) {
-            map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
-        }
-        setHoveredStateId(null);
-        setPopupInfo(null);
-    }
-}, [hoveredStateId]);
-
-const onMouseLeave = useCallback(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getSource('states-source')) {
-        return;
-    }
-    if (hoveredStateId !== null) {
-        map.setFeatureState({ source: 'states-source', id: hoveredStateId }, { hover: false });
-    }
-    setHoveredStateId(null);
-    setPopupInfo(null);
-}, [hoveredStateId]);
 
   const handleLegendClose = (layerId: keyof LayerState) => {
     setLayers(prev => ({...prev, [layerId]: false}));
@@ -393,8 +350,6 @@ const onMouseLeave = useCallback(() => {
             terrain={is3D ? {source: 'mapbox-dem', exaggeration: terrainExaggeration} : undefined}
             onMove={(evt) => setBearing(evt.viewState.bearing)}
             onClick={handleMapClick}
-            onMouseMove={onMouseMove}
-            onMouseLeave={onMouseLeave}
             interactiveLayerIds={['states-fill']}
             cursor="pointer"
         >
@@ -414,15 +369,6 @@ const onMouseLeave = useCallback(() => {
                         paint={{
                            'fill-color': 'transparent',
                         }}
-                    />
-                    <Layer
-                        id="states-hover"
-                        type="fill"
-                        paint={{
-                            'fill-color': 'hsl(var(--primary))',
-                            'fill-opacity': 0.3,
-                        }}
-                        filter={['==', ['feature-state', 'hover'], true]}
                     />
                 </Source>
             )}
@@ -463,13 +409,10 @@ const onMouseLeave = useCallback(() => {
                     latitude={popupInfo.lat}
                     onClose={() => setPopupInfo(null)}
                     closeOnClick={false}
-                    closeButton={false}
+                    closeButton={true}
                     anchor="bottom"
-                    className="bg-transparent shadow-none"
                 >
-                     <div className="bg-popover text-popover-foreground rounded-md p-2 shadow-md text-sm">
-                        {popupInfo.message}
-                    </div>
+                     {popupInfo.message}
                 </Popup>
             )}
         </Map>
