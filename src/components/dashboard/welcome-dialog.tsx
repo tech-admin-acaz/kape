@@ -81,16 +81,16 @@ export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: Wel
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl p-10">
-                <DialogHeader className="items-center mb-6">
+            <DialogContent className="max-w-4xl p-8">
+                <DialogHeader className="items-center mb-4">
                     <Logo />
-                    <DialogTitle className="text-2xl font-bold font-headline text-center mt-4">Bem-vindo à Plataforma de Biodiversidade</DialogTitle>
-                    <DialogDescription className="text-base text-center max-w-3xl mx-auto text-muted-foreground">
+                    <DialogTitle className="text-2xl font-bold font-headline text-center mt-2">Bem-vindo à Plataforma de Biodiversidade</DialogTitle>
+                    <DialogDescription className="text-sm text-center max-w-3xl mx-auto text-muted-foreground">
                         Esta plataforma apresenta a quantificação de serviços ambientais e a detecção de áreas prioritárias para a restauração na Amazônia com base em três pilares: (i) valoração dos serviços ambientais de florestas de terra firme relacionados ao carbono, biodiversidade e água; (ii) sugestão de espécies-chave a serem usadas na restauração, que possam aumentar a resiliência das florestas frente às mudanças climáticas futuras e proporcionar benefícios econômicos para as comunidades locais; e (iii) integração do conhecimento tradicional com a ciência ocidental.
                     </DialogDescription>
                 </DialogHeader>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="flex flex-col">
                         <CardHeader className="items-center text-center">
                             <Avatar className="w-16 h-16 mb-2">
@@ -141,7 +141,7 @@ export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: Wel
                         </CardFooter>
                     </Card>
                 </div>
-                 <DialogFooter className="sm:justify-center pt-6">
+                 <DialogFooter className="sm:justify-center pt-4">
                     <div className="flex items-center space-x-2">
                         <Checkbox id="dont-show-again" checked={dontShowAgain} onCheckedChange={(checked) => setDontShowAgain(!!checked)} />
                         <Label htmlFor="dont-show-again" className="text-sm font-normal">Não mostrar novamente</Label>
