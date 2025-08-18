@@ -64,7 +64,7 @@ export function TimelineNav() {
                 "text-sm font-medium transition-all duration-300",
                 activeSection === section.id 
                     ? "text-primary opacity-100" 
-                    : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    : "text-muted-foreground opacity-50 group-hover:opacity-100"
                )}
             >
               {t(section.key)}
