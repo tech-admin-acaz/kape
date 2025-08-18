@@ -55,9 +55,11 @@ export default function DashboardHeader() {
                 <span>Configurações</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
