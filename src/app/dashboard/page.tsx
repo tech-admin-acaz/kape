@@ -7,15 +7,22 @@ import DashboardClient from "@/components/dashboard/dashboard-client";
 import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import type { StatsData } from '@/components/dashboard/stats-panel';
+import WelcomeDialog from '@/components/dashboard/welcome-dialog';
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
     const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
+    const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(false);
 
     React.useEffect(() => {
         setIsClient(true);
+        const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcomeDialog');
+        if (!hasSeenWelcome) {
+            setShowWelcomeDialog(true);
+            sessionStorage.setItem('hasSeenWelcomeDialog', 'true');
+        }
     }, []);
 
     const togglePanel = React.useCallback(() => {
@@ -32,6 +39,7 @@ export default function DashboardPage() {
 
     return (
         <div className="flex-1 flex relative">
+            <WelcomeDialog open={showWelcomeDialog} onOpenChange={setShowWelcomeDialog} />
             <ResizablePanelGroup 
                 ref={panelGroupRef}
                 direction="horizontal" 
