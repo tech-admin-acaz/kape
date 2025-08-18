@@ -23,11 +23,6 @@ import { territoryTypes } from '@/models/location.model';
 import ExpandButton from './expand-button';
 import type { PanelGroup } from "react-resizable-panels";
 
-const locations = [
-  { id: "1", lat: 2.8, lng: -63.8, name: "T.I. Yanomami" },
-  { id: "2", lat: -20.25, lng: -46.45, name: "Serra da Canastra" },
-];
-
 const basemaps = {
     'satélite': 'mapbox://styles/mapbox/satellite-streets-v12',
     'ruas': 'mapbox://styles/mapbox/streets-v12',
@@ -51,7 +46,6 @@ interface PopupInfo {
 }
 
 export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef }: InteractiveMapProps) {
-  const [selectedLocation, setSelectedLocation] = useState<typeof locations[0] | null>(null);
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
@@ -356,36 +350,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                   }}
                 />
               </Source>
-            )}
-        
-            {locations.map((loc) => (
-                <Marker
-                key={loc.id}
-                longitude={loc.lng}
-                latitude={loc.lat}
-                onClick={(e) => {
-                    e.originalEvent.stopPropagation();
-                    const areaData = mockData[loc.id as keyof typeof mockData];
-                    if (areaData) onAreaUpdate(areaData);
-                    setSelectedLocation(loc);
-                }}
-                style={{cursor: 'pointer'}}
-                >
-                <MapPin className="w-6 h-6 text-primary fill-primary/50" />
-                </Marker>
-            ))}
-
-            {selectedLocation && (
-                <Popup
-                longitude={selectedLocation.lng}
-                latitude={selectedLocation.lat}
-                onClose={() => setSelectedLocation(null)}
-                closeButton={false}
-                offset={30}
-                anchor="bottom"
-                >
-                <div className="text-sm font-semibold">{selectedLocation.name}</div>
-                </Popup>
             )}
 
             {popupInfo && (
