@@ -9,10 +9,13 @@ export function BiodiversitySection() {
   return (
     <section 
       id="biodiversity" 
-      className="relative h-screen w-full overflow-hidden bg-background"
+      className="relative h-screen w-full overflow-hidden"
     >
-      <div className="container h-full flex items-center">
-        <div className="flex flex-col items-end text-right md:w-1/2">
+      <div className="absolute inset-0 z-0">
+        <HeroMap />
+      </div>
+      <div className="relative z-10 container h-full flex items-center">
+        <div className="flex flex-col items-end text-right md:w-1/2 ml-auto">
           <div className="max-w-2xl">
             <h2 className="font-headline text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl">
               {t('biodiversityTitle')}
@@ -24,9 +27,6 @@ export function BiodiversitySection() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="absolute right-0 top-0 h-full w-1/2 hidden md:block">
-        <HeroMap />
       </div>
     </section>
   );
