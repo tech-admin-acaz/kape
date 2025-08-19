@@ -42,22 +42,26 @@ export async function GET(
             return NextResponse.json({ error: `Failed to fetch metadata from source` }, { status: response.status });
         }
         
-        const data = await response.json();
+        let data = await response.json();
         
         // The API might return an array, so we take the first element if it exists.
-        let details = data && data.length > 0 ? data[0] : {};
+        let details = Array.isArray(data) && data.length > 0 ? data[0] : (data || {});
 
         // For UCs, the initial fetch might not have all location details.
         // We do a second fetch to a more generic TI endpoint to gather that, if needed, as per business rule.
         if (type === 'uc' && (!details.uf_sigla || !details.municipio_)) {
-            const territoryResponse = await fetch(`${API_BIO_URL}/ti/${id}`);
-            if(territoryResponse.ok) {
-                const territoryData = await territoryResponse.json();
-                const territoryDetails = territoryData && territoryData.length > 0 ? territoryData[0] : null;
-                if(territoryDetails) {
-                    // Combine details: preserve the UC name, but take location from territory data.
-                    details = { ...territoryDetails, name: details.nome_uc1 || details.name };
+            try {
+                const territoryResponse = await fetch(`${API_BIO_URL}/ti/${id}`);
+                if(territoryResponse.ok) {
+                    const territoryData = await territoryResponse.json();
+                    const territoryDetails = territoryData && territoryData.length > 0 ? territoryData[0] : null;
+                    if(territoryDetails) {
+                        // Combine details: preserve the UC name, but take location from territory data.
+                        details = { ...territoryDetails, ...details };
+                    }
                 }
+            } catch (tiError) {
+                console.warn(`Could not fetch supplementary TI data for UC ${id}, proceeding with UC data only. Error:`, tiError);
             }
         }
 
@@ -94,7 +98,7 @@ export async function GET(
                 break;
         }
 
-        return NextResponse.json(metadata, {
+        return new NextResponse(JSON.stringify(metadata), {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
             }
