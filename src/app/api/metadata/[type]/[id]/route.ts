@@ -68,8 +68,8 @@ export async function GET(
                 metadata.municipality = details.name;
                 break;
             case 'ti':
-                metadata.state = getRelatedInfo(details.uf, 'nm_uf') || details.uf_sigla;
-                metadata.municipality = getRelatedInfo(details.municipios, 'municipio') || details.municipio_;
+                metadata.state = details.uf_sigla;
+                metadata.municipality = details.municipio_;
                 metadata.territoryName = details.terrai_nom || details.name;
                 break;
             case 'uc':
