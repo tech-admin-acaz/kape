@@ -48,15 +48,15 @@ export async function GET(
         let details = data && data.length > 0 ? data[0] : {};
 
         // For UCs, the initial fetch might not have all location details.
-        // We do a second fetch to a more generic endpoint to gather that, if needed.
-        if (type === 'uc' && (!details.uf || !details.municipios)) {
+        // We do a second fetch to a more generic TI endpoint to gather that, if needed, as per business rule.
+        if (type === 'uc' && (!details.uf_sigla || !details.municipio_)) {
             const territoryResponse = await fetch(`${API_BIO_URL}/ti/${id}`);
             if(territoryResponse.ok) {
                 const territoryData = await territoryResponse.json();
                 const territoryDetails = territoryData && territoryData.length > 0 ? territoryData[0] : null;
                 if(territoryDetails) {
                     // Combine details: preserve the UC name, but take location from territory data.
-                    details = { ...territoryDetails, ...details, name: details.nome_uc1 || details.name };
+                    details = { ...territoryDetails, name: details.nome_uc1 || details.name };
                 }
             }
         }
@@ -94,7 +94,11 @@ export async function GET(
                 break;
         }
 
-        return NextResponse.json(metadata);
+        return NextResponse.json(metadata, {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
 
     } catch (error) {
         console.error(`Error fetching metadata for ${type}/${id}:`, error);
