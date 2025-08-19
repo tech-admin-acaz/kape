@@ -71,13 +71,11 @@ export async function GET(
                 metadata.state = getRelatedInfo(details.uf, 'nm_uf') || details.uf_sigla;
                 metadata.municipality = getRelatedInfo(details.municipios, 'municipio') || details.municipio_;
                 metadata.territoryName = details.terrai_nom || details.name;
-                metadata.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
                 break;
             case 'uc':
                 metadata.state = getRelatedInfo(details.uf, 'nm_uf');
                 metadata.municipality = getRelatedInfo(details.municipios, 'municipio');
-                metadata.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
-                metadata.conservationUnit = details.name;
+                metadata.conservationUnit = details.nome_uc1 || details.name;
                 break;
         }
 
