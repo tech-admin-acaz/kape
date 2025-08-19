@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -13,7 +14,6 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
-import { getLocationDetails } from '@/services/map.service';
 
 interface LandCoverData {
   name: string;
@@ -65,6 +65,7 @@ export interface StatsData {
   name: string;
   type: string;
   typeKey: TerritoryTypeKey;
+  generalInfo?: GeneralInfo;
   stats: {
     landCover: LandCoverData[];
     waterQuality: number;
@@ -115,9 +116,6 @@ function StatsPanelSkeleton() {
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
-  const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
-  const [isLoadingInfo, setIsLoadingInfo] = useState(true);
-
   
   useEffect(() => {
     const panel = panelRef.current;
@@ -135,56 +133,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       resizeObserver.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    if (data) {
-      const fetchInfo = async () => {
-        setIsLoadingInfo(true);
-        try {
-          const details = await getLocationDetails(data.typeKey, data.id);
-          const getRelatedInfo = (d: any[] = [], nameKey: string): string | undefined => {
-            if (!d || d.length === 0) return undefined;
-            return d.map(item => item[nameKey]).filter(Boolean).join(', ');
-          };
-
-          const info: GeneralInfo = {};
-          switch (data.typeKey) {
-            case 'estado':
-              info.state = `${details.name} (${details.sigla})`;
-              break;
-            case 'municipio':
-              if (details.uf && details.uf.length > 0) {
-                info.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
-              }
-              info.municipality = details.name;
-              break;
-            case 'ti':
-              info.state = getRelatedInfo(details.uf, 'nm_uf');
-              info.municipality = getRelatedInfo(details.municipios, 'municipio');
-              info.territoryName = details.name;
-              info.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
-              break;
-            case 'uc':
-              info.state = getRelatedInfo(details.uf, 'nm_uf');
-              info.municipality = getRelatedInfo(details.municipios, 'municipio');
-              info.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
-              info.conservationUnit = details.name;
-              break;
-          }
-          setGeneralInfo(info);
-        } catch (error) {
-          console.error("Failed to fetch general info:", error);
-          setGeneralInfo(null);
-        } finally {
-          setIsLoadingInfo(false);
-        }
-      };
-      fetchInfo();
-    } else {
-      setGeneralInfo(null);
-      setIsLoadingInfo(false);
-    }
-  }, [data]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
@@ -246,7 +194,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             
             <div className="flex-1 overflow-y-auto">
               <TabsContent value="characterization" className="mt-0">
-                  <CharacterizationTab data={data} generalInfo={generalInfo} isLoadingInfo={isLoadingInfo} />
+                  <CharacterizationTab data={data} />
               </TabsContent>
               <TabsContent value="services" className="mt-0">
                   <ServicesTab 
@@ -291,3 +239,5 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </div>
   );
 }
+
+    

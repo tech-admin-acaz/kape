@@ -16,7 +16,6 @@ import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCa
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData, GeneralInfo } from './stats-panel';
-import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
 import { territoryTypes } from '@/models/location.model';
@@ -186,8 +185,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             const bbox = turf.bbox(details.geom) as LngLatBoundsLike;
             mapRef.current.fitBounds(bbox, { padding: 40, duration: 1000 });
         }
-
-        const baseMockData = mockData[Object.keys(mockData)[0]];
         
         let areaName = details.name;
 
@@ -203,7 +200,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.state = `${details.name} (${details.sigla})`;
                 break;
             case 'municipio':
-                // The 'uf' property is an array with state info
                 if (details.uf && details.uf.length > 0) {
                     areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
                     generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
@@ -211,14 +207,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.municipality = details.name;
                 break;
             case 'ti':
-                // For TI, 'uf' and 'municipios' are arrays of related places.
                 generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
                 generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
                 generalInfo.territoryName = details.name;
                 generalInfo.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
                 break;
             case 'uc':
-                 // For UC, it's similar to TI
                 generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
                 generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
                 generalInfo.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
@@ -233,16 +227,17 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           name: areaName,
           type: typeLabel,
           typeKey: type,
+          generalInfo,
           stats: {
             landCover: [],
-            waterQuality: baseMockData.stats.waterQuality,
-            vegetationIndex: baseMockData.stats.vegetationIndex,
+            waterQuality: 0,
+            vegetationIndex: 0,
           },
           environmentalServices: {
             carbon: { currentAndRestorable: [], valuation: [] },
             water: { valuation: [] }
           },
-          correlationInsights: baseMockData.correlationInsights,
+          correlationInsights: "Insights de correlação para esta área ainda não estão disponíveis.",
           species: [],
           futureClimate: {
             temperature: [],
@@ -505,3 +500,5 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
     </div>
   );
 }
+
+    

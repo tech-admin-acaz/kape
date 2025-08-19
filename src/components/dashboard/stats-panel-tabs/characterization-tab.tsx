@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -42,18 +43,29 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 
 
 export default function CharacterizationTab({ data }: CharacterizationTabProps) {
-  const { stats, futureClimate, correlationInsights, id, typeKey, generalInfo } = data;
+  const { id, typeKey, generalInfo, correlationInsights } = data;
   
+  const isLoadingInfo = !generalInfo;
+
   return (
     <div className="space-y-6 p-6">
         <div className="space-y-3">
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
             <Card className="bg-muted/30">
                 <CardContent className="p-4 space-y-2">
-                    <GeneralInfoItem label="Estado" value={generalInfo?.state} />
-                    <GeneralInfoItem label="Município" value={generalInfo?.municipality} />
-                    <GeneralInfoItem label="Nome do Território" value={generalInfo?.territoryName} />
-                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo?.conservationUnit} />
+                   {isLoadingInfo ? (
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                        </div>
+                    ) : (
+                        <>
+                            <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                            <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                            <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                            <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                        </>
+                    )}
                 </CardContent>
             </Card>
         </div>
@@ -95,3 +107,5 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
     </div>
   );
 }
+
+    
