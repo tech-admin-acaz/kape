@@ -3,13 +3,9 @@ import { NextResponse, NextRequest } from 'next/server';
 
 const API_BIO_URL = process.env.API_BIO_URL;
 
-const getRelatedInfo = (data: any[] = [], nameKey: string): string | undefined => {
-    if (!data || data.length === 0) return undefined;
-    return data.map(item => item[nameKey]).filter(Boolean).join(', ');
-};
-
 /**
  * API route to fetch and format metadata for the "Panorama Geral".
+ * This now acts as a direct proxy to the dedicated metadata endpoint.
  */
 export async function GET(
     request: NextRequest,
@@ -30,73 +26,44 @@ export async function GET(
         return NextResponse.json({ error: 'Location ID is required' }, { status: 400 });
     }
 
-    let fetchType = type;
-    if (type === 'estado') fetchType = 'estados';
-    if (type === 'municipio') fetchType = 'municipios';
+    // The external API path for metadata is /metadata/{type}/{id}
+    const apiPath = `${API_BIO_URL}/metadata/${type}/${id}`;
 
     try {
-        const response = await fetch(`${API_BIO_URL}/${fetchType}/${id}`);
+        const response = await fetch(apiPath);
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error fetching metadata source from ${fetchType}/${id}:`, response.status, errorText);
+            console.error(`Error fetching metadata from ${apiPath}:`, response.status, errorText);
             return NextResponse.json({ error: `Failed to fetch metadata from source` }, { status: response.status });
         }
         
         let data = await response.json();
         
-        // The API might return an array, so we take the first element if it exists.
+        // API returns data in an array, e.g. [{...}]
         let details = Array.isArray(data) && data.length > 0 ? data[0] : (data || {});
-
-        // For UCs, the initial fetch might not have all location details.
-        // We do a second fetch to a more generic TI endpoint to gather that, if needed, as per business rule.
-        if (type === 'uc' && (!details.uf_sigla || !details.municipio_)) {
-            try {
-                const territoryResponse = await fetch(`${API_BIO_URL}/ti/${id}`);
-                if(territoryResponse.ok) {
-                    const territoryData = await territoryResponse.json();
-                    const territoryDetails = territoryData && territoryData.length > 0 ? territoryData[0] : null;
-                    if(territoryDetails) {
-                        // Combine details: preserve the UC name, but take location from territory data.
-                        details = { ...territoryDetails, ...details };
-                    }
-                }
-            } catch (tiError) {
-                console.warn(`Could not fetch supplementary TI data for UC ${id}, proceeding with UC data only. Error:`, tiError);
-            }
-        }
 
         if (!details || Object.keys(details).length === 0) {
             return NextResponse.json({ error: 'Location not found' }, { status: 404 });
         }
-        
-        const metadata: { [key: string]: string | undefined } = {
-            state: undefined,
-            municipality: undefined,
-            territoryName: undefined,
-            conservationUnit: undefined,
-        };
 
-        switch (type) {
-            case 'estado':
-                metadata.state = `${details.name} (${details.sigla})`;
-                break;
-            case 'municipio':
-                if (details.uf && details.uf.length > 0) {
-                    metadata.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
-                }
-                metadata.municipality = details.name;
-                break;
-            case 'ti':
-                metadata.state = details.uf_sigla;
-                metadata.municipality = details.municipio_;
-                metadata.territoryName = details.terrai_nom || details.name;
-                break;
-            case 'uc':
-                metadata.state = details.uf_sigla || getRelatedInfo(details.uf, 'nm_uf');
-                metadata.municipality = details.municipio_ || getRelatedInfo(details.municipios, 'municipio');
-                metadata.conservationUnit = details.nome_uc1 || details.name;
-                break;
+        const metadata: { [key: string]: string | undefined } = {
+            state: details.nm_uf || details.uf_sigla,
+            municipality: details.municipio_,
+            territoryName: type === 'ti' ? details.terrai_nom : undefined,
+            conservationUnit: type === 'uc' ? details.nome_uc1 : undefined,
+        };
+        
+        // For 'estado' and 'municipio', the name is in a different field.
+        if (type === 'estado') {
+             metadata.state = `${details.name} (${details.sigla})`;
+             metadata.municipality = undefined;
+        } else if (type === 'municipio') {
+             if (details.uf && details.uf.length > 0) {
+                metadata.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
+            }
+            metadata.municipality = details.name;
         }
+
 
         return new NextResponse(JSON.stringify(metadata), {
             headers: {

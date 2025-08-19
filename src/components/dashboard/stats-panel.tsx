@@ -14,7 +14,6 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
-import { getMetadata } from '@/services/map.service';
 
 interface LandCoverData {
   name: string;
@@ -114,6 +113,21 @@ function StatsPanelSkeleton() {
     )
 }
 
+const fetchGeneralInfo = async (typeKey: TerritoryTypeKey, id: string): Promise<GeneralInfo | null> => {
+    try {
+        const response = await fetch(`/api/metadata/${typeKey}/${id}`);
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`Failed to fetch metadata for ${typeKey}/${id}. Status: ${response.status}. Body: ${errorBody}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error in fetchGeneralInfo:", error);
+        return null;
+    }
+};
+
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
@@ -141,15 +155,9 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     if (data) {
         const fetchInfo = async () => {
             setIsInfoLoading(true);
-            try {
-                const info = await getMetadata(data.typeKey, data.id);
-                setGeneralInfo(info);
-            } catch (error) {
-                console.error("Failed to fetch metadata:", error);
-                setGeneralInfo(null);
-            } finally {
-                setIsInfoLoading(false);
-            }
+            const info = await fetchGeneralInfo(data.typeKey, data.id);
+            setGeneralInfo(info);
+            setIsInfoLoading(false);
         };
         fetchInfo();
     }

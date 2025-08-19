@@ -10,8 +10,28 @@ import { Download, FilePlus2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TerritoryTypeKey } from '@/models/location.model';
 import type { StatsData, GeneralInfo } from '../dashboard/stats-panel';
-import { getMetadata } from '@/services/map.service';
 import { Skeleton } from '../ui/skeleton';
+
+const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promise<[GeneralInfo | null, Partial<StatsData> | null]> => {
+     try {
+          const response = await fetch(`/api/metadata/${typeKey}/${areaId}`);
+          if(!response.ok) {
+              throw new Error('Failed to fetch metadata');
+          }
+          const info = await response.json();
+          const tempData: Partial<StatsData> = {
+            id: areaId,
+            typeKey: typeKey,
+            name: info.conservationUnit || info.territoryName || info.municipality || info.state || `Área ${areaId}`,
+            type: 'Relatório'
+          };
+          document.title = `Relatório - ${tempData.name}`;
+          return [info, tempData];
+     } catch (error) {
+         console.error("Failed to fetch report data:", error);
+         return [null, null];
+     }
+}
 
 export default function ReportLayout() {
   const searchParams = useSearchParams();
@@ -25,33 +45,14 @@ export default function ReportLayout() {
 
   useEffect(() => {
     if (areaId && typeKey) {
-      const fetchData = async () => {
+      const loadData = async () => {
         setIsLoading(true);
-        try {
-          // Here we would normally fetch the full data for the report.
-          // For now, we construct a partial object and fetch metadata.
-          const info = await getMetadata(typeKey, areaId);
-          setGeneralInfo(info);
-          
-          // In a real scenario, you'd fetch the full data object for the areaId.
-          // We are setting a minimal structure for the report page to function.
-          const tempData: Partial<StatsData> = {
-            id: areaId,
-            typeKey: typeKey,
-            name: info.territoryName || info.conservationUnit || info.municipality || info.state || `Área ${areaId}`,
-            type: 'Relatório'
-          };
-          setData(tempData as StatsData);
-          document.title = `Relatório - ${tempData.name}`;
-
-        } catch (error) {
-          console.error("Failed to fetch report data:", error);
-          setData(null);
-        } finally {
-          setIsLoading(false);
-        }
+        const [info, tempData] = await fetchReportData(typeKey, areaId);
+        setGeneralInfo(info);
+        setData(tempData as StatsData);
+        setIsLoading(false);
       };
-      fetchData();
+      loadData();
     } else {
       setIsLoading(false);
     }

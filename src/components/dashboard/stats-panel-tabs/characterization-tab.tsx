@@ -63,7 +63,7 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                         <>
                             <GeneralInfoItem label="Estado" value={generalInfo.state} />
                             <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                            <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                            <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
                             <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
                         </>
                     ) : (
