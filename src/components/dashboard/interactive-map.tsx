@@ -213,13 +213,13 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 break;
             case 'ti':
                 generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
-                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio_', 'municipio_');
+                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio', 'municipio');
                 generalInfo.territoryName = details.name;
                 generalInfo.conservationUnit = getGeneralInfoValue(details.uc, 'nome_uc1', 'nome_uc1');
                 break;
             case 'uc':
                 generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
-                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio_', 'municipio_');
+                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio', 'municipio');
                 generalInfo.territoryName = getGeneralInfoValue(details.ti, 'terrai_nom', 'terrai_nom');
                 generalInfo.conservationUnit = details.name;
                 break;
