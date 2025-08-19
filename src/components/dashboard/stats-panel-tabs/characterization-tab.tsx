@@ -1,16 +1,19 @@
 "use client";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LandCoverChart from '../charts/land-cover-chart';
 import TemperatureTrendChart from '../charts/temperature-trend-chart';
 import RainfallTrendChart from '../charts/rainfall-trend-chart';
-import type { StatsData } from '../stats-panel';
+import type { GeneralInfo, StatsData } from '../stats-panel';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CharacterizationTabProps {
   data: StatsData;
+  generalInfo: GeneralInfo | null;
+  isLoadingInfo: boolean;
 }
 
 const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: string }) => (
@@ -39,22 +42,35 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
     )
 };
 
+const InfoSkeleton = () => (
+    <Card className="bg-muted/30">
+        <CardContent className="p-4 space-y-2">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-5 w-1/2" />
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-5 w-3/5" />
+        </CardContent>
+    </Card>
+);
 
-export default function CharacterizationTab({ data }: CharacterizationTabProps) {
-  const { stats, futureClimate, correlationInsights, id, typeKey, generalInfo } = data;
+
+export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }: CharacterizationTabProps) {
+  const { stats, futureClimate, correlationInsights, id, typeKey } = data;
   
   return (
     <div className="space-y-6 p-6">
         <div className="space-y-3">
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
-            <Card className="bg-muted/30">
-                <CardContent className="p-4 space-y-2">
-                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                    <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
-                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
-                </CardContent>
-            </Card>
+            {isLoadingInfo ? <InfoSkeleton /> : (
+                <Card className="bg-muted/30">
+                    <CardContent className="p-4 space-y-2">
+                        <GeneralInfoItem label="Estado" value={generalInfo?.state} />
+                        <GeneralInfoItem label="Município" value={generalInfo?.municipality} />
+                        <GeneralInfoItem label="Nome do Território" value={generalInfo?.territoryName} />
+                        <GeneralInfoItem label="Unidade de Conservação" value={generalInfo?.conservationUnit} />
+                    </CardContent>
+                </Card>
+            )}
         </div>
 
         <div className="space-y-4">

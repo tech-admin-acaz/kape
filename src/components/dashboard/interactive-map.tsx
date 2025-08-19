@@ -203,6 +203,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.state = `${details.name} (${details.sigla})`;
                 break;
             case 'municipio':
+                // The 'uf' property is an array with state info
                 if (details.uf && details.uf.length > 0) {
                     areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
                     generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
@@ -210,12 +211,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.municipality = details.name;
                 break;
             case 'ti':
+                // For TI, 'uf' and 'municipios' are arrays of related places.
                 generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
                 generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
                 generalInfo.territoryName = details.name;
                 generalInfo.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
                 break;
             case 'uc':
+                 // For UC, it's similar to TI
                 generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
                 generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
                 generalInfo.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
@@ -230,7 +233,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           name: areaName,
           type: typeLabel,
           typeKey: type,
-          generalInfo,
           stats: {
             landCover: [],
             waterQuality: baseMockData.stats.waterQuality,
