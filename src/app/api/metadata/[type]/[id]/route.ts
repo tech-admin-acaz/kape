@@ -47,20 +47,22 @@ export async function GET(
         // The API might return an array, so we take the first element if it exists.
         let details = data && data.length > 0 ? data[0] : {};
 
-        if (!details || Object.keys(details).length === 0) {
-            // If the first call returns no details (e.g., for UCs without direct /uc/{id} data),
-            // try fetching from the generic territory endpoint as a fallback.
-            const fallbackResponse = await fetch(`${API_BIO_URL}/territory/${id}`);
-            if(fallbackResponse.ok) {
-                const fallbackData = await fallbackResponse.json();
-                const fallbackDetails = fallbackData && fallbackData.length > 0 ? fallbackData[0] : null;
-                 if (!fallbackDetails) {
-                    return NextResponse.json({ error: 'Location not found' }, { status: 404 });
-                 }
-                 details = fallbackDetails;
-            } else {
-                 return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+        // For UCs, the initial fetch might not have all location details.
+        // We do a second fetch to a more generic endpoint to gather that, if needed.
+        if (type === 'uc' && (!details.uf || !details.municipios)) {
+            const territoryResponse = await fetch(`${API_BIO_URL}/ti/${id}`);
+            if(territoryResponse.ok) {
+                const territoryData = await territoryResponse.json();
+                const territoryDetails = territoryData && territoryData.length > 0 ? territoryData[0] : null;
+                if(territoryDetails) {
+                    // Combine details: preserve the UC name, but take location from territory data.
+                    details = { ...territoryDetails, ...details, name: details.nome_uc1 || details.name };
+                }
             }
+        }
+
+        if (!details || Object.keys(details).length === 0) {
+            return NextResponse.json({ error: 'Location not found' }, { status: 404 });
         }
         
         const metadata: { [key: string]: string | undefined } = {
@@ -86,8 +88,8 @@ export async function GET(
                 metadata.territoryName = details.terrai_nom || details.name;
                 break;
             case 'uc':
-                metadata.state = getRelatedInfo(details.uf, 'nm_uf');
-                metadata.municipality = getRelatedInfo(details.municipios, 'municipio');
+                metadata.state = details.uf_sigla || getRelatedInfo(details.uf, 'nm_uf');
+                metadata.municipality = details.municipio_ || getRelatedInfo(details.municipios, 'municipio');
                 metadata.conservationUnit = details.nome_uc1 || details.name;
                 break;
         }
