@@ -18,7 +18,7 @@ interface I18nContextType {
 export const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>('en');
+  const [locale, setLocale] = useState<Locale>('pt');
 
   const t = useCallback((key: keyof Translations, ...args: (string | number)[]) => {
     let translation = translations[locale][key] || translations['en'][key] || key;
