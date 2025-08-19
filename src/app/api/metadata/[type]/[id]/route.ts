@@ -43,6 +43,9 @@ export async function GET(
         const response = await fetch(apiPath);
         
         if (!response.ok) {
+            if (response.status === 404) {
+                return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+            }
             const errorText = await response.text();
             console.error(`Error fetching metadata from ${apiPath}:`, response.status, errorText);
             return NextResponse.json({ error: `Failed to fetch metadata from source` }, { status: response.status });
