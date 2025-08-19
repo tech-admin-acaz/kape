@@ -57,22 +57,27 @@ export async function GET(
             return NextResponse.json({ error: 'Location not found' }, { status: 404 });
         }
         
-        // Let's format the data correctly here
-        const metadata: { [key: string]: string | undefined } = {
-            state: details.nm_uf,
-            municipality: details.municipio_,
-            territoryName: details.terrai_nom,
-            conservationUnit: details.nome_uc1 ? titleCase(details.nome_uc1) : undefined
-        };
-        
+        const metadata: { [key: string]: string | undefined } = {};
+
         if (type === 'estado') {
              metadata.state = `${details.name} (${details.sigla})`;
-             metadata.municipality = undefined;
         } else if (type === 'municipio') {
+            metadata.municipality = details.name;
             if (details.uf && details.uf.length > 0) {
                 metadata.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
             }
-            metadata.municipality = details.name;
+        } else if (type === 'ti') {
+            metadata.territoryName = details.terrai_nom;
+            metadata.municipality = details.municipio_;
+            metadata.state = `${details.nm_uf} (${details.uf_sigla})`;
+        } else if (type === 'uc') {
+            metadata.conservationUnit = details.nome_uc1 ? titleCase(details.nome_uc1) : undefined;
+            if (details.municipios && details.municipios.length > 0) {
+                 metadata.municipality = details.municipios.map((m: any) => m.nm_mun).join(', ');
+            }
+             if (details.uf && details.uf.length > 0) {
+                metadata.state = details.uf.map((u: any) => `${u.nm_uf} (${u.sigla_uf})`).join(', ');
+            }
         }
 
 
