@@ -41,9 +41,10 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
       try {
         const response = await fetch(`/api/stats/land-cover/${type}/${id}`);
         if (!response.ok) {
-          console.error(`Error fetching land cover stats: ${response.statusText}`);
-          setChartData([]);
-          return;
+            const errorText = await response.text();
+            console.error(`Error fetching land cover stats. Status: ${response.status}, Body: ${errorText}`);
+            setChartData([]);
+            return;
         }
         
         const data = await response.json();
