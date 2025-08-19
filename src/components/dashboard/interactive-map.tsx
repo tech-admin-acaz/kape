@@ -15,7 +15,7 @@ import LegendControl from './legend-control';
 import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLocationsByType } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
-import type { StatsData, FutureClimateData, GeneralInfo } from './stats-panel';
+import type { StatsData, GeneralInfo } from './stats-panel';
 import { mockData } from './mock-data';
 import MapSettingsControl from './map-settings-control';
 import { Separator } from '../ui/separator';
@@ -163,7 +163,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   };
 
   const handleLocationSelect = async (location: Location | null, type: TerritoryTypeKey | null) => {
-    setPopupInfo(null); // Close any info popup when a location is selected
+    setPopupInfo(null); 
     if (!location || !type) {
       setSelectedShape(null);
       onAreaUpdate(null);
@@ -190,14 +190,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         const baseMockData = mockData[Object.keys(mockData)[0]];
         
         let areaName = details.name;
-        
-        const getGeneralInfoValue = (apiData: any[], nameKey: string, propKey: string = 'name') => {
-            if (apiData && Array.isArray(apiData) && apiData.length > 0) {
-              return apiData.map((item: any) => item[propKey]).filter(Boolean).join(', ');
-            }
-            return undefined;
-        };
 
+        const getRelatedInfo = (data: any[] = [], nameKey: string): string | undefined => {
+            if (!data || data.length === 0) return undefined;
+            return data.map(item => item[nameKey]).filter(Boolean).join(', ');
+        };
+        
         const generalInfo: GeneralInfo = {};
 
         switch (type) {
@@ -212,15 +210,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 generalInfo.municipality = details.name;
                 break;
             case 'ti':
-                generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
-                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio', 'municipio');
+                generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
+                generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
                 generalInfo.territoryName = details.name;
-                generalInfo.conservationUnit = getGeneralInfoValue(details.uc, 'nome_uc1', 'nome_uc1');
+                generalInfo.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
                 break;
             case 'uc':
-                generalInfo.state = getGeneralInfoValue(details.uf, 'nm_uf', 'nm_uf');
-                generalInfo.municipality = getGeneralInfoValue(details.municipios, 'municipio', 'municipio');
-                generalInfo.territoryName = getGeneralInfoValue(details.ti, 'terrai_nom', 'terrai_nom');
+                generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
+                generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
+                generalInfo.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
                 generalInfo.conservationUnit = details.name;
                 break;
         }

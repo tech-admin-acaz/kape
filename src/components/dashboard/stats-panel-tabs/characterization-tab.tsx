@@ -7,13 +7,10 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 import LandCoverChart from '../charts/land-cover-chart';
 import TemperatureTrendChart from '../charts/temperature-trend-chart';
 import RainfallTrendChart from '../charts/rainfall-trend-chart';
-import type { StatsData, GeneralInfo } from '../stats-panel';
-import { Skeleton } from '@/components/ui/skeleton';
+import type { StatsData } from '../stats-panel';
 
 interface CharacterizationTabProps {
   data: StatsData;
-  generalInfo: GeneralInfo | null;
-  isLoading: boolean;
 }
 
 const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: string }) => (
@@ -33,26 +30,18 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
 );
 
 const GeneralInfoItem = ({ label, value }: { label: string; value: string | undefined | null }) => {
-    const displayValue = value || `Sem dados de ${label.replace(':', '')}`;
+    if (!value) return null;
     return (
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">{label}:</span>
-          <span className="font-medium text-right">{displayValue}</span>
+          <span className="font-medium text-right">{value}</span>
         </div>
     )
 };
 
-const GeneralInfoSkeleton = () => (
-    <div className="p-4 space-y-3">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-2/3" />
-        <Skeleton className="h-5 w-4/5" />
-    </div>
-);
 
-export default function CharacterizationTab({ data, generalInfo, isLoading }: CharacterizationTabProps) {
-  const { stats, futureClimate, correlationInsights, id, typeKey } = data;
+export default function CharacterizationTab({ data }: CharacterizationTabProps) {
+  const { stats, futureClimate, correlationInsights, id, typeKey, generalInfo } = data;
   
   return (
     <div className="space-y-6 p-6">
@@ -60,18 +49,10 @@ export default function CharacterizationTab({ data, generalInfo, isLoading }: Ch
             <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
             <Card className="bg-muted/30">
                 <CardContent className="p-4 space-y-2">
-                    {isLoading ? (
-                        <GeneralInfoSkeleton />
-                    ) : generalInfo ? (
-                        <>
-                            <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                            <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                            <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
-                            <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
-                        </>
-                    ) : (
-                        <p className="text-sm text-muted-foreground p-4 text-center">Não foi possível carregar os dados.</p>
-                    )}
+                    <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                    <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                    <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
+                    <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
                 </CardContent>
             </Card>
         </div>

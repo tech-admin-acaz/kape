@@ -2,7 +2,6 @@
 "use client";
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
-import { GeneralInfo } from "@/components/dashboard/stats-panel";
 
 const fetchXYZ = async (endpoint: string): Promise<string> => {
     const response = await fetch(endpoint);
@@ -106,19 +105,6 @@ export async function getLocationByCoords(lat: number, lng: number): Promise<any
         const errorText = await response.text();
         console.error(`Error fetching location by coords:`, response.status, errorText);
         throw new Error(`Failed to fetch location by coords`);
-    }
-    return await response.json();
-}
-
-/**
- * Fetches formatted metadata for the General Info panel.
- */
-export async function getMetadata(type: TerritoryTypeKey, id: string): Promise<GeneralInfo> {
-    const response = await fetch(`/api/metadata/${type}/${id}`);
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error fetching metadata for ${type}/${id}:`, response.status, errorText);
-        throw new Error(`Failed to fetch metadata for ${type}/${id}`);
     }
     return await response.json();
 }
