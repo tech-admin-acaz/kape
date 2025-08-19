@@ -56,6 +56,14 @@ export async function getMapbiomasXYZ(): Promise<string> {
     return fetchXYZ('/api/map/mapbiomas');
 }
 
+const titleCase = (str: string) => {
+    if (!str) return '';
+    return str.toLowerCase().split(' ').map(word => {
+        return (word.length > 3) ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+    }).join(' ');
+}
+
+
 /**
  * Fetches locations based on the territory type.
  */
@@ -65,14 +73,13 @@ export async function getLocationsByType(type: TerritoryTypeKey): Promise<Locati
         throw new Error(`Failed to fetch locations for type: ${type}`);
     }
     const data = await response.json();
-    // API returns id as number, but CommandItem in shadcn expects string value
+    
     const locations = data.map((item: any) => ({
         value: String(item.id), 
-        label: item.name,
+        label: type === 'uc' ? titleCase(item.name) : item.name,
     }));
 
-    // Sort locations alphabetically by label
-    locations.sort((a, b) => a.label.localeCompare(b.label));
+    locations.sort((a: Location, b: Location) => a.label.localeCompare(b.label));
 
     return locations;
 }
@@ -88,8 +95,15 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
         throw new Error(`Failed to fetch location details for ${type}/${id}`);
     }
     const data = await response.json();
-    // The API wraps the result in an array, so we return the first element.
-    return data && data.length > 0 ? data[0] : null;
+    
+    if (data && data.length > 0) {
+        const details = data[0];
+        if (type === 'uc' && details.name) {
+            details.name = titleCase(details.name);
+        }
+        return details;
+    }
+    return null;
 }
 
 /**

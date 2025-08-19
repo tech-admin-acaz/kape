@@ -3,6 +3,16 @@ import { NextResponse, NextRequest } from 'next/server';
 
 const API_BIO_URL = process.env.API_BIO_URL;
 
+const titleCase = (str: string) => {
+    if (!str) return '';
+    return str.toLowerCase().split(' ').map(word => {
+        return (word.length > 3 || word.toLowerCase() === 'do' || word.toLowerCase() === 'da') 
+               ? word.charAt(0).toUpperCase() + word.slice(1) 
+               : word;
+    }).join(' ');
+}
+
+
 /**
  * API route to fetch and format metadata for the "Panorama Geral".
  * This now acts as a direct proxy to the dedicated metadata endpoint.
@@ -31,6 +41,7 @@ export async function GET(
 
     try {
         const response = await fetch(apiPath);
+        
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Error fetching metadata from ${apiPath}:`, response.status, errorText);
@@ -45,20 +56,20 @@ export async function GET(
         if (!details || Object.keys(details).length === 0) {
             return NextResponse.json({ error: 'Location not found' }, { status: 404 });
         }
-
+        
+        // Let's format the data correctly here
         const metadata: { [key: string]: string | undefined } = {
-            state: details.nm_uf || details.uf_sigla,
+            state: details.nm_uf,
             municipality: details.municipio_,
-            territoryName: type === 'ti' ? details.terrai_nom : undefined,
-            conservationUnit: type === 'uc' ? details.nome_uc1 : undefined,
+            territoryName: details.terrai_nom,
+            conservationUnit: details.nome_uc1 ? titleCase(details.nome_uc1) : undefined
         };
         
-        // For 'estado' and 'municipio', the name is in a different field.
         if (type === 'estado') {
              metadata.state = `${details.name} (${details.sigla})`;
              metadata.municipality = undefined;
         } else if (type === 'municipio') {
-             if (details.uf && details.uf.length > 0) {
+            if (details.uf && details.uf.length > 0) {
                 metadata.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
             }
             metadata.municipality = details.name;

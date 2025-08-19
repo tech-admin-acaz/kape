@@ -46,6 +46,10 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 
 export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }: CharacterizationTabProps) {
   const { id, typeKey, correlationInsights } = data;
+  
+  const displayTerritoryName = typeKey === 'ti' ? generalInfo?.territoryName : null;
+  const displayConservationUnit = typeKey === 'uc' ? generalInfo?.conservationUnit : null;
+
 
   return (
     <div className="space-y-6 p-6">
@@ -63,8 +67,8 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                         <>
                             <GeneralInfoItem label="Estado" value={generalInfo.state} />
                             <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                            <GeneralInfoItem label="Terra Indígena" value={generalInfo.territoryName} />
-                            <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
+                            <GeneralInfoItem label="Terra Indígena" value={displayTerritoryName} />
+                            <GeneralInfoItem label="Unidade de Conservação" value={displayConservationUnit} />
                         </>
                     ) : (
                         <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do panorama geral.</p>
