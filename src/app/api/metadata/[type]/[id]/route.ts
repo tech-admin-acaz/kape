@@ -43,11 +43,24 @@ export async function GET(
         }
         
         const data = await response.json();
-        // The API returns an array, we are interested in the first element.
+        
+        // The API might return an array, so we take the first element if it exists.
         const details = data && data.length > 0 ? data[0] : null;
 
         if (!details) {
-            return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+            // If the first call returns no details (e.g., for UCs without direct /uc/{id} data),
+            // try fetching from the generic territory endpoint.
+            const fallbackResponse = await fetch(`${API_BIO_URL}/territory/${id}`);
+            if(fallbackResponse.ok) {
+                const fallbackData = await fallbackResponse.json();
+                const fallbackDetails = fallbackData && fallbackData.length > 0 ? fallbackData[0] : null;
+                 if (!fallbackDetails) {
+                    return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+                 }
+                 Object.assign(details || {}, fallbackDetails);
+            } else {
+                 return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+            }
         }
         
         const metadata: { [key: string]: string | undefined } = {
