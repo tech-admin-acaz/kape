@@ -191,7 +191,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         
         let areaName = details.name;
         
-        const getGeneralInfoValue = (apiData: any[], nameKey: string, propKey = 'name') => {
+        const getGeneralInfoValue = (apiData: any[], nameKey: string, propKey: string = 'name') => {
             if (apiData && Array.isArray(apiData) && apiData.length > 0) {
               return apiData.map((item: any) => item[propKey]).filter(Boolean).join(', ');
             }
