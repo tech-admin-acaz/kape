@@ -43,6 +43,7 @@ export async function GET(
         }
         
         const data = await response.json();
+        // The API returns an array, we are interested in the first element.
         const details = data && data.length > 0 ? data[0] : null;
 
         if (!details) {
@@ -61,18 +62,21 @@ export async function GET(
                 metadata.state = `${details.name} (${details.sigla})`;
                 break;
             case 'municipio':
+                 // The 'uf' property is an array with state info
                 if (details.uf && details.uf.length > 0) {
                     metadata.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
                 }
                 metadata.municipality = details.name;
                 break;
             case 'ti':
+                // For TI, 'uf' and 'municipios' are arrays of related places.
                 metadata.state = getRelatedInfo(details.uf, 'nm_uf');
                 metadata.municipality = getRelatedInfo(details.municipios, 'municipio');
                 metadata.territoryName = details.name;
                 metadata.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
                 break;
             case 'uc':
+                 // For UC, it's similar to TI
                 metadata.state = getRelatedInfo(details.uf, 'nm_uf');
                 metadata.municipality = getRelatedInfo(details.municipios, 'municipio');
                 metadata.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
