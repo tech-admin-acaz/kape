@@ -13,6 +13,7 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
+import { getMetadata } from '@/services/map.service';
 
 
 interface LandCoverData {
@@ -116,6 +117,8 @@ function StatsPanelSkeleton() {
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
+  const [metadata, setMetadata] = useState<GeneralInfo | null>(null);
+  const [isMetadataLoading, setIsMetadataLoading] = useState(false);
   
   useEffect(() => {
     const panel = panelRef.current;
@@ -133,6 +136,26 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       resizeObserver.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (data) {
+      const fetchMetadata = async () => {
+        setIsMetadataLoading(true);
+        try {
+          const fetchedMetadata = await getMetadata(data.typeKey, data.id);
+          setMetadata(fetchedMetadata);
+        } catch (error) {
+          console.error("Failed to fetch metadata", error);
+          setMetadata(null);
+        } finally {
+          setIsMetadataLoading(false);
+        }
+      };
+      fetchMetadata();
+    } else {
+      setMetadata(null);
+    }
+  }, [data]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
@@ -194,7 +217,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             
             <div className="flex-1 overflow-y-auto">
               <TabsContent value="characterization" className="mt-0">
-                  <CharacterizationTab data={data} />
+                  <CharacterizationTab data={data} generalInfo={metadata} isLoading={isMetadataLoading}/>
               </TabsContent>
               <TabsContent value="services" className="mt-0">
                   <ServicesTab 
