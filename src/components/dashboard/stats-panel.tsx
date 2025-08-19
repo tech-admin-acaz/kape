@@ -14,6 +14,7 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
+import { getMetadata } from '@/services/map.service';
 
 interface LandCoverData {
   name: string;
@@ -116,6 +117,8 @@ function StatsPanelSkeleton() {
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
+  const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
+  const [isInfoLoading, setIsInfoLoading] = useState(true);
   
   useEffect(() => {
     const panel = panelRef.current;
@@ -133,6 +136,24 @@ export default function StatsPanel({ data }: StatsPanelProps) {
       resizeObserver.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (data) {
+        const fetchInfo = async () => {
+            setIsInfoLoading(true);
+            try {
+                const info = await getMetadata(data.typeKey, data.id);
+                setGeneralInfo(info);
+            } catch (error) {
+                console.error("Failed to fetch metadata:", error);
+                setGeneralInfo(null);
+            } finally {
+                setIsInfoLoading(false);
+            }
+        };
+        fetchInfo();
+    }
+  }, [data]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
@@ -194,7 +215,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             
             <div className="flex-1 overflow-y-auto">
               <TabsContent value="characterization" className="mt-0">
-                  <CharacterizationTab data={data} />
+                  <CharacterizationTab data={data} generalInfo={generalInfo} isLoadingInfo={isInfoLoading} />
               </TabsContent>
               <TabsContent value="services" className="mt-0">
                   <ServicesTab 
@@ -239,5 +260,3 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     </div>
   );
 }
-
-    

@@ -187,39 +187,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         }
         
         let areaName = details.name;
-
-        const getRelatedInfo = (data: any[] = [], nameKey: string): string | undefined => {
-            if (!data || data.length === 0) return undefined;
-            return data.map(item => item[nameKey]).filter(Boolean).join(', ');
-        };
-        
-        const generalInfo: GeneralInfo = {};
-
-        switch (type) {
-            case 'estado':
-                generalInfo.state = `${details.name} (${details.sigla})`;
-                break;
-            case 'municipio':
-                if (details.uf && details.uf.length > 0) {
-                    areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
-                    generalInfo.state = `${details.uf[0].nm_uf} (${details.uf[0].sigla_uf})`;
-                }
-                generalInfo.municipality = details.name;
-                break;
-            case 'ti':
-                generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
-                generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
-                generalInfo.territoryName = details.name;
-                generalInfo.conservationUnit = getRelatedInfo(details.uc, 'nome_uc1');
-                break;
-            case 'uc':
-                generalInfo.state = getRelatedInfo(details.uf, 'nm_uf');
-                generalInfo.municipality = getRelatedInfo(details.municipios, 'municipio');
-                generalInfo.territoryName = getRelatedInfo(details.ti, 'terrai_nom');
-                generalInfo.conservationUnit = details.name;
-                break;
+        if(type === 'municipio' && details.uf && details.uf.length > 0) {
+             areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
         }
-
+       
         const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
        
         const newArea: StatsData = {
@@ -227,7 +198,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           name: areaName,
           type: typeLabel,
           typeKey: type,
-          generalInfo,
           stats: {
             landCover: [],
             waterQuality: 0,
@@ -500,5 +470,3 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
     </div>
   );
 }
-
-    

@@ -13,6 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface CharacterizationTabProps {
   data: StatsData;
+  generalInfo: GeneralInfo | null;
+  isLoadingInfo: boolean;
 }
 
 const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: string }) => (
@@ -42,10 +44,8 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 };
 
 
-export default function CharacterizationTab({ data }: CharacterizationTabProps) {
-  const { id, typeKey, generalInfo, correlationInsights } = data;
-  
-  const isLoadingInfo = !generalInfo;
+export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }: CharacterizationTabProps) {
+  const { id, typeKey, correlationInsights } = data;
 
   return (
     <div className="space-y-6 p-6">
@@ -55,16 +55,19 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
                 <CardContent className="p-4 space-y-2">
                    {isLoadingInfo ? (
                         <div className="space-y-2">
+                            <Skeleton className="h-4 w-3/4" />
                             <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-2/3" />
                         </div>
-                    ) : (
+                    ) : generalInfo ? (
                         <>
                             <GeneralInfoItem label="Estado" value={generalInfo.state} />
                             <GeneralInfoItem label="Município" value={generalInfo.municipality} />
                             <GeneralInfoItem label="Nome do Território" value={generalInfo.territoryName} />
                             <GeneralInfoItem label="Unidade de Conservação" value={generalInfo.conservationUnit} />
                         </>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do panorama geral.</p>
                     )}
                 </CardContent>
             </Card>
@@ -107,5 +110,3 @@ export default function CharacterizationTab({ data }: CharacterizationTabProps) 
     </div>
   );
 }
-
-    

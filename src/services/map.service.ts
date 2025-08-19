@@ -93,6 +93,19 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
 }
 
 /**
+ * Fetches metadata for the general overview panel.
+ */
+export async function getMetadata(type: TerritoryTypeKey, id: string): Promise<any> {
+    const response = await fetch(`/api/metadata/${type}/${id}`);
+     if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error fetching metadata for ${type}/${id}:`, response.status, errorText);
+        throw new Error(`Failed to fetch metadata for ${type}/${id}`);
+    }
+    return await response.json();
+}
+
+/**
  * Fetches a location based on geographic coordinates.
  */
 export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
