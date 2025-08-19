@@ -2,34 +2,81 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import { mockData } from '@/components/dashboard/mock-data';
 import CharacterizationTab from '@/components/dashboard/stats-panel-tabs/characterization-tab';
 import ServicesTab from '@/components/dashboard/stats-panel-tabs/services-tab';
 import SpeciesTab from '@/components/dashboard/stats-panel-tabs/species-tab';
 import { Button } from '../ui/button';
 import { Download, FilePlus2 } from 'lucide-react';
-import { Separator } from '../ui/separator';
 import { useState, useEffect } from 'react';
 import { TerritoryTypeKey } from '@/models/location.model';
-import { StatsData } from '../dashboard/stats-panel';
+import type { StatsData, GeneralInfo } from '../dashboard/stats-panel';
+import { getMetadata } from '@/services/map.service';
+import { Skeleton } from '../ui/skeleton';
 
 export default function ReportLayout() {
   const searchParams = useSearchParams();
   const areaId = searchParams.get('areaId');
   const typeKey = searchParams.get('typeKey') as TerritoryTypeKey | null;
 
-  // For this report, we'll continue using mockData for simplicity,
-  // but in a real app, you might fetch fresh data.
-  const data: StatsData | null = areaId ? mockData[areaId] : null;
-
+  const [data, setData] = useState<StatsData | null>(null);
+  const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [includeSpecies, setIncludeSpecies] = useState(false);
 
-  // Update the document title when data is available
   useEffect(() => {
-    if (data) {
-      document.title = `Relatório - ${data.name}`;
+    if (areaId && typeKey) {
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          // Here we would normally fetch the full data for the report.
+          // For now, we construct a partial object and fetch metadata.
+          const info = await getMetadata(typeKey, areaId);
+          setGeneralInfo(info);
+          
+          // In a real scenario, you'd fetch the full data object for the areaId.
+          // We are setting a minimal structure for the report page to function.
+          const tempData: Partial<StatsData> = {
+            id: areaId,
+            typeKey: typeKey,
+            name: info.territoryName || info.conservationUnit || info.municipality || info.state || `Área ${areaId}`,
+            type: 'Relatório'
+          };
+          setData(tempData as StatsData);
+          document.title = `Relatório - ${tempData.name}`;
+
+        } catch (error) {
+          console.error("Failed to fetch report data:", error);
+          setData(null);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchData();
+    } else {
+      setIsLoading(false);
     }
-  }, [data]);
+  }, [areaId, typeKey]);
+
+
+  if (isLoading) {
+      return (
+          <div className="p-8 space-y-8">
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-10 w-1/4" />
+              <div className="flex gap-2">
+                  <Skeleton className="h-10 w-32" />
+                  <Skeleton className="h-10 w-48" />
+              </div>
+            </div>
+            <Skeleton className="h-px w-full" />
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-1/3" />
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          </div>
+      )
+  }
 
   if (!data || !areaId || !typeKey) {
     return (
@@ -76,7 +123,7 @@ export default function ReportLayout() {
         <div className="divide-y divide-border/50 space-y-8">
             <div id="characterization-section">
                 <h2 className="text-2xl font-bold font-headline mb-4">1. Caracterização</h2>
-                <CharacterizationTab data={data} />
+                <CharacterizationTab data={data} generalInfo={generalInfo} isLoadingInfo={isLoading} />
             </div>
             
             <div id="services-section" className="pt-8">

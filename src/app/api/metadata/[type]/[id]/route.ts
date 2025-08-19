@@ -45,11 +45,11 @@ export async function GET(
         const data = await response.json();
         
         // The API might return an array, so we take the first element if it exists.
-        const details = data && data.length > 0 ? data[0] : null;
+        let details = data && data.length > 0 ? data[0] : {};
 
-        if (!details) {
+        if (!details || Object.keys(details).length === 0) {
             // If the first call returns no details (e.g., for UCs without direct /uc/{id} data),
-            // try fetching from the generic territory endpoint.
+            // try fetching from the generic territory endpoint as a fallback.
             const fallbackResponse = await fetch(`${API_BIO_URL}/territory/${id}`);
             if(fallbackResponse.ok) {
                 const fallbackData = await fallbackResponse.json();
@@ -57,7 +57,7 @@ export async function GET(
                  if (!fallbackDetails) {
                     return NextResponse.json({ error: 'Location not found' }, { status: 404 });
                  }
-                 Object.assign(details || {}, fallbackDetails);
+                 details = fallbackDetails;
             } else {
                  return NextResponse.json({ error: 'Location not found' }, { status: 404 });
             }
