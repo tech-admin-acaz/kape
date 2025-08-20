@@ -27,7 +27,7 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ initialLayerData, statesGeoJSON }: DashboardClientProps) {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
-    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
     const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(true);
@@ -67,7 +67,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                     setIsCollapsed(sizes[1] < 5);
                 }}
             >
-                <ResizablePanel defaultSize={62} minSize={30}>
+                <ResizablePanel defaultSize={100} minSize={30}>
                      <div className="h-full w-full relative">
                       <InteractiveMap 
                           onAreaUpdate={setSelectedArea} 
@@ -83,7 +83,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                 <ResizableHandle withHandle />
                 <ResizablePanel
                     id="stats-panel"
-                    defaultSize={38}
+                    defaultSize={0}
                     minSize={25}
                     maxSize={50}
                     collapsible={true}

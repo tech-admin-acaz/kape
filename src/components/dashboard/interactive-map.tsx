@@ -329,7 +329,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
         </Map>
 
         <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
-             <ExpandButton onClick={togglePanel} isCollapsed={isPanelCollapsed} />
+             {selectedArea && <ExpandButton onClick={togglePanel} isCollapsed={isPanelCollapsed} />}
         </div>
         
         <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
