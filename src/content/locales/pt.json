@@ -31,5 +31,11 @@
   "about": "Sobre",
   "navBiodiversity": "Biodiversidade",
   "biodiversityTitle": "Biodiversidade Global na Ponta dos Seus Dedos",
-  "biodiversityDesc": "Interaja com nosso globo para explorar áreas prioritárias para conservação e entender a distribuição geográfica da biodiversidade. Rotacione e aplique zoom para descobrir insights sobre diferentes regiões."
+  "biodiversityDesc": "Interaja com nosso globo para explorar áreas prioritárias para conservação e entender a distribuição geográfica da biodiversidade. Rotacione e aplique zoom para descobrir insights sobre diferentes regiões.",
+  "viewFullscreen": "Ver em tela cheia",
+  "printChart": "Imprimir gráfico",
+  "downloadPNG": "Baixar imagem PNG",
+  "downloadJPEG": "Baixar imagem JPEG",
+  "downloadPDF": "Baixar documento PDF",
+  "downloadSVG": "Baixar imagem SVG"
 }

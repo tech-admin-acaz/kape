@@ -31,5 +31,11 @@
   "about": "About",
   "navBiodiversity": "Biodiversity",
   "biodiversityTitle": "Global Biodiversity at Your Fingertips",
-  "biodiversityDesc": "Interact with our globe to explore priority areas for conservation and understand the geographic distribution of biodiversity. Rotate and zoom to discover insights about different regions."
+  "biodiversityDesc": "Interact with our globe to explore priority areas for conservation and understand the geographic distribution of biodiversity. Rotate and zoom to discover insights about different regions.",
+  "viewFullscreen": "View in full screen",
+  "printChart": "Print chart",
+  "downloadPNG": "Download PNG image",
+  "downloadJPEG": "Download JPEG image",
+  "downloadPDF": "Download PDF document",
+  "downloadSVG": "Download SVG vector image"
 }

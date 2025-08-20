@@ -8,6 +8,7 @@ import exporting from 'highcharts/modules/exporting';
 import type { FutureClimateData } from '../stats-panel';
 import type { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
@@ -18,31 +19,25 @@ interface TemperatureTrendChartProps {
     type: TerritoryTypeKey;
 }
 
-const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
-    const values = data.map(d => d.value);
-    const n = values.length;
-    if (n < 2) return values;
-
-    const sumX = values.reduce((acc, _, i) => acc + i, 0);
-    const sumY = values.reduce((acc, curr) => acc + curr, 0);
-    const sumXY = values.reduce((acc, curr, i) => acc + i * curr, 0);
-    const sumXX = values.reduce((acc, _, i) => acc + i * i, 0);
-
-    const denominator = n * sumXX - sumX * sumX;
-    if (denominator === 0) return values;
-
-    const slope = (n * sumXY - sumX * sumY) / denominator;
-    const intercept = (sumY - slope * sumX) / n;
-
-    return values.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
-};
-
-
 export default function TemperatureTrendChart({ id, type }: TemperatureTrendChartProps) {
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const [chartData, setChartData] = useState<FutureClimateData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { t, locale } = useI18n();
+    
+    useEffect(() => {
+        Highcharts.setOptions({
+            lang: {
+                viewFullscreen: t('viewFullscreen' as any),
+                printChart: t('printChart' as any),
+                downloadPNG: t('downloadPNG' as any),
+                downloadJPEG: t('downloadJPEG' as any),
+                downloadPDF: t('downloadPDF' as any),
+                downloadSVG: t('downloadSVG' as any),
+            }
+        });
+    }, [locale, t]);
 
     useEffect(() => {
         if (!id || !type) {
@@ -97,7 +92,25 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                     year: new Date(d.time).getFullYear().toString(),
                     value: parseFloat(d.value.toFixed(2))
                 }));
+                
+                const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
+                    const values = data.map(d => d.value);
+                    const n = values.length;
+                    if (n < 2) return values;
 
+                    const sumX = values.reduce((acc, _, i) => acc + i, 0);
+                    const sumY = values.reduce((acc, curr) => acc + curr, 0);
+                    const sumXY = values.reduce((acc, curr, i) => acc + i * curr, 0);
+                    const sumXX = values.reduce((acc, _, i) => acc + i * i, 0);
+
+                    const denominator = n * sumXX - sumX * sumX;
+                    if (denominator === 0) return values;
+
+                    const slope = (n * sumXY - sumX * sumY) / denominator;
+                    const intercept = (sumY - slope * sumX) / n;
+
+                    return values.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
+                };
                 const trendLine = calculateTrendLine(processedData);
 
                 const finalData = processedData.map((d, index) => ({
@@ -253,6 +266,21 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
                         }
                     }
                 }
+            },
+            menuItemStyle: {
+                fontFamily: 'Inter, sans-serif',
+                color: 'hsl(var(--foreground))',
+            },
+            menuItemHoverStyle: {
+                background: 'hsl(var(--accent))',
+                color: 'hsl(var(--accent-foreground))',
+            }
+        },
+        navigation: {
+            menuStyle: {
+                background: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border))',
+                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
             }
         },
     };

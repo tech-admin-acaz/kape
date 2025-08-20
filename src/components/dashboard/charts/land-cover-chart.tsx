@@ -7,6 +7,7 @@ import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
 import type { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
 if (typeof Highcharts === 'object') {
   exporting(Highcharts);
@@ -27,6 +28,20 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+  const { t, locale } = useI18n();
+
+  useEffect(() => {
+    Highcharts.setOptions({
+        lang: {
+            viewFullscreen: t('viewFullscreen' as any),
+            printChart: t('printChart' as any),
+            downloadPNG: t('downloadPNG' as any),
+            downloadJPEG: t('downloadJPEG' as any),
+            downloadPDF: t('downloadPDF' as any),
+            downloadSVG: t('downloadSVG' as any),
+        }
+    });
+  }, [locale, t]);
 
   useEffect(() => {
     if (!id || !type) {
@@ -117,6 +132,21 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
                     }
                 }
             }
+        },
+        menuItemStyle: {
+            fontFamily: 'Inter, sans-serif',
+            color: 'hsl(var(--foreground))',
+        },
+        menuItemHoverStyle: {
+            background: 'hsl(var(--accent))',
+            color: 'hsl(var(--accent-foreground))',
+        }
+    },
+    navigation: {
+        menuStyle: {
+            background: 'hsl(var(--background))',
+            border: '1px solid hsl(var(--border))',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
         }
     },
     tooltip: {
