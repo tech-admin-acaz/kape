@@ -1,136 +1,73 @@
-
-"use client";
-
-import React, { useRef, useEffect } from 'react';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import exporting from 'highcharts/modules/exporting';
-import type { FutureClimateData } from '../stats-panel';
-
-if (typeof Highcharts === 'object') {
-  exporting(Highcharts);
-}
-
-interface TesteChartProps {
-    data: FutureClimateData[];
-}
-
-export default function TesteChart({ data }: TesteChartProps) {
-    const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
-
-    useEffect(() => {
-        if (chartComponentRef.current) {
-            chartComponentRef.current.chart.reflow();
-        }
-    }, [data]);
-
-    const options: Highcharts.Options = {
-        chart: {
-            backgroundColor: 'transparent',
-            type: 'spline'
-        },
-        title: {
-            text: 'Teste Chart',
-            align: 'left',
-            style: {
-                color: 'hsl(var(--foreground))',
-                fontWeight: 'bold',
-                fontSize: '14px'
-            }
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            categories: data.map(d => d.year),
-            crosshair: true,
-            labels: {
-                style: {
-                    color: 'hsl(var(--muted-foreground))'
-                }
-            },
-            tickInterval: 2
-        },
-        yAxis: { 
-            labels: {
-                format: `{value}°`,
-                style: {
-                    color: 'hsl(var(--foreground))'
-                }
-            },
-            title: {
-                text: 'Temperatura (°C)',
-                style: {
-                    color: 'hsl(var(--foreground))'
-                }
-            },
-            gridLineColor: 'hsl(var(--border))',
-        },
-        tooltip: {
-            shared: true,
-            backgroundColor: 'hsl(var(--popover))',
-            borderColor: 'hsl(var(--border))',
-            style: {
-                color: 'hsl(var(--popover-foreground))',
-            },
-            pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f} °C</b><br/>'
-        },
-        legend: {
-           enabled: true
-        },
-        series: [{
-            name: "Temperatura",
-            type: 'spline',
-            data: data.map(d => d.value),
-            color: 'hsl(var(--chart-1))',
-        },
-        {
-            name: 'Tendência',
-            type: 'spline',
-            data: data.map(d => d.trend),
-            color: 'hsl(var(--destructive))',
-            dashStyle: 'Dash',
-            marker: {
-                enabled: false
-            },
-        }
-        ],
-        exporting: {
-            enabled: true,
-            buttons: {
-                contextButton: {
-                    symbol: 'menu',
-                    symbolStroke: 'hsl(var(--foreground))',
-                    theme: {
-                        fill: 'transparent',
-                        states: {
-                            hover: {
-                                fill: 'hsl(var(--muted))',
-                            },
-                            select: {
-                                fill: 'hsl(var(--muted))',
-                            }
-                        }
-                    }
-                }
-            }
-        },
-    };
-
-    return (
-        <div className="w-full h-[320px]">
-             {data && data.length > 0 ? (
-                <HighchartsReact
-                    highcharts={Highcharts}
-                    options={options}
-                    ref={chartComponentRef}
-                    containerProps={{ style: { height: "100%", width: "100%" } }}
-                />
-             ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Nenhum dado disponível para exibir.
-                </div>
-             )}
-        </div>
-    );
+{
+  "name": "nextn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 9002",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@genkit-ai/googleai": "^1.14.1",
+    "@genkit-ai/next": "^1.14.1",
+    "@hookform/resolvers": "^4.1.3",
+    "@radix-ui/react-accordion": "^1.2.3",
+    "@radix-ui/react-avatar": "^1.1.3",
+    "@radix-ui/react-checkbox": "^1.1.4",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-progress": "^1.1.2",
+    "@radix-ui/react-radio-group": "^1.2.3",
+    "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.1.3",
+    "@radix-ui/react-tabs": "^1.1.3",
+    "@radix-ui/react-toast": "^1.2.6",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@turf/turf": "^6.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.5.0",
+    "firebase": "^11.9.1",
+    "genkit": "^1.14.1",
+    "highcharts": "^11.4.1",
+    "highcharts-react-official": "^3.2.1",
+    "lucide-react": "^0.475.0",
+    "mapbox-gl": "^3.4.0",
+    "next": "15.3.3",
+    "next-themes": "^0.3.0",
+    "patch-package": "^8.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
+    "react-map-gl": "^7.1.7",
+    "react-resizable-panels": "^2.0.21",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/mapbox-gl": "^3.1.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/turf": "^3.5.32",
+    "genkit-cli": "^1.14.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
 }
