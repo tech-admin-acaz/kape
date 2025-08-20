@@ -30,6 +30,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
     const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
+    const panelContainerRef = React.useRef<HTMLDivElement>(null);
     const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(true);
     const { t } = useI18n();
 
@@ -54,7 +55,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
     };
 
     return (
-        <div className="flex-1 flex relative">
+        <div ref={panelContainerRef} className="flex-1 flex relative">
             <WelcomeDialog open={showWelcomeDialog} onOpenChange={setShowWelcomeDialog} onDialogClose={handleDialogClose} />
             <ResizablePanelGroup
                 ref={panelGroupRef}
@@ -62,12 +63,12 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                 className="flex-1"
                 onLayout={(sizes) => {
                     const [mapPanelSize, statsPanelSize] = sizes;
-                    const groupElement = panelGroupRef.current?.getElement();
+                    const groupElement = panelContainerRef.current;
 
                     if (groupElement && statsPanelSize > 0 && statsPanelSize < 100) {
                         const totalWidth = groupElement.offsetWidth;
                         const statsPanelWidth = (totalWidth * statsPanelSize) / 100;
-                        if (statsPanelWidth < 249) {
+                        if (statsPanelWidth < 249 && !isCollapsed) {
                             panelGroupRef.current?.setLayout([100, 0]);
                         }
                     }
