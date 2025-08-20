@@ -158,7 +158,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         const fetchInfo = async () => {
             setIsInfoLoading(true);
             const info = await fetchGeneralInfo(data.typeKey, data.id);
-            if (!info) {
+            // Only show toast for TI and UC because metadata is not displayed for others
+            if (!info && (data.typeKey === 'ti' || data.typeKey === 'uc')) {
                 toast({
                     variant: 'destructive',
                     title: 'Erro de Metadados',
