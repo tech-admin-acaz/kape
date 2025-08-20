@@ -55,13 +55,7 @@ export async function GET(
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Error fetching land cover stats from external API (${apiPath}):`, response.status, errorText);
-            // Check if the response is JSON or something else (like HTML error page)
-            try {
-                const errorJson = JSON.parse(errorText);
-                return NextResponse.json({ error: `Failed to fetch stats data from source: ${errorJson.message || errorText}` }, { status: response.status });
-            } catch (e) {
-                 return NextResponse.json({ error: `Failed to fetch stats data from source. Upstream API returned non-JSON response.` }, { status: response.status });
-            }
+            return NextResponse.json({ error: `Failed to fetch stats data from source: ${errorText}` }, { status: response.status });
         }
         
         const rawData = await response.json();

@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
     const type = 'estados'; // Changed from 'municipios' to 'estados'
-    const timeKey = `[API] Fetching by-coords: ${lat},${lng}`;
 
     if (!API_BIO_URL) {
         return NextResponse.json({ error: 'API URL not configured' }, { status: 500 });
@@ -23,10 +22,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        console.time(timeKey);
         // The external API uses 'estados' in the path for states
         const response = await fetch(`${API_BIO_URL}/action/${type}/${lng}/${lat}`);
-        console.timeEnd(timeKey);
         
         if (!response.ok) {
              if (response.status === 404) {
@@ -46,7 +43,6 @@ export async function GET(request: NextRequest) {
         }
 
     } catch (error) {
-        console.timeEnd(timeKey);
         console.error(`Error fetching by-coords data:`, error);
         return NextResponse.json({ error: `Failed to fetch location data` }, { status: 500 });
     }

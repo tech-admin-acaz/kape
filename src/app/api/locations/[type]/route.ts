@@ -12,7 +12,6 @@ export async function GET(
     { params }: { params: { type: string } }
 ) {
     let type = params.type;
-    const timeKey = `[API] Fetching locations for type: ${type}`;
 
     if (!API_BIO_URL) {
         return NextResponse.json({ error: 'API URL not configured' }, { status: 500 });
@@ -32,9 +31,7 @@ export async function GET(
     }
 
     try {
-        console.time(timeKey);
         const response = await fetch(`${API_BIO_URL}/${fetchType}`);
-        console.timeEnd(timeKey);
         
         if (!response.ok) {
             const errorText = await response.text();
@@ -46,7 +43,6 @@ export async function GET(
         return NextResponse.json(data);
 
     } catch (error) {
-        console.timeEnd(timeKey);
         console.error(`Error fetching ${fetchType} data:`, error);
         return NextResponse.json({ error: `Failed to fetch ${fetchType} data` }, { status: 500 });
     }

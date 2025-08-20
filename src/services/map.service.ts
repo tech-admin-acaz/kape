@@ -3,10 +3,8 @@
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
-const fetchWithTiming = async (endpoint: string, key: string) => {
-    console.time(key);
+const fetchWithTiming = async (endpoint: string) => {
     const response = await fetch(endpoint);
-    console.timeEnd(key);
     if (!response.ok) {
         const errorText = await response.text();
         console.error(`Error fetching from ${endpoint}:`, response.status, errorText);
@@ -17,7 +15,7 @@ const fetchWithTiming = async (endpoint: string, key: string) => {
 
 
 const fetchXYZ = async (endpoint: string): Promise<string> => {
-    const data = await fetchWithTiming(endpoint, `[Client] Fetching XYZ for ${endpoint}`);
+    const data = await fetchWithTiming(endpoint);
     return data.xyz;
 };
 
@@ -75,7 +73,7 @@ const titleCase = (str: string) => {
  * Fetches locations based on the territory type.
  */
 export async function getLocationsByType(type: TerritoryTypeKey): Promise<Location[]> {
-    const data = await fetchWithTiming(`/api/locations/${type}`, `[Client] Fetching locations for type: ${type}`);
+    const data = await fetchWithTiming(`/api/locations/${type}`);
     
     const locations = data.map((item: any) => ({
         value: String(item.id), 
@@ -91,7 +89,7 @@ export async function getLocationsByType(type: TerritoryTypeKey): Promise<Locati
  * Fetches a single location's details, including its GeoJSON geometry.
  */
 export async function getLocationDetails(type: TerritoryTypeKey, id: string): Promise<any> {
-    const data = await fetchWithTiming(`/api/locations/${type}/${id}`, `[Client] Fetching location details for ${type}/${id}`);
+    const data = await fetchWithTiming(`/api/locations/${type}/${id}`);
     
     if (data && data.length > 0) {
         const details = data[0];
@@ -107,10 +105,7 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
  * Fetches a location based on geographic coordinates.
  */
 export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
-    const timeKey = `[Client] Fetching location by coords: ${lat},${lng}`;
-    console.time(timeKey);
     const response = await fetch(`/api/locations/by-coords?lat=${lat}&lng=${lng}`);
-    console.timeEnd(timeKey);
      if (!response.ok) {
         if (response.status === 404) {
             console.log(`Location not found for coords ${lat},${lng}`);

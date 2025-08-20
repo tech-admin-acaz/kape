@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 const API_BIO_URL = process.env.API_BIO_URL;
-const timeKey = "[API] Fetching restored carbon XYZ";
+
 /**
  * API route to fetch the restored carbon layer XYZ tile URL.
  * This acts as a proxy to avoid exposing the real API URL and any keys to the client.
@@ -13,9 +13,7 @@ export async function GET() {
     }
     
     try {
-        console.time(timeKey);
         const response = await fetch(`${API_BIO_URL}/xyz/carbonoRestauracao`);
-        console.timeEnd(timeKey);
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Error fetching restored carbon from external API:', response.status, errorText);
@@ -25,7 +23,6 @@ export async function GET() {
         return NextResponse.json({ xyz: data.xyz });
 
     } catch (error) {
-        console.timeEnd(timeKey);
         console.error('Error fetching restored carbon XYZ:', error);
         return NextResponse.json({ error: 'Failed to fetch restored carbon data' }, { status: 500 });
     }

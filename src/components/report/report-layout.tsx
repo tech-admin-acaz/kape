@@ -49,28 +49,18 @@ export default function ReportLayout() {
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [includeSpecies, setIncludeSpecies] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (areaId && typeKey) {
       const loadData = async () => {
         setIsLoading(true);
-        setError(null);
-        try {
-            const [info, tempData] = await fetchReportData(typeKey, areaId);
-            if (!tempData) {
-                throw new Error("Nenhum dado encontrado para esta área.");
-            }
-            setGeneralInfo(info);
-            setData(tempData as StatsData);
-        } catch (e: any) {
-            setError(e.message || "Erro ao carregar dados do relatório.");
-        }
+        const [info, tempData] = await fetchReportData(typeKey, areaId);
+        setGeneralInfo(info);
+        setData(tempData as StatsData);
         setIsLoading(false);
       };
       loadData();
     } else {
-      setError("Parâmetros de área e tipo são necessários para gerar o relatório.");
       setIsLoading(false);
     }
   }, [areaId, typeKey]);
@@ -96,10 +86,10 @@ export default function ReportLayout() {
       )
   }
 
-  if (error || !data || !areaId || !typeKey) {
+  if (!data || !areaId || !typeKey) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-destructive">{error || "Selecione uma área no painel para ver o relatório."}</p>
+        <p>Selecione uma área no painel para ver o relatório.</p>
       </div>
     );
   }
