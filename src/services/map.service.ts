@@ -1,6 +1,4 @@
 
-"use client";
-
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
 const fetchWithTiming = async (endpoint: string) => {
