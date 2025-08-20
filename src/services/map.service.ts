@@ -1,12 +1,28 @@
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
+// Function to get the base URL, works on both server and client
+const getBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+        // client-side
+        return '';
+    }
+    // server-side
+    // Try VERCEL_URL, then localhost for development
+    return process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+};
+
+
 const fetchWithTiming = async (endpoint: string) => {
-    const response = await fetch(endpoint);
+    const baseUrl = getBaseUrl();
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+    
+    const response = await fetch(fullUrl);
+
     if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Error fetching from ${endpoint}:`, response.status, errorText);
-        throw new Error(`Network response was not ok for ${endpoint}`);
+        console.error(`Error fetching from ${fullUrl}:`, response.status, errorText);
+        throw new Error(`Network response was not ok for ${fullUrl}`);
     }
     return response.json();
 };
@@ -103,7 +119,8 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
  * Fetches a location based on geographic coordinates.
  */
 export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
-    const response = await fetch(`/api/locations/by-coords?lat=${lat}&lng=${lng}`);
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/locations/by-coords?lat=${lat}&lng=${lng}`);
      if (!response.ok) {
         if (response.status === 404) {
             console.log(`Location not found for coords ${lat},${lng}`);
