@@ -12,7 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LayerControl, { type LayerState } from './layer-control';
 import LegendControl from './legend-control';
-import { getIndicatorXYZ, getLocationDetails, getLocationByCoords, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLocationsByType } from '@/services/map.service';
+import { getLocationDetails, getLocationByCoords } from '@/services/map.service';
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 import * as turf from '@turf/turf';
 import type { StatsData, GeneralInfo } from './stats-panel';
@@ -32,12 +32,23 @@ const basemaps = {
 
 const defaultBasemapKey = 'dark';
 
+interface InitialLayerData {
+    indicator: string | null;
+    restoredCarbon: string | null;
+    currentCarbon: string | null;
+    opportunityCost: string | null;
+    restorationCost: string | null;
+    mapbiomas: string | null;
+}
+
 interface InteractiveMapProps {
   onAreaUpdate: (data: StatsData | null) => void;
   selectedArea: StatsData | null;
   isPanelCollapsed: boolean;
   togglePanel: () => void;
   panelGroupRef: React.RefObject<PanelGroup>;
+  initialLayerData: InitialLayerData;
+  statesGeoJSON: FeatureCollection<Geometry> | null;
 }
 
 interface PopupInfo {
@@ -46,7 +57,7 @@ interface PopupInfo {
     message: string;
 }
 
-export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef, initialLayerData, statesGeoJSON }: InteractiveMapProps) {
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
@@ -56,15 +67,15 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const mapRef = useRef<MapRef>(null);
   const { t } = useI18n();
 
-  // Layer XYZ URLs
-  const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
-  const [restoredCarbonXYZ, setRestoredCarbonXYZ] = useState<string | null>(null);
-  const [currentCarbonXYZ, setCurrentCarbonXYZ] = useState<string | null>(null);
-  const [opportunityCostXYZ, setOpportunityCostXYZ] = useState<string | null>(null);
-  const [restorationCostXYZ, setRestorationCostXYZ] = useState<string | null>(null);
-  const [mapbiomasXYZ, setMapbiomasXYZ] = useState<string | null>(null);
-
-  const [statesGeoJSON, setStatesGeoJSON] = useState<FeatureCollection<Geometry> | null>(null);
+  // Layer XYZ URLs now come from props
+  const { 
+    indicator: indicatorXYZ, 
+    restoredCarbon: restoredCarbonXYZ,
+    currentCarbon: currentCarbonXYZ,
+    opportunityCost: opportunityCostXYZ,
+    restorationCost: restorationCostXYZ,
+    mapbiomas: mapbiomasXYZ,
+  } = initialLayerData;
 
   const [layers, setLayers] = React.useState<LayerState>({
     indicator: true,
@@ -79,58 +90,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [fillOpacity, setFillOpacity] = useState(0);
   const [strokeOpacity, setStrokeOpacity] = useState(1);
   const [terrainExaggeration, setTerrainExaggeration] = useState(1.5);
-
-   useEffect(() => {
-        async function fetchAllLayers() {
-            try {
-                const [
-                    indicator, 
-                    restoredCarbon, 
-                    currentCarbon,
-                    opportunityCost,
-                    restorationCost,
-                    mapbiomas,
-                    states,
-                ] = await Promise.all([
-                    getIndicatorXYZ(),
-                    getRestoredCarbonXYZ(),
-                    getCurrentCarbonXYZ(),
-                    getOpportunityCostXYZ(),
-                    getRestorationCostXYZ(),
-                    getMapbiomasXYZ(),
-                    getLocationsByType('estado').then(locations => {
-                        const geojson: FeatureCollection<Geometry> = {
-                            type: 'FeatureCollection',
-                            features: []
-                        };
-                        const promises = locations.map(loc => 
-                            getLocationDetails('estado', loc.value).then(detail => {
-                                if (detail && detail.geom) {
-                                    geojson.features.push({
-                                        type: 'Feature',
-                                        geometry: detail.geom,
-                                        properties: { name: detail.name, id: detail.id },
-                                        id: detail.id
-                                    })
-                                }
-                            })
-                        );
-                        return Promise.all(promises).then(() => geojson);
-                    })
-                ]);
-                if(indicator) setIndicatorXYZ(indicator);
-                if(restoredCarbon) setRestoredCarbonXYZ(restoredCarbon);
-                if(currentCarbon) setCurrentCarbonXYZ(currentCarbon);
-                if(opportunityCost) setOpportunityCostXYZ(opportunityCost);
-                if(restorationCost) setRestorationCostXYZ(restorationCost);
-                if(mapbiomas) setMapbiomasXYZ(mapbiomas);
-                if(states) setStatesGeoJSON(states);
-            } catch (error) {
-                console.error('Failed to fetch one or more layers:', error);
-            }
-        }
-        fetchAllLayers();
-    }, []);
 
   useEffect(() => {
     if (mapRef.current) {
