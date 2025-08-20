@@ -11,6 +11,7 @@ import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { BiodiversityData, CarbonData, WaterData } from '../stats-panel';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface ServicesTabProps {
   biodiversity: BiodiversityData | null;
@@ -111,20 +112,21 @@ export default function ServicesTab({
     isCarbonLoading,
     isWaterLoading
 }: ServicesTabProps) {
-    
+    const { t } = useI18n();
+
     const biodiversityCards = biodiversity ? [
-      { category: 'Anfíbios', count: biodiversity.amphibians, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'frog tree' },
-      { category: 'Aves', count: biodiversity.birds, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'macaw bird' },
-      { category: 'Mamíferos', count: biodiversity.mammals, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'jaguar animal' },
-      { category: 'Árvores', count: biodiversity.trees, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'brazil nut tree' },
-      { category: 'Répteis', count: biodiversity.reptiles, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'green snake' },
+      { category: t('amphibians'), count: biodiversity.amphibians, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'frog tree' },
+      { category: t('birds'), count: biodiversity.birds, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'macaw bird' },
+      { category: t('mammals'), count: biodiversity.mammals, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'jaguar animal' },
+      { category: t('trees'), count: biodiversity.trees, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'brazil nut tree' },
+      { category: t('reptiles'), count: biodiversity.reptiles, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'green snake' },
     ] : [];
 
   return (
     <div className="p-6 space-y-8">
         {/* Biodiversity Section */}
         <div className="space-y-4">
-            <SectionHeader title="Biodiversidade" tooltipText="Quantidade média de espécies na área selecionada." />
+            <SectionHeader title={t('biodiversityTitle')} tooltipText={t('biodiversityTooltip')} />
              {isBiodiversityLoading ? (
                 <DataSkeleton>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -143,13 +145,13 @@ export default function ServicesTab({
                     ))}
                 </div>
             ) : (
-                <p className="text-muted-foreground">Não foi possível carregar os dados de biodiversidade.</p>
+                <p className="text-muted-foreground">{t('biodiversityError')}</p>
             )}
         </div>
 
         {/* Carbon Section */}
         <div className="space-y-4">
-            <SectionHeader title="Carbono" tooltipText="Análise de estoque e valoração de serviços de carbono." />
+            <SectionHeader title={t('carbonTitle')} tooltipText={t('carbonTooltip')} />
             {isCarbonLoading ? (
                  <DataSkeleton>
                     <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
@@ -158,7 +160,7 @@ export default function ServicesTab({
             ) : carbonData ? (
                 <>
                     <Card className="bg-muted/30">
-                        <CardHeader><CardTitle className="text-base font-medium">Atual e Restaurável</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base font-medium">{t('carbonCurrentRestorableTitle')}</CardTitle></CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={256}>
                                 <ComposedChart data={carbonData.currentAndRestorable} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -170,10 +172,10 @@ export default function ServicesTab({
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }}
                                     />
                                     <Legend wrapperStyle={{fontSize: "12px"}} />
-                                    <Bar dataKey="current" name="Atual" stackId="a" fill="hsl(var(--chart-3))">
+                                    <Bar dataKey="current" name={t('current')} stackId="a" fill="hsl(var(--chart-3))">
                                       <LabelList dataKey="current" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
                                     </Bar>
-                                    <Bar dataKey="restorable" name="Restaurável" stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]}>
+                                    <Bar dataKey="restorable" name={t('restorable')} stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]}>
                                       <LabelList dataKey="restorable" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
                                     </Bar>
                                 </ComposedChart>
@@ -181,7 +183,7 @@ export default function ServicesTab({
                         </CardContent>
                     </Card>
                     <Card className="bg-muted/30">
-                        <CardHeader><CardTitle className="text-base font-medium">Valoração de Serviços de Carbono</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base font-medium">{t('carbonValuationTitle')}</CardTitle></CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={256}>
                                 <BarChart data={carbonData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -192,7 +194,7 @@ export default function ServicesTab({
                                         content={<CustomTooltip />}
                                         cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
                                     />
-                                    <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]}>
+                                    <Bar dataKey="value" name={t('value')} fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]}>
                                       <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10} />
                                     </Bar>
                                 </BarChart>
@@ -201,13 +203,13 @@ export default function ServicesTab({
                     </Card>
                 </>
             ) : (
-                 <p className="text-muted-foreground">Não foi possível carregar os dados de carbono.</p>
+                 <p className="text-muted-foreground">{t('carbonError')}</p>
             )}
         </div>
 
         {/* Water Section */}
         <div className="space-y-4">
-            <SectionHeader title="Água" tooltipText="Análise de valoração de serviços hídricos." />
+            <SectionHeader title={t('waterTitle')} tooltipText={t('waterTooltip')} />
             {isWaterLoading ? (
                  <DataSkeleton>
                     <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
@@ -215,7 +217,7 @@ export default function ServicesTab({
             ) : waterData ? (
                  <Card className="bg-muted/30">
                     <CardHeader>
-                        <CardTitle className="text-base font-medium">Valoração de Serviços de Água</CardTitle>
+                        <CardTitle className="text-base font-medium">{t('waterValuationTitle')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                        <ResponsiveContainer width="100%" height={256}>
@@ -227,7 +229,7 @@ export default function ServicesTab({
                                     content={<CustomTooltip />}
                                     cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
                                 />
-                                <Bar dataKey="value" name="Valor" fill="hsl(var(--chart-2) / 0.7)" radius={[0, 4, 4, 0]}>
+                                <Bar dataKey="value" name={t('value')} fill="hsl(var(--chart-2) / 0.7)" radius={[0, 4, 4, 0]}>
                                   <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10}/>
                                 </Bar>
                             </BarChart>
@@ -235,7 +237,7 @@ export default function ServicesTab({
                     </CardContent>
                 </Card>
             ) : (
-                <p className="text-muted-foreground">Não foi possível carregar os dados de valoração de água.</p>
+                <p className="text-muted-foreground">{t('waterError')}</p>
             )}
         </div>
     </div>

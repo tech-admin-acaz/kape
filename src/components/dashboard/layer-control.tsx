@@ -18,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { useI18n } from "@/hooks/use-i18n"
 
 
 export interface LayerState {
@@ -35,16 +36,17 @@ interface LayerControlProps {
 }
 
 const layerItems = [
-    { id: 'indicator', label: 'Indicador', collapsible: true },
-    { id: 'restoredCarbon', label: 'Carbono Restaurado', collapsible: true },
-    { id: 'currentCarbon', label: 'Carbono Atual', collapsible: true },
-    { id: 'opportunityCost', label: 'Custo de Oportunidade', collapsible: true },
-    { id: 'restorationCost', label: 'Custo de Restauracao', collapsible: true },
-    { id: 'mapbiomas', label: 'Mapbiomas Categorizado', collapsible: true },
+    { id: 'indicator', labelKey: 'layerIndicator' },
+    { id: 'restoredCarbon', labelKey: 'layerRestoredCarbon' },
+    { id: 'currentCarbon', labelKey: 'layerCurrentCarbon' },
+    { id: 'opportunityCost', labelKey: 'layerOpportunityCost' },
+    { id: 'restorationCost', labelKey: 'layerRestorationCost' },
+    { id: 'mapbiomas', labelKey: 'layerMapbiomas' },
 ] as const;
 
 
 export default function LayerControl({ layers, setLayers }: LayerControlProps) {
+    const { t } = useI18n();
     const handleLayerChange = (layerId: keyof LayerState) => {
         setLayers(prev => ({...prev, [layerId]: !prev[layerId]}));
     }
@@ -57,7 +59,7 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Camadas</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('layers')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
         <div className="p-1">
@@ -74,18 +76,16 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
                             />
                             <AccordionTrigger className="p-1 flex-1 flex justify-between [&[data-state=open]>svg]:rotate-180">
                                 <Label htmlFor={item.id} className="ml-2">
-                                    {item.label}
+                                    {t(item.labelKey as any)}
                                 </Label>
                              </AccordionTrigger>
                         </div>
-                        {item.collapsible && (
-                            <AccordionContent>
-                                <div className="mx-3 mb-2 rounded-md bg-muted/50 p-2 text-sm text-muted-foreground">
-                                    <p>Fonte: GEE</p>
-                                    <p>Ano: 2024</p>
-                                </div>
-                            </AccordionContent>
-                        )}
+                        <AccordionContent>
+                            <div className="mx-3 mb-2 rounded-md bg-muted/50 p-2 text-sm text-muted-foreground">
+                                <p>{t('source')}: GEE</p>
+                                <p>{t('year')}: 2024</p>
+                            </div>
+                        </AccordionContent>
                     </AccordionItem>
                 ))}
             </Accordion>

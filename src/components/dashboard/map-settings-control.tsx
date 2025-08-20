@@ -15,6 +15,7 @@ import {
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { useI18n } from "@/hooks/use-i18n"
 
 interface MapSettingsControlProps {
   is3D: boolean;
@@ -39,6 +40,7 @@ export default function MapSettingsControl({
   terrainExaggeration,
   onTerrainExaggerationChange,
 }: MapSettingsControlProps) {
+  const { t } = useI18n();
 
   return (
     <DropdownMenu>
@@ -52,21 +54,21 @@ export default function MapSettingsControl({
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                    <p>Configurações do Mapa</p>
+                    <p>{t('mapSettings')}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
 
       <DropdownMenuContent align="end" className="w-64 p-4 space-y-6">
         <div>
-          <DropdownMenuLabel>Opacidade da Camada</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('layerOpacity')}</DropdownMenuLabel>
           <DropdownMenuSeparator className="-mx-4 w-auto" />
         </div>
 
         <div className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="indicator-opacity" className="flex items-center gap-2 text-sm">
-                <ImageIcon className="w-4 h-4 text-primary"/> Região de Interesse
+                <ImageIcon className="w-4 h-4 text-primary"/> {t('mapSettingsIndicator')}
             </Label>
             <Slider
               id="indicator-opacity"
@@ -80,7 +82,7 @@ export default function MapSettingsControl({
 
           <div className="grid gap-2">
             <Label htmlFor="fill-opacity" className="flex items-center gap-2 text-sm">
-                <Square className="w-4 h-4 text-primary fill-current"/> Região no centro do shape
+                <Square className="w-4 h-4 text-primary fill-current"/> {t('mapSettingsFill')}
             </Label>
             <Slider
               id="fill-opacity"
@@ -94,7 +96,7 @@ export default function MapSettingsControl({
 
           <div className="grid gap-2">
             <Label htmlFor="stroke-opacity" className="flex items-center gap-2 text-sm">
-                <Minus className="w-4 h-4 text-primary"/> Borda do shape
+                <Minus className="w-4 h-4 text-primary"/> {t('mapSettingsBorder')}
             </Label>
             <Slider
               id="stroke-opacity"
@@ -110,13 +112,13 @@ export default function MapSettingsControl({
         {is3D && (
           <>
             <div>
-              <DropdownMenuLabel>Opções de relevo</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('mapSettingsTerrain')}</DropdownMenuLabel>
               <DropdownMenuSeparator className="-mx-4 w-auto" />
             </div>
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="terrain-exaggeration" className="flex items-center gap-2 text-sm">
-                  <Mountain className="w-4 h-4 text-primary"/> Exagero do Terreno
+                  <Mountain className="w-4 h-4 text-primary"/> {t('mapSettingsExaggeration')}
                 </Label>
                 <Slider
                   id="terrain-exaggeration"

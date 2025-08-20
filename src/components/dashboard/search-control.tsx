@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { territoryTypes, type Location, type TerritoryTypeKey } from "@/models/location.model"
 import { getLocationsByType } from "@/services/map.service"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { useI18n } from "@/hooks/use-i18n"
 
 interface SearchControlProps {
     onLocationSelect: (location: Location | null, type: TerritoryTypeKey | null) => void;
@@ -53,11 +54,11 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const { t } = useI18n();
 
   const handleTypeChange = async (value: string) => {
     const typeKey = value as TerritoryTypeKey;
     setSelectedType(typeKey);
-    // Reset location when type changes
     setSelectedLocation(null);
     onLocationSelect(null, null);
     setAvailableLocations([]);
@@ -91,33 +92,11 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
   }
 
   const getLabelForType = (type: TerritoryTypeKey | null) => {
-    if (!type) return "Tipo de Território";
-    return territoryTypes.find(t => t.value === type)?.label || "Tipo de Território";
+    if (!type) return t('territoryType');
+    return territoryTypes.find(t => t.value === type)?.label || t('territoryType');
   }
   
   const isSearchDisabled = !selectedType || isLoading;
-
-  const searchTrigger = (
-    <div
-        role="combobox"
-        aria-expanded={popoverOpen}
-        className={cn(
-            "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-            "font-normal justify-start",
-            isSearchDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-        )}
-        onClick={() => !isSearchDisabled && setPopoverOpen(true)}
-    >
-         <div className="flex items-center w-full min-w-0">
-            <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
-            <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
-            <Separator orientation="vertical" className="h-4 mx-2" />
-            <div className="flex-1 text-left truncate min-w-0">
-                {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
-            </div>
-        </div>
-    </div>
-  );
 
   return (
     <Card className="flex items-center gap-2 p-2 bg-background/80 backdrop-blur-sm shadow-md w-[450px]">
@@ -126,9 +105,9 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                 <SelectTrigger className="w-full">
                     <div className="flex items-center">
                         <span className="text-xs text-muted-foreground mr-1.5">AT</span>
-                        <InfoTooltip text="Agrupamento Territorial (Estado, Município, etc.)" />
+                        <InfoTooltip text={t('territorialGroupingTooltip')} />
                         <Separator orientation="vertical" className="h-4 mx-2" />
-                        <SelectValue placeholder="Selecione o tipo" />
+                        <SelectValue placeholder={t('selectType')} />
                     </div>
                 </SelectTrigger>
                 <SelectContent>
@@ -156,11 +135,11 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <div className="flex items-center w-full min-w-0">
-                                    <span className="text-xs text-muted-foreground mr-1.5">Buscar</span>
-                                    <InfoTooltip text={`Buscar por ${getLabelForType(selectedType)}`} />
+                                    <span className="text-xs text-muted-foreground mr-1.5">{t('search')}</span>
+                                    <InfoTooltip text={`${t('searchBy')} ${getLabelForType(selectedType)}`} />
                                     <Separator orientation="vertical" className="h-4 mx-2" />
                                     <div className="flex-1 text-left truncate min-w-0">
-                                        {selectedLocation ? selectedLocation.label : (isLoading ? "Carregando..." : "Selecione o local")}
+                                        {selectedLocation ? selectedLocation.label : (isLoading ? t('loading') : t('selectLocation'))}
                                     </div>
                                 </div>
                             </TooltipTrigger>
@@ -175,18 +154,18 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
-                <CommandInput placeholder="Buscar..." />
+                <CommandInput placeholder={`${t('search')}...`} />
                 <CommandList>
                 {isLoading ? (
                     <CommandLoading>
                         <div className="flex items-center justify-center p-2">
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            <span className="ml-2 text-sm">Carregando locais...</span>
+                            <span className="ml-2 text-sm">{t('loadingLocations')}</span>
                         </div>
                     </CommandLoading>
                 ) : (
                   <>
-                    <CommandEmpty>Nenhum local encontrado.</CommandEmpty>
+                    <CommandEmpty>{t('noLocationFound')}</CommandEmpty>
                     <CommandGroup>
                         {availableLocations.map((location) => (
                         <CommandItem
@@ -221,7 +200,7 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Limpar seleção</p>
+                    <p>{t('clearSelection')}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

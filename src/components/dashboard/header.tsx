@@ -81,13 +81,13 @@ export default function DashboardHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
+                  <span>{t('logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
              <Button variant="ghost" onClick={() => router.push('/')}>
-                Sair
+                {t('logout')}
              </Button>
           )}
         </div>

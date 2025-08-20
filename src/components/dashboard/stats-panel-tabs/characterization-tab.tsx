@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LandCoverChart from '../charts/land-cover-chart';
@@ -9,6 +9,7 @@ import TemperatureTrendChart from '../charts/temperature-trend-chart';
 import RainfallTrendChart from '../charts/rainfall-trend-chart';
 import type { GeneralInfo, StatsData } from '../stats-panel';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface CharacterizationTabProps {
   data: StatsData;
@@ -45,6 +46,7 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 
 export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }: CharacterizationTabProps) {
   const { id, typeKey } = data;
+  const { t } = useI18n();
   
   const displayTerritoryName = typeKey === 'ti' ? generalInfo?.territoryName : null;
   const displayConservationUnit = typeKey === 'uc' ? generalInfo?.conservationUnit : null;
@@ -55,7 +57,7 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
     <div className="space-y-6 p-6">
         {showGeneralInfo && (
             <div className="space-y-3">
-                <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
+                <h3 className="font-headline text-lg font-semibold">{t('generalOverview')}</h3>
                 <Card className="bg-muted/30">
                     <CardContent className="p-4 space-y-2">
                     {isLoadingInfo ? (
@@ -66,13 +68,13 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                             </div>
                         ) : generalInfo ? (
                             <>
-                                <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                                <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                                <GeneralInfoItem label="Terra Indígena" value={displayTerritoryName} />
-                                <GeneralInfoItem label="Unidade de Conservação" value={displayConservationUnit} />
+                                <GeneralInfoItem label={t('state')} value={generalInfo.state} />
+                                <GeneralInfoItem label={t('municipality')} value={generalInfo.municipality} />
+                                <GeneralInfoItem label={t('indigenousLand')} value={displayTerritoryName} />
+                                <GeneralInfoItem label={t('conservationUnit')} value={displayConservationUnit} />
                             </>
                         ) : (
-                            <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do panorama geral.</p>
+                            <p className="text-sm text-muted-foreground">{t('generalOverviewError')}</p>
                         )}
                     </CardContent>
                 </Card>
@@ -80,7 +82,7 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
         )}
 
         <div className="space-y-4">
-            <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
+            <SectionHeader title={t('landCoverTitle')} tooltipText={t('landCoverTooltip')} />
              <Card className="bg-muted/30">
                 <CardContent className="pt-6">
                     <LandCoverChart type={typeKey} id={id} />
@@ -90,8 +92,8 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
 
         <div className="space-y-4">
             <SectionHeader 
-                title="Clima do Futuro" 
-                tooltipText="Projeções de temperatura e precipitação para a área selecionada." 
+                title={t('futureClimateTitle')} 
+                tooltipText={t('futureClimateTooltip')} 
             />
             <Card className="bg-muted/30">
                 <CardContent className="pt-6">

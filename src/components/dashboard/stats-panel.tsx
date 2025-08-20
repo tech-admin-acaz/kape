@@ -15,6 +15,7 @@ import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface LandCoverData {
   name: string;
@@ -102,15 +103,14 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
   const { toast } = useToast();
+  const { t } = useI18n();
   
-  // State for all tab data
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
   const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
   const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
   const [waterData, setWaterData] = useState<WaterData | null>(null);
   const [species, setSpecies] = useState<SpeciesData[]>([]);
 
-  // Loading states
   const [isInfoLoading, setIsInfoLoading] = useState(true);
   const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
   const [isCarbonLoading, setIsCarbonLoading] = useState(true);
@@ -138,7 +138,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     if (data && data.id && data.typeKey) {
         const { id, typeKey } = data;
 
-        // Reset states and set loading to true for all data types
         setIsInfoLoading(true);
         setGeneralInfo(null);
         setIsBiodiversityLoading(true);
@@ -150,7 +149,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         setIsSpeciesLoading(true);
         setSpecies([]);
 
-        // Fetch General Info only for TI and UC
         if (typeKey === 'ti' || typeKey === 'uc') {
             fetch(`/api/metadata/${typeKey}/${id}`)
                 .then(res => {
@@ -165,59 +163,57 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                 })
                 .catch(error => {
                      console.error(`Error fetching metadata for ${typeKey}/${id}:`, error)
-                     toast({
-                        variant: 'destructive',
-                        title: 'Erro ao carregar metadados',
-                        description: 'Não foi possível carregar as informações do panorama geral.',
-                    });
+                     if (typeKey === 'ti' || typeKey === 'uc') {
+                        toast({
+                           variant: 'destructive',
+                           title: t('errorToastTitle'),
+                           description: t('errorToastMetadata'),
+                       });
+                    }
                 })
                 .finally(() => setIsInfoLoading(false));
         } else {
-            setIsInfoLoading(false); // No need to load info for other types
+            setIsInfoLoading(false);
         }
 
-        // Fetch Biodiversity Data (Services Tab)
         fetch(`/api/stats/biodiversity/${typeKey}/${id}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setBiodiversity(data))
             .catch(error => console.error("Error fetching biodiversity data:", error))
             .finally(() => setIsBiodiversityLoading(false));
             
-        // Fetch Carbon Data (Services Tab)
         fetch(`/api/stats/carbon/${typeKey}/${id}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setCarbonData(data))
             .catch(error => console.error("Error fetching carbon data:", error))
             .finally(() => setIsCarbonLoading(false));
 
-        // Fetch Water Data (Services Tab)
         fetch(`/api/stats/water/${typeKey}/${id}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setWaterData(data))
             .catch(error => console.error("Error fetching water data:", error))
             .finally(() => setIsWaterLoading(false));
 
-        // Fetch Species Data (Ranking Tab)
         fetch(`/api/stats/species/${typeKey}/${id}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => setSpecies(data))
             .catch(error => console.error("Error fetching species data:", error))
             .finally(() => setIsSpeciesLoading(false));
     }
-  }, [data, toast]);
+  }, [data, toast, t]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
   }
   
   const TABS = {
-    characterization: "Caracterização",
-    services: "Serviços Ambientais",
-    ranking: "Ranking de Espécies",
+    characterization: t('characterizationTab'),
+    services: t('servicesTab'),
+    ranking: t('rankingTab'),
   }
 
-  const servicesLabel = shouldAbbreviate ? "S. Ambientais" : TABS.services;
-  const rankingLabel = shouldAbbreviate ? "R. Espécies" : TABS.ranking;
+  const servicesLabel = shouldAbbreviate ? t('servicesTabAbbr') : TABS.services;
+  const rankingLabel = shouldAbbreviate ? t('rankingTabAbbr') : TABS.ranking;
 
 
   return (
@@ -290,7 +286,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                         <span className="p-1 rounded-full bg-gradient-to-br from-sparkle-from to-sparkle-to mr-2">
                             <SparkleIcon className="w-4 h-4 text-white" />
                         </span>
-                        Aprofundar Análise com IA...
+                        {t('aiCorrelatorTrigger')}
                     </Button>
                 </AICorrelator>
                 <TooltipProvider>
@@ -306,7 +302,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Visualizar PDF</p>
+                            <p>{t('viewPdf')}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

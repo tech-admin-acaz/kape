@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useI18n } from "@/hooks/use-i18n"
 
 interface BasemapControlProps {
     onStyleChange: (style: string) => void;
@@ -22,6 +23,7 @@ interface BasemapControlProps {
 }
 
 export default function BasemapControl({ onStyleChange, basemaps, currentStyleKey }: BasemapControlProps) {
+  const { t } = useI18n();
   
   const handleStyleChange = (styleKey: string) => {
     onStyleChange(basemaps[styleKey]);
@@ -35,7 +37,7 @@ export default function BasemapControl({ onStyleChange, basemaps, currentStyleKe
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Mapa base</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('basemapLabel')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={currentStyleKey} onValueChange={handleStyleChange}>
             {Object.keys(basemaps).map((styleKey) => (
@@ -43,7 +45,7 @@ export default function BasemapControl({ onStyleChange, basemaps, currentStyleKe
                      <div className="w-4">
                         {currentStyleKey === styleKey && <CheckCircle2 className="h-4 w-4 text-primary" />}
                     </div>
-                    <span className="capitalize">{styleKey}</span>
+                    <span className="capitalize">{t(styleKey as any)}</span>
                 </DropdownMenuRadioItem>
             ))}
         </DropdownMenuRadioGroup>

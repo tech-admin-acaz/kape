@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { TerritoryTypeKey } from '@/models/location.model';
 import type { StatsData, GeneralInfo } from '../dashboard/stats-panel';
 import { Skeleton } from '../ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
 const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promise<[GeneralInfo | null, Partial<StatsData> | null]> => {
      try {
@@ -32,7 +33,7 @@ const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promi
             name: name,
             type: 'Relatório'
           };
-          document.title = `Relatório - ${tempData.name}`;
+          
           return [info, tempData];
      } catch (error) {
          console.error("Failed to fetch report data:", error);
@@ -44,6 +45,7 @@ export default function ReportLayout() {
   const searchParams = useSearchParams();
   const areaId = searchParams.get('areaId');
   const typeKey = searchParams.get('typeKey') as TerritoryTypeKey | null;
+  const { t } = useI18n();
 
   const [data, setData] = useState<StatsData | null>(null);
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
@@ -57,13 +59,16 @@ export default function ReportLayout() {
         const [info, tempData] = await fetchReportData(typeKey, areaId);
         setGeneralInfo(info);
         setData(tempData as StatsData);
+        if (tempData?.name) {
+          document.title = `${t('reportTitle')} - ${tempData.name}`;
+        }
         setIsLoading(false);
       };
       loadData();
     } else {
       setIsLoading(false);
     }
-  }, [areaId, typeKey]);
+  }, [areaId, typeKey, t]);
 
 
   if (isLoading) {
@@ -89,15 +94,13 @@ export default function ReportLayout() {
   if (!data || !areaId || !typeKey) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Selecione uma área no painel para ver o relatório.</p>
+        <p>{t('reportSelectArea')}</p>
       </div>
     );
   }
 
   const handleDownloadPDF = (includeSpeciesData: boolean) => {
     setIncludeSpecies(includeSpeciesData);
-    // This is a placeholder for the print functionality
-    // A short delay ensures state is set before printing
     setTimeout(() => {
         window.print();
     }, 100);
@@ -111,16 +114,16 @@ export default function ReportLayout() {
             <div className="flex justify-between items-center py-4">
                 <div>
                     <h1 className="text-2xl font-bold font-headline">{data.name}</h1>
-                    <p className="text-sm text-muted-foreground">Relatório de Análise Ambiental</p>
+                    <p className="text-sm text-muted-foreground">{t('reportSubtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" onClick={() => handleDownloadPDF(false)}>
                         <Download className="mr-2 h-4 w-4" />
-                        Baixar PDF
+                        {t('reportDownloadPdf')}
                     </Button>
                     <Button onClick={() => handleDownloadPDF(true)}>
                         <FilePlus2 className="mr-2 h-4 w-4" />
-                        Baixar Relatório Completo
+                        {t('reportDownloadFull')}
                     </Button>
                 </div>
             </div>
@@ -130,23 +133,30 @@ export default function ReportLayout() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="divide-y divide-border/50 space-y-8">
             <div id="characterization-section">
-                <h2 className="text-2xl font-bold font-headline mb-4">1. Caracterização</h2>
+                <h2 className="text-2xl font-bold font-headline mb-4">1. {t('characterizationTab')}</h2>
                 <CharacterizationTab data={data} generalInfo={generalInfo} isLoadingInfo={isLoading} />
             </div>
             
             <div id="services-section" className="pt-8">
-                 <h2 className="text-2xl font-bold font-headline mb-4">2. Serviços Ambientais</h2>
+                 <h2 className="text-2xl font-bold font-headline mb-4">2. {t('servicesTab')}</h2>
                 <ServicesTab 
-                  id={areaId} 
-                  typeKey={typeKey}
+                  biodiversity={null}
+                  carbonData={null}
+                  waterData={null}
+                  isBiodiversityLoading={isLoading}
+                  isCarbonLoading={isLoading}
+                  isWaterLoading={isLoading}
                 />
             </div>
 
             {includeSpecies && (
                  <div id="species-section" className="pt-8">
-                    <h2 className="text-2xl font-bold font-headline mb-4">3. Ranking de Espécies</h2>
+                    <h2 className="text-2xl font-bold font-headline mb-4">3. {t('rankingTab')}</h2>
                     <div className="bg-card rounded-lg border">
-                        <SpeciesTab id={areaId} typeKey={typeKey} />
+                         <SpeciesTab 
+                            species={[]}
+                            isLoading={isLoading}
+                         />
                     </div>
                 </div>
             )}

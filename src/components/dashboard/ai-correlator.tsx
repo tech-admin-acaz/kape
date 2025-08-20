@@ -18,7 +18,7 @@ import { Loader2, Wand2, Info, FilePenLine, Save, X, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import { cn } from '@/lib/utils';
+import { useI18n } from '@/hooks/use-i18n';
 
 type EditableField = 'insights' | 'suggestedUpdates';
 
@@ -32,6 +32,7 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
     
     const [newDatasetDesc, setNewDatasetDesc] = useState('');
     const { toast } = useToast();
+    const { t } = useI18n();
 
     useEffect(() => {
         if (result) {
@@ -66,16 +67,16 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
         startTransition(async () => {
             const { output, error } = await runCorrelation({
                 newDatasetDescription: newDatasetDesc,
-                existingVisualizationsDescription: "Gráfico de barras do uso da terra, barras de progresso para a qualidade da água e índice de vegetação.",
-                existingStatisticalInsightsDescription: "Correlação entre mineração e desmatamento. Resiliência de fontes de água em áreas protegidas.",
+                existingVisualizationsDescription: t('aiCorrelatorExistingVisualizations'),
+                existingStatisticalInsightsDescription: t('aiCorrelatorExistingInsights'),
             });
 
             if (error) {
                 console.error(error);
                 toast({
                     variant: 'destructive',
-                    title: 'Erro',
-                    description: 'Falha ao executar a correlação de IA. Por favor, tente novamente.',
+                    title: t('errorToastTitle'),
+                    description: t('aiCorrelatorErrorToast'),
                 })
                 return;
             }
@@ -90,17 +91,17 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[625px] grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="font-headline flex items-center gap-2"><Wand2 className="w-5 h-5 text-primary" /> Correlação de Conjunto de Dados com IA</DialogTitle>
+          <DialogTitle className="font-headline flex items-center gap-2"><Wand2 className="w-5 h-5 text-primary" /> {t('aiCorrelatorTitle')}</DialogTitle>
           <DialogDescription>
-            Descreva um novo conjunto de dados ambientais para ver como ele se correlaciona com os dados existentes e obter sugestões de atualizações.
+            {t('aiCorrelatorDescription')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="overflow-y-auto space-y-4 pr-2">
             <div className="grid gap-4 py-4">
                 <div className="grid w-full gap-1.5">
-                    <Label htmlFor="dataset-description">Descrição do Novo Conjunto de Dados</Label>
+                    <Label htmlFor="dataset-description">{t('aiCorrelatorNewLabel')}</Label>
                     <Textarea 
-                        placeholder="Ex: 'Imagens de satélite semanais do Sentinel-2 mostrando os níveis de estresse da vegetação na bacia amazônica para o segundo trimestre de 2024.'" 
+                        placeholder={t('aiCorrelatorNewPlaceholder')} 
                         id="dataset-description" 
                         value={newDatasetDesc}
                         onChange={(e) => setNewDatasetDesc(e.target.value)}
@@ -112,14 +113,14 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                         <Alert>
                             <div className="flex justify-between items-center mb-2">
                                 <div className="flex items-center gap-2">
-                                     <AlertTitle>Insights de Correlação</AlertTitle>
+                                     <AlertTitle>{t('aiCorrelatorInsightsTitle')}</AlertTitle>
                                      <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <button type="button"><Info className="h-4 w-4 text-muted-foreground" /></button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p className="max-w-xs">Análise da IA sobre como os novos dados se conectam<br/> com as informações e visualizações existentes.</p>
+                                                <p className="max-w-xs">{t('aiCorrelatorInsightsTooltip')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -128,15 +129,15 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                                     {editing === 'insights' ? (
                                         <>
                                             <TooltipProvider>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('insights')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>Salvar</p></TooltipContent></Tooltip>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('insights')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>Cancelar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('insights')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>{t('save')}</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('insights')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>{t('cancel')}</p></TooltipContent></Tooltip>
                                             </TooltipProvider>
                                         </>
                                     ) : (
                                         <>
                                             <TooltipProvider>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('insights')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>Editar</p></TooltipContent></Tooltip>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>Enviar para PDF</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('insights')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>{t('edit')}</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>{t('sendToPdf')}</p></TooltipContent></Tooltip>
                                             </TooltipProvider>
                                         </>
                                     )}
@@ -156,14 +157,14 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                          <Alert>
                             <div className="flex justify-between items-center mb-2">
                                  <div className="flex items-center gap-2">
-                                     <AlertTitle>Atualizações Sugeridas</AlertTitle>
+                                     <AlertTitle>{t('aiCorrelatorSuggestionsTitle')}</AlertTitle>
                                      <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <button type="button"><Info className="h-4 w-4 text-muted-foreground" /></button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p className="max-w-xs">Recomendações da IA para novos gráficos ou<br/> modificações nas visualizações atuais.</p>
+                                                <p className="max-w-xs">{t('aiCorrelatorSuggestionsTooltip')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -172,15 +173,15 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
                                     {editing === 'suggestedUpdates' ? (
                                         <>
                                             <TooltipProvider>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('suggestedUpdates')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>Salvar</p></TooltipContent></Tooltip>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('suggestedUpdates')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>Cancelar</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSave('suggestedUpdates')}><Save className="h-4 w-4 text-green-600" /></Button></TooltipTrigger><TooltipContent><p>{t('save')}</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCancel('suggestedUpdates')}><X className="h-4 w-4 text-red-600" /></Button></TooltipTrigger><TooltipContent><p>{t('cancel')}</p></TooltipContent></Tooltip>
                                             </TooltipProvider>
                                         </>
                                     ) : (
                                         <>
                                             <TooltipProvider>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('suggestedUpdates')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>Editar</p></TooltipContent></Tooltip>
-                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>Enviar para PDF</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit('suggestedUpdates')}><FilePenLine className="h-4 w-4" /></Button></TooltipTrigger><TooltipContent><p>{t('edit')}</p></TooltipContent></Tooltip>
+                                                <Tooltip><TooltipTrigger asChild><Button type="button" variant="ghost" size="icon" className="h-7 w-7"><Send className="h-4 w-4 text-primary" /></Button></TooltipTrigger><TooltipContent><p>{t('sendToPdf')}</p></TooltipContent></Tooltip>
                                             </TooltipProvider>
                                         </>
                                     )}
@@ -203,7 +204,7 @@ export function AICorrelator({ children }: { children: React.ReactNode }) {
             <DialogFooter className="sticky bottom-0 bg-background py-4">
                 <Button type="submit" disabled={isPending || !newDatasetDesc}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Correlacionar Dados
+                    {t('aiCorrelatorSubmitButton')}
                 </Button>
             </DialogFooter>
         </form>

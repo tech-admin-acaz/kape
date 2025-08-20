@@ -22,14 +22,15 @@ import { territoryTypes } from '@/models/location.model';
 import ExpandButton from './expand-button';
 import type { PanelGroup } from "react-resizable-panels";
 import type { FeatureCollection, Geometry } from 'geojson';
+import { useI18n } from '@/hooks/use-i18n';
 
 const basemaps = {
-    'satélite': 'mapbox://styles/mapbox/satellite-streets-v12',
-    'ruas': 'mapbox://styles/mapbox/streets-v12',
-    'escuro': 'mapbox://styles/mapbox/dark-v11',
+    'satellite': 'mapbox://styles/mapbox/satellite-streets-v12',
+    'streets': 'mapbox://styles/mapbox/streets-v12',
+    'dark': 'mapbox://styles/mapbox/dark-v11',
 };
 
-const defaultBasemapKey = 'escuro';
+const defaultBasemapKey = 'dark';
 
 interface InteractiveMapProps {
   onAreaUpdate: (data: StatsData | null) => void;
@@ -53,6 +54,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
   const [projection, setProjection] = useState<'mercator' | 'globe'>('mercator');
   const mapRef = useRef<MapRef>(null);
+  const { t } = useI18n();
 
   // Layer XYZ URLs
   const [indicatorXYZ, setIndicatorXYZ] = useState<string | null>(null);
@@ -191,7 +193,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
              areaName = `${details.name} - ${details.uf[0].sigla_uf}`;
         }
        
-        const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Território';
+        const typeLabel = territoryTypes.find(t => t.value === type)?.label || 'Territory';
        
         const newArea: StatsData = {
           id: location.value,
@@ -237,14 +239,14 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             const location: Location = { value: String(clickedLocation.id), label: clickedLocation.name };
             handleLocationSelect(location, 'estado');
         } else {
-             setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
+             setPopupInfo({ lng, lat, message: t('mapPopupSelectTerritory') });
         }
     } catch(error) {
         if (error instanceof Error && error.message.includes('404')) {
-             setPopupInfo({ lng, lat, message: "Por favor, selecione um território onde as camadas atuam." });
+             setPopupInfo({ lng, lat, message: t('mapPopupSelectTerritory') });
         } else {
             console.error("[InteractiveMap] Failed to get location by coords", error);
-            setPopupInfo({ lng, lat, message: "Erro ao buscar dados do local. Tente novamente." });
+            setPopupInfo({ lng, lat, message: t('mapPopupError') });
         }
     }
   }
@@ -396,7 +398,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             <Box className="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="left"><p>{is3D ? 'Desativar relevo 3D' : 'Ativar relevo 3D'}</p></TooltipContent>
+                    <TooltipContent side="left"><p>{is3D ? t('disable3D') : t('enable3D')}</p></TooltipContent>
                 </Tooltip>
             </TooltipProvider>
 
@@ -413,7 +415,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
-                        <p>{projection === 'mercator' ? 'Mudar para projeção de Globo' : 'Mudar para projeção de Mercator'}</p>
+                        <p>{projection === 'mercator' ? t('globeProjection') : t('mercatorProjection')}</p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
@@ -429,7 +431,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             <Plus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="left"><p>Zoom In</p></TooltipContent>
+                        <TooltipContent side="left"><p>{t('zoomIn')}</p></TooltipContent>
                     </Tooltip>
                     <Separator />
                     <Tooltip>
@@ -438,7 +440,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             <Minus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="left"><p>Zoom Out</p></TooltipContent>
+                        <TooltipContent side="left"><p>{t('zoomOut')}</p></TooltipContent>
                     </Tooltip>
                     <Separator />
                     <Tooltip>
@@ -447,7 +449,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
                         </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="left"><p>Orientação: {Math.abs(bearing).toFixed(0)}°</p></TooltipContent>
+                        <TooltipContent side="left"><p>{t('orientation')}: {Math.abs(bearing).toFixed(0)}°</p></TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
