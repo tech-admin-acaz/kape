@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -96,12 +97,18 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                 tooltipText={t('futureClimateTooltip')} 
             />
             <Card className="bg-muted/30">
-                <CardContent className="pt-6">
+                <CardHeader>
+                    <h4 className="font-semibold text-sm">{t('temperatureTrendTitle')}</h4>
+                </CardHeader>
+                <CardContent>
                     <TemperatureTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
             <Card className="bg-muted/30">
-                <CardContent className="pt-6">
+                <CardHeader>
+                    <h4 className="font-semibold text-sm">{t('rainfallTrendTitle')}</h4>
+                </CardHeader>
+                <CardContent>
                     <RainfallTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
