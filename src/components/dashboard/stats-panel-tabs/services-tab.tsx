@@ -3,37 +3,16 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Info } from 'lucide-react';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, LabelList } from 'recharts';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import type { TooltipProps } from 'recharts';
-import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { BiodiversityData, CarbonData, WaterData } from '../stats-panel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useI18n } from '@/hooks/use-i18n';
+import CarbonStackedBarChart from '../charts/carbon-stacked-bar-chart';
+import CarbonValuationBarChart from '../charts/carbon-valuation-bar-chart';
+import WaterValuationBarChart from '../charts/water-valuation-bar-chart';
 
-interface ServicesTabProps {
-  biodiversity: BiodiversityData | null;
-  carbonData: CarbonData | null;
-  waterData: WaterData | null;
-  isBiodiversityLoading: boolean;
-  isCarbonLoading: boolean;
-  isWaterLoading: boolean;
-}
-
-const formatNumber = (value: number): string => {
-    if (value === 0) return "0.00M";
-    if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
-    if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
-    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(2)}k`;
-    return value.toFixed(2);
-};
-
-const formatCurrency = (value: number) => {
-    const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', compactDisplay: 'short' }).format(value);
-    return formatted.replace(/\s/g, '').replace('.',',');
-};
 
 const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: string }) => (
     <div className="flex items-center gap-2 mb-2">
@@ -51,23 +30,6 @@ const SectionHeader = ({ title, tooltipText }: { title: string, tooltipText: str
     </div>
 );
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
-                <p className="font-bold mb-1">{label}</p>
-                {payload.map((p, index) => (
-                    <div key={index} style={{ color: p.color || p.fill }}>
-                        <span className="mr-2">●</span>
-                        <span>{`${p.name}: `}</span>
-                        <span className="font-bold">{p.name === 'Valor' ? formatCurrency(Number(p.value)) : `${formatNumber(Number(p.value))} tCO₂e`}</span>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-    return null;
-};
 
 const BiodiversityCard = ({
   imageUrl,
@@ -104,13 +66,25 @@ const DataSkeleton = ({ children }: { children: React.ReactNode }) => (
     </div>
 );
 
+interface ServicesTabProps {
+  biodiversity: BiodiversityData | null;
+  carbonData: CarbonData | null;
+  waterData: WaterData | null;
+  isBiodiversityLoading: boolean;
+  isCarbonLoading: boolean;
+  isWaterLoading: boolean;
+  data: any;
+}
+
+
 export default function ServicesTab({
     biodiversity,
     carbonData,
     waterData,
     isBiodiversityLoading,
     isCarbonLoading,
-    isWaterLoading
+    isWaterLoading,
+    data
 }: ServicesTabProps) {
     const { t } = useI18n();
 
@@ -152,93 +126,40 @@ export default function ServicesTab({
         {/* Carbon Section */}
         <div className="space-y-4">
             <SectionHeader title={t('carbonTitle')} tooltipText={t('carbonTooltip')} />
-            {isCarbonLoading ? (
-                 <DataSkeleton>
-                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
-                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
-                </DataSkeleton>
-            ) : carbonData ? (
-                <>
-                    <Card className="bg-muted/30">
-                        <CardHeader><CardTitle className="text-base font-medium">{t('carbonCurrentRestorableTitle')}</CardTitle></CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={256}>
-                                <ComposedChart data={carbonData.currentAndRestorable} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                    <YAxis tickFormatter={(value) => formatNumber(Number(value))} tick={{ fontSize: 12 }} />
-                                    <Tooltip 
-                                        content={<CustomTooltip />} 
-                                        cursor={{ fill: 'hsl(var(--accent) / 0.3)' }}
-                                    />
-                                    <Legend wrapperStyle={{fontSize: "12px"}} />
-                                    <Bar dataKey="current" name={t('current')} stackId="a" fill="hsl(var(--chart-3))">
-                                      <LabelList dataKey="current" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
-                                    </Bar>
-                                    <Bar dataKey="restorable" name={t('restorable')} stackId="a" fill="hsl(var(--chart-3) / 0.5)" radius={[4, 4, 0, 0]}>
-                                      <LabelList dataKey="restorable" position="center" formatter={(value: number) => formatNumber(value)} style={{ fill: 'white', fontSize: '12px', fontWeight: 'bold' }} />
-                                    </Bar>
-                                </ComposedChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-muted/30">
-                        <CardHeader><CardTitle className="text-base font-medium">{t('carbonValuationTitle')}</CardTitle></CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={256}>
-                                <BarChart data={carbonData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                    <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={110} />
-                                    <Tooltip 
-                                        content={<CustomTooltip />}
-                                        cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
-                                    />
-                                    <Bar dataKey="value" name={t('value')} fill="hsl(var(--chart-3) / 0.7)" radius={[0, 4, 4, 0]}>
-                                      <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10} />
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </>
-            ) : (
-                 <p className="text-muted-foreground">{t('carbonError')}</p>
-            )}
+            <Card className="bg-muted/30">
+                <CardHeader><CardTitle className="text-base font-medium">{t('carbonCurrentRestorableTitle')}</CardTitle></CardHeader>
+                <CardContent>
+                    <CarbonStackedBarChart 
+                        data={carbonData?.currentAndRestorable ?? null} 
+                        isLoading={isCarbonLoading} 
+                    />
+                </CardContent>
+            </Card>
+            <Card className="bg-muted/30">
+                <CardHeader><CardTitle className="text-base font-medium">{t('carbonValuationTitle')}</CardTitle></CardHeader>
+                <CardContent>
+                     <CarbonValuationBarChart 
+                        data={carbonData?.valuation ?? null} 
+                        isLoading={isCarbonLoading} 
+                    />
+                </CardContent>
+            </Card>
         </div>
 
         {/* Water Section */}
         <div className="space-y-4">
             <SectionHeader title={t('waterTitle')} tooltipText={t('waterTooltip')} />
-            {isWaterLoading ? (
-                 <DataSkeleton>
-                    <Card className="bg-muted/30"><CardContent className="pt-6"><Skeleton className="w-full h-[256px]" /></CardContent></Card>
-                </DataSkeleton>
-            ) : waterData ? (
-                 <Card className="bg-muted/30">
-                    <CardHeader>
-                        <CardTitle className="text-base font-medium">{t('waterValuationTitle')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                       <ResponsiveContainer width="100%" height={256}>
-                            <BarChart data={waterData.valuation} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                <XAxis type="number" tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
-                                <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={110} />
-                                <Tooltip 
-                                    content={<CustomTooltip />}
-                                    cursor={{ fill: 'hsl(var(--accent) / 0.3)' }} 
-                                />
-                                <Bar dataKey="value" name={t('value')} fill="hsl(var(--chart-2) / 0.7)" radius={[0, 4, 4, 0]}>
-                                  <LabelList dataKey="value" position="right" formatter={formatCurrency} style={{ fill: 'hsl(var(--foreground))', fontSize: '12px', fontWeight: 'bold' }} offset={10}/>
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card>
-            ) : (
-                <p className="text-muted-foreground">{t('waterError')}</p>
-            )}
+             <Card className="bg-muted/30">
+                <CardHeader>
+                    <CardTitle className="text-base font-medium">{t('waterValuationTitle')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <WaterValuationBarChart 
+                        data={waterData?.valuation ?? null} 
+                        isLoading={isWaterLoading} 
+                    />
+                </CardContent>
+            </Card>
         </div>
     </div>
   );

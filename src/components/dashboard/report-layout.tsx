@@ -140,6 +140,7 @@ export default function ReportLayout() {
             <div id="services-section" className="pt-8">
                  <h2 className="text-2xl font-bold font-headline mb-4">2. {t('servicesTab')}</h2>
                 <ServicesTab 
+                  data={data}
                   biodiversity={null}
                   carbonData={null}
                   waterData={null}
