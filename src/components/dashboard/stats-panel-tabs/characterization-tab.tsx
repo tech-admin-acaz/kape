@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -45,37 +44,40 @@ const GeneralInfoItem = ({ label, value }: { label: string; value: string | unde
 
 
 export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }: CharacterizationTabProps) {
-  const { id, typeKey, correlationInsights } = data;
+  const { id, typeKey } = data;
   
   const displayTerritoryName = typeKey === 'ti' ? generalInfo?.territoryName : null;
   const displayConservationUnit = typeKey === 'uc' ? generalInfo?.conservationUnit : null;
+  const showGeneralInfo = typeKey === 'ti' || typeKey === 'uc';
 
 
   return (
     <div className="space-y-6 p-6">
-        <div className="space-y-3">
-            <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
-            <Card className="bg-muted/30">
-                <CardContent className="p-4 space-y-2">
-                {isLoadingInfo ? (
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-3/4" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-2/3" />
-                        </div>
-                    ) : generalInfo ? (
-                        <>
-                            <GeneralInfoItem label="Estado" value={generalInfo.state} />
-                            <GeneralInfoItem label="Município" value={generalInfo.municipality} />
-                            <GeneralInfoItem label="Terra Indígena" value={displayTerritoryName} />
-                            <GeneralInfoItem label="Unidade de Conservação" value={displayConservationUnit} />
-                        </>
-                    ) : (
-                        <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do panorama geral.</p>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+        {showGeneralInfo && (
+            <div className="space-y-3">
+                <h3 className="font-headline text-lg font-semibold">Panorama Geral</h3>
+                <Card className="bg-muted/30">
+                    <CardContent className="p-4 space-y-2">
+                    {isLoadingInfo ? (
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-2/3" />
+                            </div>
+                        ) : generalInfo ? (
+                            <>
+                                <GeneralInfoItem label="Estado" value={generalInfo.state} />
+                                <GeneralInfoItem label="Município" value={generalInfo.municipality} />
+                                <GeneralInfoItem label="Terra Indígena" value={displayTerritoryName} />
+                                <GeneralInfoItem label="Unidade de Conservação" value={displayConservationUnit} />
+                            </>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do panorama geral.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        )}
 
         <div className="space-y-4">
             <SectionHeader title="Uso e Cobertura da Terra" tooltipText="Distribuição do uso do solo na área selecionada." />
@@ -85,15 +87,6 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                 </CardContent>
             </Card>
         </div>
-        
-        <Card className="bg-muted/30">
-            <CardHeader className='pb-2'>
-                <CardTitle className="text-base font-medium flex items-center gap-2"><Info className="w-4 h-4" />Insights de Correlação</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-sm">{correlationInsights}</p>
-            </CardContent>
-        </Card>
 
         <div className="space-y-4">
             <SectionHeader 
