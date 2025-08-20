@@ -8,6 +8,7 @@ import StatsPanel from "@/components/dashboard/stats-panel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import type { StatsData } from '@/components/dashboard/stats-panel';
 import WelcomeDialog from '@/components/dashboard/welcome-dialog';
+import { useI18n } from '@/hooks/use-i18n';
 
 export default function DashboardPage() {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
@@ -15,9 +16,11 @@ export default function DashboardPage() {
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
     const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(false);
+    const { t } = useI18n();
 
     React.useEffect(() => {
         setIsClient(true);
+        // We check localStorage to see if the user has previously opted out.
         const hideDialog = localStorage.getItem('hideWelcomeDialog');
         if (hideDialog !== 'true') {
             setShowWelcomeDialog(true);
