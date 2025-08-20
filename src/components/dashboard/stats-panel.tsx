@@ -65,22 +65,6 @@ export interface StatsData {
   name: string;
   type: string;
   typeKey: TerritoryTypeKey;
-  generalInfo?: GeneralInfo;
-  stats: {
-    landCover: LandCoverData[];
-    waterQuality: number;
-    vegetationIndex: number;
-  };
-  environmentalServices: {
-    carbon: CarbonData;
-    water: WaterData;
-  };
-  correlationInsights: string;
-  species: SpeciesData[];
-  futureClimate: {
-    temperature: FutureClimateData[];
-    precipitation: FutureClimateData[];
-  };
 }
 
 interface StatsPanelProps {
@@ -113,26 +97,23 @@ function StatsPanelSkeleton() {
     )
 }
 
-const fetchGeneralInfo = async (typeKey: TerritoryTypeKey, id: string): Promise<GeneralInfo | null> => {
-    try {
-        const response = await fetch(`/api/metadata/${typeKey}/${id}`);
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error(`Failed to fetch metadata for ${typeKey}/${id}. Status: ${response.status}. Body: ${errorBody}`);
-            return null;
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error in fetchGeneralInfo:", error);
-        return null;
-    }
-};
-
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
+  
+  // State for all tab data
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
+  const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
+  const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
+  const [waterData, setWaterData] = useState<WaterData | null>(null);
+  const [species, setSpecies] = useState<SpeciesData[]>([]);
+
+  // Loading states
   const [isInfoLoading, setIsInfoLoading] = useState(true);
+  const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
+  const [isCarbonLoading, setIsCarbonLoading] = useState(true);
+  const [isWaterLoading, setIsWaterLoading] = useState(true);
+  const [isSpeciesLoading, setIsSpeciesLoading] = useState(true);
   
   useEffect(() => {
     const panel = panelRef.current;
@@ -152,14 +133,59 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   }, []);
 
   useEffect(() => {
-    if (data) {
-        const fetchInfo = async () => {
-            setIsInfoLoading(true);
-            const info = await fetchGeneralInfo(data.typeKey, data.id);
-            setGeneralInfo(info);
-            setIsInfoLoading(false);
-        };
-        fetchInfo();
+    if (data && data.id && data.typeKey) {
+        const { id, typeKey } = data;
+
+        // Reset states and set loading to true
+        setIsInfoLoading(true);
+        setIsBiodiversityLoading(true);
+        setIsCarbonLoading(true);
+        setIsWaterLoading(true);
+        setIsSpeciesLoading(true);
+        
+        setGeneralInfo(null);
+        setBiodiversity(null);
+        setCarbonData(null);
+        setWaterData(null);
+        setSpecies([]);
+
+        // Fetch General Info (Characterization Tab)
+        fetch(`/api/metadata/${typeKey}/${id}`)
+            .then(res => {
+                if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => setGeneralInfo(data))
+            .catch(error => console.error(`Error fetching metadata for ${typeKey}/${id}:`, error))
+            .finally(() => setIsInfoLoading(false));
+
+        // Fetch Biodiversity Data (Services Tab)
+        fetch(`/api/stats/biodiversity/${typeKey}/${id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => setBiodiversity(data))
+            .catch(error => console.error("Error fetching biodiversity data:", error))
+            .finally(() => setIsBiodiversityLoading(false));
+            
+        // Fetch Carbon Data (Services Tab)
+        fetch(`/api/stats/carbon/${typeKey}/${id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => setCarbonData(data))
+            .catch(error => console.error("Error fetching carbon data:", error))
+            .finally(() => setIsCarbonLoading(false));
+
+        // Fetch Water Data (Services Tab)
+        fetch(`/api/stats/water/${typeKey}/${id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => setWaterData(data))
+            .catch(error => console.error("Error fetching water data:", error))
+            .finally(() => setIsWaterLoading(false));
+
+        // Fetch Species Data (Ranking Tab)
+        fetch(`/api/stats/species/${typeKey}/${id}`)
+            .then(res => res.ok ? res.json() : [])
+            .then(data => setSpecies(data))
+            .catch(error => console.error("Error fetching species data:", error))
+            .finally(() => setIsSpeciesLoading(false));
     }
   }, [data]);
   
@@ -227,12 +253,16 @@ export default function StatsPanel({ data }: StatsPanelProps) {
               </TabsContent>
               <TabsContent value="services" className="mt-0">
                   <ServicesTab 
-                      id={data.id} 
-                      typeKey={data.typeKey} 
+                      biodiversity={biodiversity}
+                      carbonData={carbonData}
+                      waterData={waterData}
+                      isBiodiversityLoading={isBiodiversityLoading}
+                      isCarbonLoading={isCarbonLoading}
+                      isWaterLoading={isWaterLoading}
                   />
               </TabsContent>
               <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
-                  <SpeciesTab id={data.id} typeKey={data.typeKey} />
+                  <SpeciesTab species={species} isLoading={isSpeciesLoading} />
               </TabsContent>
             </div>
         </Tabs>

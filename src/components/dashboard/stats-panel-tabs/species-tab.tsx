@@ -1,14 +1,14 @@
+
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SpeciesRankingTable from '../species-ranking-table';
 import type { SpeciesData } from '../stats-panel';
-import { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface SpeciesTabProps {
-    id: string;
-    typeKey: TerritoryTypeKey;
+    species: SpeciesData[];
+    isLoading: boolean;
 }
 
 const TableSkeleton = () => (
@@ -31,36 +31,7 @@ const TableSkeleton = () => (
 );
 
 
-export default function SpeciesTab({ id, typeKey }: SpeciesTabProps) {
-    const [species, setSpecies] = useState<SpeciesData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        if (!id || !typeKey) {
-            setIsLoading(false);
-            return;
-        }
-
-        const fetchSpeciesData = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch(`/api/stats/species/${typeKey}/${id}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch species data');
-                }
-                const data = await response.json();
-                setSpecies(data);
-            } catch (error) {
-                console.error("Error fetching species data:", error);
-                setSpecies([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchSpeciesData();
-    }, [id, typeKey]);
-
+export default function SpeciesTab({ species, isLoading }: SpeciesTabProps) {
     if(isLoading) {
         return <TableSkeleton />;
     }

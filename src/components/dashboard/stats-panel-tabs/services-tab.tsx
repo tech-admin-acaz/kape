@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from 'lucide-react';
@@ -9,12 +10,15 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 import type { TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { BiodiversityData, CarbonData, WaterData } from '../stats-panel';
-import { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ServicesTabProps {
-  id: string;
-  typeKey: TerritoryTypeKey;
+  biodiversity: BiodiversityData | null;
+  carbonData: CarbonData | null;
+  waterData: WaterData | null;
+  isBiodiversityLoading: boolean;
+  isCarbonLoading: boolean;
+  isWaterLoading: boolean;
 }
 
 const formatNumber = (value: number): string => {
@@ -99,71 +103,14 @@ const DataSkeleton = ({ children }: { children: React.ReactNode }) => (
     </div>
 );
 
-export default function ServicesTab({ id, typeKey }: ServicesTabProps) {
-    const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
-    const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
-    const [waterData, setWaterData] = useState<WaterData | null>(null);
-    const [isBiodiversityLoading, setIsBiodiversityLoading] = useState(true);
-    const [isCarbonLoading, setIsCarbonLoading] = useState(true);
-    const [isWaterLoading, setIsWaterLoading] = useState(true);
-
-     useEffect(() => {
-        if (!id || !typeKey) {
-            setIsBiodiversityLoading(false);
-            setIsCarbonLoading(false);
-            setIsWaterLoading(false);
-            return;
-        }
-
-        const fetchBiodiversityData = async () => {
-            setIsBiodiversityLoading(true);
-            try {
-                const response = await fetch(`/api/stats/biodiversity/${typeKey}/${id}`);
-                if (!response.ok) throw new Error('Failed to fetch biodiversity data');
-                const data = await response.json();
-                setBiodiversity(data);
-            } catch (error) {
-                console.error("Error fetching biodiversity data:", error);
-                setBiodiversity(null);
-            } finally {
-                setIsBiodiversityLoading(false);
-            }
-        };
-
-        const fetchCarbonData = async () => {
-            setIsCarbonLoading(true);
-            try {
-                const response = await fetch(`/api/stats/carbon/${typeKey}/${id}`);
-                if (!response.ok) throw new Error('Failed to fetch carbon data');
-                const data = await response.json();
-                setCarbonData(data);
-            } catch (error) {
-                console.error("Error fetching carbon data:", error);
-                setCarbonData(null);
-            } finally {
-                setIsCarbonLoading(false);
-            }
-        };
-
-        const fetchWaterData = async () => {
-            setIsWaterLoading(true);
-            try {
-                const response = await fetch(`/api/stats/water/${typeKey}/${id}`);
-                if (!response.ok) throw new Error('Failed to fetch water data');
-                const data = await response.json();
-                setWaterData(data);
-            } catch (error) {
-                console.error("Error fetching water data:", error);
-                setWaterData(null);
-            } finally {
-                setIsWaterLoading(false);
-            }
-        };
-
-        fetchBiodiversityData();
-        fetchCarbonData();
-        fetchWaterData();
-    }, [id, typeKey]);
+export default function ServicesTab({
+    biodiversity,
+    carbonData,
+    waterData,
+    isBiodiversityLoading,
+    isCarbonLoading,
+    isWaterLoading
+}: ServicesTabProps) {
     
     const biodiversityCards = biodiversity ? [
       { category: 'Anfíbios', count: biodiversity.amphibians, imageUrl: 'https://placehold.co/100x100.png', imageHint: 'frog tree' },
