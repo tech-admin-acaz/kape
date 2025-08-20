@@ -30,7 +30,7 @@ export default function BasemapControl({ onStyleChange, basemaps, currentStyleKe
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+        <Button variant="outline" size="icon" className="bg-background/80 btn-map-control">
           <MapIcon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>

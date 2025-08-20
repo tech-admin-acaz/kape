@@ -111,4 +111,8 @@
       opacity: 0;
     }
   }
+  
+  .btn-map-control:hover, .btn-map-control:focus {
+      @apply bg-accent text-accent-foreground;
+  }
 }

@@ -46,7 +46,7 @@ export default function MapSettingsControl({
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+                        <Button variant="outline" size="icon" className="bg-background/80 btn-map-control">
                             <Settings className="h-5 w-5" />
                         </Button>
                     </DropdownMenuTrigger>

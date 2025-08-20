@@ -52,7 +52,7 @@ export default function LayerControl({ layers, setLayers }: LayerControlProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-background/80 hover:bg-hover hover:text-primary-foreground">
+        <Button variant="outline" size="icon" className="bg-background/80 btn-map-control">
           <Layers className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

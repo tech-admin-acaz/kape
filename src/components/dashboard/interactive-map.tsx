@@ -198,21 +198,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
           name: areaName,
           type: typeLabel,
           typeKey: type,
-          stats: {
-            landCover: [],
-            waterQuality: 0,
-            vegetationIndex: 0,
-          },
-          environmentalServices: {
-            carbon: { currentAndRestorable: [], valuation: [] },
-            water: { valuation: [] }
-          },
-          correlationInsights: "Insights de correlação para esta área ainda não estão disponíveis.",
-          species: [],
-          futureClimate: {
-            temperature: [],
-            precipitation: [],
-          },
         };
         onAreaUpdate(newArea);
 
@@ -406,7 +391,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             variant="outline" 
                             size="icon" 
                             onClick={toggle3D}
-                            className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", is3D && "bg-accent text-accent-foreground")}
+                            className={cn("bg-background/80 btn-map-control", is3D && "bg-accent text-accent-foreground")}
                         >
                             <Box className="h-4 w-4" />
                         </Button>
@@ -422,7 +407,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                             variant="outline" 
                             size="icon" 
                             onClick={toggleProjection}
-                            className={cn("bg-background/80 hover:bg-hover hover:text-primary-foreground", projection === 'globe' && "bg-accent text-accent-foreground")}
+                            className={cn("bg-background/80 btn-map-control", projection === 'globe' && "bg-accent text-accent-foreground")}
                         >
                             {projection === 'mercator' ? <Globe className="h-5 w-5" /> : <MapIconLucide className="h-5 w-5" />}
                         </Button>
@@ -440,7 +425,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                  <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={handleZoomIn} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
+                        <Button variant="ghost" size="icon" onClick={handleZoomIn} className="btn-map-control rounded-none h-10 w-10">
                             <Plus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
@@ -449,7 +434,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     <Separator />
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={handleZoomOut} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
+                        <Button variant="ghost" size="icon" onClick={handleZoomOut} className="btn-map-control rounded-none h-10 w-10">
                             <Minus className="h-4 w-4" />
                         </Button>
                         </TooltipTrigger>
@@ -458,7 +443,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     <Separator />
                     <Tooltip>
                         <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={handleResetBearing} className="hover:bg-hover hover:text-primary-foreground rounded-none h-10 w-10">
+                        <Button variant="ghost" size="icon" onClick={handleResetBearing} className="btn-map-control rounded-none h-10 w-10">
                             <Navigation className="h-4 w-4 transition-transform" style={{ transform: `rotate(${bearing * -1}deg)` }} />
                         </Button>
                         </TooltipTrigger>
