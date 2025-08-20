@@ -76,10 +76,27 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
   }, [id, type]);
 
   useEffect(() => {
-    if (chartComponentRef.current && !isLoading) {
-      chartComponentRef.current.chart.reflow();
+    if (!chartComponentRef.current) return;
+
+    const chart = chartComponentRef.current.chart;
+    const container = chart.container.parentElement;
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (chartComponentRef.current && chartComponentRef.current.chart) {
+        chartComponentRef.current.chart.reflow();
+      }
+    });
+
+    if (container) {
+      resizeObserver.observe(container);
     }
-  }, [chartData, isLoading]);
+
+    return () => {
+      if (container) {
+        resizeObserver.unobserve(container);
+      }
+    };
+  }, [isLoading]);
 
   const options: Highcharts.Options = {
     chart: {
@@ -174,7 +191,7 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
-          containerProps={{ style: { height: "100%", width: "100%" } }}
+          containerProps={{ style: { height: "99%", width: "100%" } }}
         />
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">

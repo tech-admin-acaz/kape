@@ -70,12 +70,11 @@ const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => 
     fetchData();
   }, [id, type]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!chartComponentRef.current) return;
 
     const chart = chartComponentRef.current.chart;
     const container = chart.container.parentElement;
-    if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
       if (chartComponentRef.current && chartComponentRef.current.chart) {
@@ -83,10 +82,14 @@ const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => 
       }
     });
 
-    resizeObserver.observe(container);
+    if (container) {
+      resizeObserver.observe(container);
+    }
 
     return () => {
-      resizeObserver.disconnect();
+      if (container) {
+        resizeObserver.unobserve(container);
+      }
     };
   }, [isLoading]);
 
@@ -220,7 +223,7 @@ const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => 
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
-          containerProps={{ style: { height: "100%", width: "100%" } }}
+          containerProps={{ style: { height: "99%", width: "100%" } }}
         />
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">

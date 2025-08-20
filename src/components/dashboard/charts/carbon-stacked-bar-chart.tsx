@@ -160,7 +160,7 @@ const CarbonStackedBarChart: React.FC<CarbonStackedBarChartProps> = ({ data, isL
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
-          containerProps={{ style: { height: "100%", width: "100%" } }}
+          containerProps={{ style: { height: "99%", width: "100%" } }}
         />
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">

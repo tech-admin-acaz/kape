@@ -134,7 +134,6 @@ const TemperatureTrendChart: React.FC<TemperatureTrendChartProps> = ({ id, type 
 
     const chart = chartComponentRef.current.chart;
     const container = chart.container.parentElement;
-    if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
       if (chartComponentRef.current && chartComponentRef.current.chart) {
@@ -142,10 +141,14 @@ const TemperatureTrendChart: React.FC<TemperatureTrendChartProps> = ({ id, type 
       }
     });
 
-    resizeObserver.observe(container);
+    if (container) {
+      resizeObserver.observe(container);
+    }
 
     return () => {
-      resizeObserver.disconnect();
+      if (container) {
+        resizeObserver.unobserve(container);
+      }
     };
   }, [isLoading]);
 
@@ -286,7 +289,7 @@ const TemperatureTrendChart: React.FC<TemperatureTrendChartProps> = ({ id, type 
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
-          containerProps={{ style: { height: "100%", width: "100%" } }}
+          containerProps={{ style: { height: "99%", width: "100%" } }}
         />
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">
