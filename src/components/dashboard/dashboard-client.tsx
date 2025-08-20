@@ -64,7 +64,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                     if (typeof document !== 'undefined') {
                        document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
                     }
-                    setIsCollapsed(sizes[1] < 25);
+                    setIsCollapsed(sizes[1] < 5);
                 }}
             >
                 <ResizablePanel defaultSize={62} minSize={30}>

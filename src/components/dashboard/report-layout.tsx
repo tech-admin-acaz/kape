@@ -9,19 +9,26 @@ import { Button } from '../ui/button';
 import { Download, FilePlus2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TerritoryTypeKey } from '@/models/location.model';
-import type { StatsData, GeneralInfo } from '../dashboard/stats-panel';
+import type { StatsData, GeneralInfo, BiodiversityData, CarbonData, WaterData, SpeciesData } from '../dashboard/stats-panel';
 import { Skeleton } from '../ui/skeleton';
 import { useI18n } from '@/hooks/use-i18n';
 
-const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promise<[GeneralInfo | null, Partial<StatsData> | null]> => {
+const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promise<[GeneralInfo | null, Partial<StatsData> | null, BiodiversityData | null, CarbonData | null, WaterData | null, SpeciesData[] | null]> => {
      try {
-          const response = await fetch(`/api/metadata/${typeKey}/${areaId}`);
-          if(!response.ok) {
-              const errorText = await response.text();
-              console.error("Failed to fetch metadata:", errorText)
-              throw new Error('Failed to fetch metadata');
-          }
-          const info = await response.json();
+          const [infoRes, bioRes, carbonRes, waterRes, speciesRes] = await Promise.all([
+               fetch(`/api/metadata/${typeKey}/${areaId}`),
+               fetch(`/api/stats/biodiversity/${typeKey}/${areaId}`),
+               fetch(`/api/stats/carbon/${typeKey}/${areaId}`),
+               fetch(`/api/stats/water/${typeKey}/${areaId}`),
+               fetch(`/api/stats/species/${typeKey}/${areaId}`)
+          ]);
+
+          const info = infoRes.ok ? await infoRes.json() : null;
+          const biodiversity = bioRes.ok ? await bioRes.json() : null;
+          const carbonData = carbonRes.ok ? await carbonRes.json() : null;
+          const waterData = waterRes.ok ? await waterRes.json() : null;
+          const speciesData = speciesRes.ok ? await speciesRes.json() : [];
+          
           let name = `Área ${areaId}`;
           if (info) {
               name = info.conservationUnit || info.territoryName || info.municipality || info.state || `Área ${areaId}`
@@ -34,10 +41,11 @@ const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promi
             type: 'Relatório'
           };
           
-          return [info, tempData];
+          return [info, tempData, biodiversity, carbonData, waterData, speciesData];
+
      } catch (error) {
          console.error("Failed to fetch report data:", error);
-         return [null, null];
+         return [null, null, null, null, null, null];
      }
 }
 
@@ -49,6 +57,11 @@ export default function ReportLayout() {
 
   const [data, setData] = useState<StatsData | null>(null);
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
+  const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
+  const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
+  const [waterData, setWaterData] = useState<WaterData | null>(null);
+  const [species, setSpecies] = useState<SpeciesData[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [includeSpecies, setIncludeSpecies] = useState(false);
 
@@ -56,9 +69,13 @@ export default function ReportLayout() {
     if (areaId && typeKey) {
       const loadData = async () => {
         setIsLoading(true);
-        const [info, tempData] = await fetchReportData(typeKey, areaId);
+        const [info, tempData, bioData, carbData, watData, specData] = await fetchReportData(typeKey, areaId);
         setGeneralInfo(info);
         setData(tempData as StatsData);
+        setBiodiversity(bioData);
+        setCarbonData(carbData);
+        setWaterData(watData);
+        setSpecies(specData ?? []);
         if (tempData?.name) {
           document.title = `${t('reportTitle')} - ${tempData.name}`;
         }
@@ -141,9 +158,9 @@ export default function ReportLayout() {
                  <h2 className="text-2xl font-bold font-headline mb-4">2. {t('servicesTab')}</h2>
                 <ServicesTab 
                   data={data}
-                  biodiversity={null}
-                  carbonData={null}
-                  waterData={null}
+                  biodiversity={biodiversity}
+                  carbonData={carbonData}
+                  waterData={waterData}
                   isBiodiversityLoading={isLoading}
                   isCarbonLoading={isLoading}
                   isWaterLoading={isLoading}
@@ -155,7 +172,7 @@ export default function ReportLayout() {
                     <h2 className="text-2xl font-bold font-headline mb-4">3. {t('rankingTab')}</h2>
                     <div className="bg-card rounded-lg border">
                          <SpeciesTab 
-                            species={[]}
+                            species={species}
                             isLoading={isLoading}
                          />
                     </div>
