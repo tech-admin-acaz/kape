@@ -6,7 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'BioDiversidade2',
+  title: 'Serrapilheira',
   description: 'An advanced platform for environmental data analysis.',
 };
 
