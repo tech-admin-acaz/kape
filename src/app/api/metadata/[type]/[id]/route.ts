@@ -22,6 +22,7 @@ export async function GET(
     { params }: { params: { type: string, id: string } }
 ) {
     const { type, id } = params;
+    const timeKey = `[API] Fetching metadata for ${type}/${id}`;
 
     if (!API_BIO_URL) {
         return NextResponse.json({ error: 'API URL not configured' }, { status: 500 });
@@ -40,7 +41,9 @@ export async function GET(
     const apiPath = `${API_BIO_URL}/metadata/${type}/${id}`;
 
     try {
+        console.time(timeKey);
         const response = await fetch(apiPath);
+        console.timeEnd(timeKey);
         
         if (!response.ok) {
             if (response.status === 404) {
@@ -91,6 +94,7 @@ export async function GET(
         });
 
     } catch (error) {
+        console.timeEnd(timeKey);
         console.error(`Error fetching metadata for ${type}/${id}:`, error);
         return NextResponse.json({ error: `Failed to fetch metadata` }, { status: 500 });
     }

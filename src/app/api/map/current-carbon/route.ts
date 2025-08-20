@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 
 const API_BIO_URL = process.env.API_BIO_URL;
+const timeKey = "[API] Fetching current carbon XYZ";
 
 /**
  * API route to fetch the current carbon layer XYZ tile URL.
@@ -13,7 +14,9 @@ export async function GET() {
     }
     
     try {
+        console.time(timeKey);
         const response = await fetch(`${API_BIO_URL}/xyz/carbonoAtual`);
+        console.timeEnd(timeKey);
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Error fetching current carbon from external API:', response.status, errorText);
@@ -23,6 +26,7 @@ export async function GET() {
         return NextResponse.json({ xyz: data.xyz });
 
     } catch (error) {
+        console.timeEnd(timeKey);
         console.error('Error fetching current carbon XYZ:', error);
         return NextResponse.json({ error: 'Failed to fetch current carbon data' }, { status: 500 });
     }
