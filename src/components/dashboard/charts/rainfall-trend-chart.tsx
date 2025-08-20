@@ -1,127 +1,235 @@
 
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { ResponsiveContainer, ComposedChart, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Line } from 'recharts';
-import type { FutureClimateData } from '../stats-panel';
+import React, { useEffect, useState, useRef } from 'react';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import exporting from 'highcharts/modules/exporting';
 import type { TerritoryTypeKey } from '@/models/location.model';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { FutureClimateData } from '../stats-panel';
 import { useI18n } from '@/hooks/use-i18n';
-import type { TooltipProps } from 'recharts';
-import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+
+if (typeof Highcharts === 'object') {
+  exporting(Highcharts);
+}
 
 interface RainfallTrendChartProps {
-    id: string;
-    type: TerritoryTypeKey;
+  id: string;
+  type: TerritoryTypeKey;
 }
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-popover text-popover-foreground border rounded-md p-2 shadow-sm text-sm">
-                <p className="font-bold mb-1">{label}</p>
-                {payload.map((p, index) => (
-                    <div key={index} style={{ color: p.color || p.fill }}>
-                        <span className="mr-2">●</span>
-                        <span>{`${p.name}: `}</span>
-                        <span className="font-bold">{`${Number(p.value).toFixed(2)} mm`}</span>
-                    </div>
-                ))}
-            </div>
-        );
+const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => {
+  const [chartData, setChartData] = useState<FutureClimateData[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+  const { t, locale } = useI18n();
+
+  useEffect(() => {
+    Highcharts.setOptions({
+        lang: {
+            viewFullscreen: t('viewFullscreen' as any),
+            printChart: t('printChart' as any),
+            downloadPNG: t('downloadPNG' as any),
+            downloadJPEG: t('downloadJPEG' as any),
+            downloadPDF: t('downloadPDF' as any),
+            downloadSVG: t('downloadSVG' as any),
+        }
+    });
+  }, [locale, t]);
+  
+  useEffect(() => {
+    if (!id || !type) {
+      setIsLoading(false);
+      return;
     }
-    return null;
-};
 
-
-export default function RainfallTrendChart({ id, type }: RainfallTrendChartProps) {
-    const [chartData, setChartData] = useState<FutureClimateData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const { t } = useI18n();
-
-    useEffect(() => {
-        if (!id || !type) {
-            setIsLoading(false);
+    const fetchData = async () => {
+      setIsLoading(true);
+      setChartData(null);
+      
+      try {
+        const response = await fetch(`/api/stats/precipitation/${type}/${id}`);
+        if (!response.ok) {
+            console.error(`Error fetching precipitation stats: ${response.statusText}`);
+            setChartData([]);
             return;
         }
+        
+        const data = await response.json();
+        setChartData(data);
+        
+      } catch (error) {
+        console.error("Failed to fetch or process precipitation stats:", error);
+        setChartData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch(`/api/stats/precipitation/${type}/${id}`);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`Error fetching precipitation stats from API:`, response.status, errorText);
-                    setChartData([]);
-                    return;
+    fetchData();
+  }, [id, type]);
+
+   useEffect(() => {
+    const chart = chartComponentRef.current?.chart;
+    if (chart && chartData) {
+      const container = chart.container.parentElement;
+
+      const resizeObserver = new ResizeObserver(() => {
+        chart.reflow();
+      });
+
+      if (container) {
+        resizeObserver.observe(container);
+      }
+
+      return () => {
+        if (container) {
+          resizeObserver.unobserve(container);
+        }
+      };
+    }
+  }, [chartData]);
+
+
+  const options: Highcharts.Options = {
+    chart: {
+      type: 'spline',
+      backgroundColor: 'transparent',
+    },
+    title: {
+      text: ''
+    },
+    credits: {
+        enabled: false
+    },
+    xAxis: {
+      categories: chartData?.map(d => d.year),
+      title: {
+        text: '',
+      },
+       labels: {
+        style: {
+          color: 'hsl(var(--foreground))'
+        }
+      },
+      lineColor: 'hsl(var(--border))',
+      tickColor: 'hsl(var(--border))',
+    },
+    yAxis: {
+      title: {
+        text: t('rainfallUnit'),
+        style: {
+          color: 'hsl(var(--foreground))'
+        }
+      },
+      gridLineColor: 'hsl(var(--border))',
+       labels: {
+        style: {
+          color: 'hsl(var(--foreground))'
+        }
+      }
+    },
+    legend: {
+      enabled: true,
+      itemStyle: {
+        color: 'hsl(var(--foreground))',
+      },
+      itemHoverStyle: {
+        color: 'hsl(var(--primary))',
+      },
+    },
+    plotOptions: {
+      spline: {
+        marker: {
+          enabled: false
+        }
+      }
+    },
+    series: [
+      {
+        type: 'spline',
+        name: t('rainfallSeriesName'),
+        data: chartData?.map(d => d.value),
+        color: 'hsl(var(--chart-2))',
+      },
+      {
+        type: 'spline',
+        name: t('trendLineName'),
+        data: chartData?.map(d => d.trend),
+        color: 'hsl(var(--destructive))',
+        dashStyle: 'ShortDash',
+      }
+    ],
+    exporting: {
+        enabled: true,
+        buttons: {
+            contextButton: {
+                symbol: 'menu',
+                symbolStroke: 'hsl(var(--foreground))',
+                theme: {
+                    fill: 'transparent',
+                    states: {
+                        hover: {
+                            fill: 'hsl(var(--muted))',
+                        },
+                        select: {
+                            fill: 'hsl(var(--muted))',
+                        }
+                    }
                 }
-                const apiData = await response.json();
-                if (!apiData || apiData.length === 0) {
-                  setChartData([]);
-                  return;
-                }
-                setChartData(apiData);
-            } catch (error) {
-                console.error(`Error processing precipitation stats:`, error);
-                setChartData([]);
-            } finally {
-                setIsLoading(false);
             }
-        };
+        },
+        menuItemStyle: {
+            fontFamily: 'Inter, sans-serif',
+            color: 'hsl(var(--foreground))',
+        },
+        menuItemHoverStyle: {
+            background: 'hsl(var(--accent))',
+            color: 'hsl(var(--accent-foreground))',
+        }
+    },
+    navigation: {
+        menuStyle: {
+            background: 'hsl(var(--background))',
+            border: '1px solid hsl(var(--border))',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+        }
+    },
+    tooltip: {
+      backgroundColor: 'hsl(var(--popover))',
+      borderColor: 'hsl(var(--border))',
+      style: {
+          color: 'hsl(var(--popover-foreground))',
+          fontWeight: 'normal'
+      },
+      formatter: function () {
+          return `
+              <div style="font-weight: bold; margin-bottom: 5px;">${this.x}</div>
+              <div><span style="color:${this.series.color};">●</span> ${this.series.name}: ${this.y?.toFixed(2)} mm</div>
+          `;
+      }
+    },
+  };
 
-        fetchData();
-    }, [id, type]);
-
-    return (
-        <div className="w-full h-[320px]">
-             {isLoading ? (
-                <Skeleton className="w-full h-full" />
-             ) : chartData && chartData.length > 0 ? (
-                 <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis 
-                            dataKey="year" 
-                            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
-                            tickLine={{ stroke: 'hsl(var(--border))' }}
-                            axisLine={{ stroke: 'hsl(var(--border))' }}
-                            interval={Math.floor(chartData.length / 5)}
-                         />
-                        <YAxis 
-                            tickFormatter={(value) => `${value} mm`} 
-                            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                            tickLine={{ stroke: 'hsl(var(--border))' }}
-                            axisLine={{ stroke: 'hsl(var(--border))' }}
-                         />
-                        <Tooltip 
-                            content={<CustomTooltip />}
-                            cursor={{ fill: 'hsl(var(--accent) / 0.3)' }}
-                        />
-                        <Legend wrapperStyle={{fontSize: "12px", color: 'hsl(var(--foreground))'}} />
-                        <Line 
-                            type="monotone" 
-                            dataKey="value" 
-                            name={t('rainfallSeriesName')} 
-                            stroke="hsl(var(--chart-2))" 
-                            dot={false}
-                            strokeWidth={2}
-                        />
-                        <Line 
-                            type="monotone" 
-                            dataKey="trend" 
-                            name={t('trendLineName')}
-                            stroke="hsl(var(--destructive))" 
-                            strokeDasharray="5 5" 
-                            dot={false}
-                            strokeWidth={2}
-                        />
-                    </ComposedChart>
-                </ResponsiveContainer>
-             ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                   {t('noDataAvailable')}
-                </div>
-             )}
+  return (
+    <div className="w-full h-80">
+      {isLoading ? (
+        <Skeleton className="w-full h-full" />
+      ) : chartData && chartData.length > 0 ? (
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={options}
+          ref={chartComponentRef}
+          containerProps={{ style: { height: "100%", width: "100%" } }}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full text-muted-foreground">
+          {t('noDataAvailable')}
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
+
+export default RainfallTrendChart;

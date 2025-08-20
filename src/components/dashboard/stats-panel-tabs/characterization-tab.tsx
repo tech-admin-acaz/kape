@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LandCoverChart from '../charts/land-cover-chart';
@@ -96,18 +96,14 @@ export default function CharacterizationTab({ data, generalInfo, isLoadingInfo }
                 tooltipText={t('futureClimateTooltip')} 
             />
             <Card className="bg-muted/30">
-                <CardHeader>
-                    <h4 className="font-semibold text-sm">{t('temperatureTrendTitle')}</h4>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
+                    <h4 className="font-semibold text-sm mb-4">{t('temperatureTrendTitle')}</h4>
                     <TemperatureTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
             <Card className="bg-muted/30">
-                <CardHeader>
-                    <h4 className="font-semibold text-sm">{t('rainfallTrendTitle')}</h4>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
+                    <h4 className="font-semibold text-sm mb-4">{t('rainfallTrendTitle')}</h4>
                     <RainfallTrendChart type={typeKey} id={id} />
                 </CardContent>
             </Card>
