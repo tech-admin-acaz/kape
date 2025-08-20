@@ -18,21 +18,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Checkbox } from '../ui/checkbox';
-import { Label } from '../ui/label';
 import { useI18n } from '@/hooks/use-i18n';
 
 interface WelcomeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDialogClose: (dontShowAgain: boolean) => void;
+  onDialogClose: () => void;
 }
 
 export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: WelcomeDialogProps) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-    const [dontShowAgain, setDontShowAgain] = useState(false);
     const { t } = useI18n();
 
     useEffect(() => {
@@ -44,7 +41,7 @@ export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: Wel
     }, []);
 
     const handleClose = () => {
-        onDialogClose(dontShowAgain);
+        onDialogClose();
     }
 
     const handleLoginRedirect = () => {
@@ -144,10 +141,7 @@ export default function WelcomeDialog({ open, onOpenChange, onDialogClose }: Wel
                     </Card>
                 </div>
                  <DialogFooter className="sm:justify-center pt-4">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="dont-show-again" checked={dontShowAgain} onCheckedChange={(checked) => setDontShowAgain(!!checked)} />
-                        <Label htmlFor="dont-show-again" className="text-sm font-normal">{t('dontShowAgain')}</Label>
-                    </div>
+                    {/* The "Don't show again" checkbox is removed as per the new requirement */}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

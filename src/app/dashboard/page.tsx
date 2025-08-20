@@ -15,16 +15,12 @@ export default function DashboardPage() {
     const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
-    const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(false);
+    const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(true); // Show by default
     const { t } = useI18n();
 
     React.useEffect(() => {
         setIsClient(true);
-        // We check localStorage to see if the user has previously opted out.
-        const hideDialog = localStorage.getItem('hideWelcomeDialog');
-        if (hideDialog !== 'true') {
-            setShowWelcomeDialog(true);
-        }
+        // The dialog is now always shown on page load, so no check is needed here.
     }, []);
 
     const togglePanel = React.useCallback(() => {
@@ -40,9 +36,7 @@ export default function DashboardPage() {
     }, [isCollapsed]);
 
     const handleDialogClose = (dontShowAgain: boolean) => {
-        if (dontShowAgain) {
-            localStorage.setItem('hideWelcomeDialog', 'true');
-        }
+        // The logic to save the user's preference is removed to ensure the dialog always shows on refresh.
         setShowWelcomeDialog(false);
     };
 
