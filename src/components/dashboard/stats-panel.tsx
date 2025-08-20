@@ -14,6 +14,7 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
+import { useToast } from '@/hooks/use-toast';
 
 interface LandCoverData {
   name: string;
@@ -100,6 +101,7 @@ function StatsPanelSkeleton() {
 export default function StatsPanel({ data }: StatsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
+  const { toast } = useToast();
   
   // State for all tab data
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
@@ -136,28 +138,43 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     if (data && data.id && data.typeKey) {
         const { id, typeKey } = data;
 
-        // Reset states and set loading to true
+        // Reset states and set loading to true for all data types
         setIsInfoLoading(true);
-        setIsBiodiversityLoading(true);
-        setIsCarbonLoading(true);
-        setIsWaterLoading(true);
-        setIsSpeciesLoading(true);
-        
         setGeneralInfo(null);
+        setIsBiodiversityLoading(true);
         setBiodiversity(null);
+        setIsCarbonLoading(true);
         setCarbonData(null);
+        setIsWaterLoading(true);
         setWaterData(null);
+        setIsSpeciesLoading(true);
         setSpecies([]);
 
-        // Fetch General Info (Characterization Tab)
-        fetch(`/api/metadata/${typeKey}/${id}`)
-            .then(res => {
-                if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                return res.json();
-            })
-            .then(data => setGeneralInfo(data))
-            .catch(error => console.error(`Error fetching metadata for ${typeKey}/${id}:`, error))
-            .finally(() => setIsInfoLoading(false));
+        // Fetch General Info only for TI and UC
+        if (typeKey === 'ti' || typeKey === 'uc') {
+            fetch(`/api/metadata/${typeKey}/${id}`)
+                .then(res => {
+                    if (!res.ok) {
+                         if(res.status === 404) return null;
+                         throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if(data) setGeneralInfo(data);
+                })
+                .catch(error => {
+                     console.error(`Error fetching metadata for ${typeKey}/${id}:`, error)
+                     toast({
+                        variant: 'destructive',
+                        title: 'Erro ao carregar metadados',
+                        description: 'Não foi possível carregar as informações do panorama geral.',
+                    });
+                })
+                .finally(() => setIsInfoLoading(false));
+        } else {
+            setIsInfoLoading(false); // No need to load info for other types
+        }
 
         // Fetch Biodiversity Data (Services Tab)
         fetch(`/api/stats/biodiversity/${typeKey}/${id}`)
@@ -187,7 +204,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
             .catch(error => console.error("Error fetching species data:", error))
             .finally(() => setIsSpeciesLoading(false));
     }
-  }, [data]);
+  }, [data, toast]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
