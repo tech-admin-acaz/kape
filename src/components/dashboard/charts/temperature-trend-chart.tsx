@@ -40,6 +40,7 @@ const calculateTrendLine = (data: { year: string; value: number }[]): number[] =
 
 export default function TemperatureTrendChart({ id, type }: TemperatureTrendChartProps) {
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+    const chartContainerRef = useRef<HTMLDivElement>(null);
     const [chartData, setChartData] = useState<FutureClimateData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -123,6 +124,20 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
             chartComponentRef.current.chart.reflow();
         }
     }, [chartData, isLoading]);
+
+    useEffect(() => {
+      const container = chartContainerRef.current;
+      if (!container) return;
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (chartComponentRef.current) {
+          chartComponentRef.current.chart.reflow();
+        }
+      });
+      resizeObserver.observe(container);
+
+      return () => resizeObserver.disconnect();
+    }, []);
 
     const options: Highcharts.Options = {
         chart: {
@@ -243,7 +258,7 @@ export default function TemperatureTrendChart({ id, type }: TemperatureTrendChar
     };
 
     return (
-        <div className="w-full h-[320px]">
+        <div ref={chartContainerRef} className="w-full h-[320px]">
              {isLoading ? (
                 <Skeleton className="w-full h-full" />
              ) : chartData && chartData.length > 0 ? (
