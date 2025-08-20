@@ -71,25 +71,24 @@ const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => 
   }, [id, type]);
 
    useEffect(() => {
-    const chart = chartComponentRef.current?.chart;
-    if (chart && chartData) {
-      const container = chart.container.parentElement;
+    if (!chartComponentRef.current) return;
 
-      const resizeObserver = new ResizeObserver(() => {
-        chart.reflow();
-      });
+    const chart = chartComponentRef.current.chart;
+    const container = chart.container.parentElement;
+    if (!container) return;
 
-      if (container) {
-        resizeObserver.observe(container);
+    const resizeObserver = new ResizeObserver(() => {
+      if (chartComponentRef.current && chartComponentRef.current.chart) {
+        chartComponentRef.current.chart.reflow();
       }
+    });
 
-      return () => {
-        if (container) {
-          resizeObserver.unobserve(container);
-        }
-      };
-    }
-  }, [chartData]);
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isLoading]);
 
 
   const options: Highcharts.Options = {
