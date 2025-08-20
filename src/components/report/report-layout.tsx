@@ -16,13 +16,20 @@ const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promi
      try {
           const response = await fetch(`/api/metadata/${typeKey}/${areaId}`);
           if(!response.ok) {
+              const errorText = await response.text();
+              console.error("Failed to fetch metadata:", errorText)
               throw new Error('Failed to fetch metadata');
           }
           const info = await response.json();
+          let name = `Área ${areaId}`;
+          if (info) {
+              name = info.conservationUnit || info.territoryName || info.municipality || info.state || `Área ${areaId}`
+          }
+
           const tempData: Partial<StatsData> = {
             id: areaId,
             typeKey: typeKey,
-            name: info.conservationUnit || info.territoryName || info.municipality || info.state || `Área ${areaId}`,
+            name: name,
             type: 'Relatório'
           };
           document.title = `Relatório - ${tempData.name}`;
@@ -42,18 +49,28 @@ export default function ReportLayout() {
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [includeSpecies, setIncludeSpecies] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (areaId && typeKey) {
       const loadData = async () => {
         setIsLoading(true);
-        const [info, tempData] = await fetchReportData(typeKey, areaId);
-        setGeneralInfo(info);
-        setData(tempData as StatsData);
+        setError(null);
+        try {
+            const [info, tempData] = await fetchReportData(typeKey, areaId);
+            if (!tempData) {
+                throw new Error("Nenhum dado encontrado para esta área.");
+            }
+            setGeneralInfo(info);
+            setData(tempData as StatsData);
+        } catch (e: any) {
+            setError(e.message || "Erro ao carregar dados do relatório.");
+        }
         setIsLoading(false);
       };
       loadData();
     } else {
+      setError("Parâmetros de área e tipo são necessários para gerar o relatório.");
       setIsLoading(false);
     }
   }, [areaId, typeKey]);
@@ -79,10 +96,10 @@ export default function ReportLayout() {
       )
   }
 
-  if (!data || !areaId || !typeKey) {
+  if (error || !data || !areaId || !typeKey) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Selecione uma área no painel para ver o relatório.</p>
+        <p className="text-destructive">{error || "Selecione uma área no painel para ver o relatório."}</p>
       </div>
     );
   }

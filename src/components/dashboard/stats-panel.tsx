@@ -14,6 +14,7 @@ import { AICorrelator } from './ai-correlator';
 import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
+import { useToast } from '@/hooks/use-toast';
 
 interface LandCoverData {
   name: string;
@@ -133,6 +134,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   const [shouldAbbreviate, setShouldAbbreviate] = useState(false);
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
+  const { toast } = useToast();
   
   useEffect(() => {
     const panel = panelRef.current;
@@ -156,12 +158,19 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         const fetchInfo = async () => {
             setIsInfoLoading(true);
             const info = await fetchGeneralInfo(data.typeKey, data.id);
+            if (!info) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Erro de Metadados',
+                    description: 'Não foi possível carregar os detalhes do "Panorama Geral" para esta área.',
+                })
+            }
             setGeneralInfo(info);
             setIsInfoLoading(false);
         };
         fetchInfo();
     }
-  }, [data]);
+  }, [data, toast]);
   
   if (!data) {
     return <StatsPanelSkeleton />;
