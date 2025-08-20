@@ -30,7 +30,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
     const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
     const panelGroupRef = React.useRef<PanelGroup>(null);
-    const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(true); // Show by default
+    const [showWelcomeDialog, setShowWelcomeDialog] = React.useState(true);
     const { t } = useI18n();
 
     React.useEffect(() => {
@@ -61,6 +61,17 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                 direction="horizontal"
                 className="flex-1"
                 onLayout={(sizes) => {
+                    const [mapPanelSize, statsPanelSize] = sizes;
+                    const groupElement = panelGroupRef.current?.getElement();
+
+                    if (groupElement && statsPanelSize > 0 && statsPanelSize < 100) {
+                        const totalWidth = groupElement.offsetWidth;
+                        const statsPanelWidth = (totalWidth * statsPanelSize) / 100;
+                        if (statsPanelWidth < 249) {
+                            panelGroupRef.current?.setLayout([100, 0]);
+                        }
+                    }
+
                     if (typeof document !== 'undefined') {
                        document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
                     }
