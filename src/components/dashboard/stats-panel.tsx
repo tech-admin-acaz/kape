@@ -275,7 +275,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                       data={data}
                   />
               </TabsContent>
-              <TabsContent value="ranking" className="mt-0 h-full flex flex-col flex-grow overflow-y-auto">
+              <TabsContent value="ranking" className="mt-0 h-full">
                   <SpeciesTab species={species} isLoading={isSpeciesLoading} />
               </TabsContent>
             </div>
