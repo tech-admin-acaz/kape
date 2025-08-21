@@ -7,9 +7,10 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from '../ui/button';
-import { Logo }s from '../shared/logo';
+import { Logo } from '../shared/logo';
 import { useI18n } from '@/hooks/use-i18n';
 
 export function AboutDialog({ children }: { children: React.ReactNode }) {
