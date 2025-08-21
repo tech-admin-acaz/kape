@@ -15,7 +15,7 @@ export function BiodiversitySection() {
         <HeroMap />
       </div>
       <div className="relative z-10 container h-full flex items-center pointer-events-none">
-        <div className="flex flex-col items-end text-right md:w-1/2 ml-auto">
+        <div className="flex flex-col items-end text-right md:w-1/2 ml-auto pr-8">
           <div className="max-w-2xl">
             <h2 
               className="font-headline text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl"
