@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -63,8 +64,7 @@ const resilienceOptions: ResilienceLevel[] = [
 ];
 
 const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tooltipText: string }) => (
-  <div className="flex items-center gap-1">
-    <span>{children}</span>
+  <div className="flex items-center gap-1.5">
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -77,8 +77,10 @@ const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tool
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+    <span className="whitespace-normal">{children}</span>
   </div>
 );
+
 
 export default function SpeciesRankingTable({ species }: SpeciesRankingTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -310,15 +312,15 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
   };
   
   const SortableHeader = ({ sortKey, children, tooltipText, className }: { sortKey: SortKey, children: React.ReactNode, tooltipText: string, className?: string }) => (
-      <TableHead className={className}>
-          <Button variant="ghost" onClick={() => requestSort(sortKey)} className="px-2 py-1 h-auto">
-             <div className="flex items-center gap-1">
+    <TableHead className={className}>
+        <Button variant="ghost" onClick={() => requestSort(sortKey)} className="px-2 py-1 h-auto w-full justify-start">
+            <div className="flex items-center gap-1">
                 <InfoHeader tooltipText={tooltipText}>{children}</InfoHeader>
-                <ArrowUpDown className="h-4 w-4" />
+                <ArrowUpDown className="h-4 w-4 ml-auto shrink-0" />
             </div>
-          </Button>
-      </TableHead>
-  );
+        </Button>
+    </TableHead>
+);
 
   const FilterRadioGroup = ({ label, value, onValueChange }: { label: string, value: BooleanFilter, onValueChange: (value: BooleanFilter) => void }) => (
     <div className="space-y-2">
@@ -431,10 +433,10 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
           <TableHeader className="bg-muted/50 sticky top-0">
             <TableRow>
               <SortableHeader sortKey="name" tooltipText="Nome científico da espécie.">Espécie</SortableHeader>
-              <SortableHeader sortKey="resilience" tooltipText="Nível de resiliência da espécie às mudanças climáticas.">Resiliência Climática</SortableHeader>
-              <SortableHeader sortKey="potential" tooltipText="Potencial de uso econômico ou ecológico.">Potencial de Uso</SortableHeader>
-              <SortableHeader sortKey="domestication" tooltipText="Espécie domesticada para cultivo.">Domesticação</SortableHeader>
-              <SortableHeader sortKey="availability" tooltipText="Disponibilidade de sementes no mercado.">Disponibilidade</SortableHeader>
+              <SortableHeader sortKey="resilience" tooltipText="Nível de resiliência da espécie às mudanças climáticas." className="w-[150px]">Resiliência Climática</SortableHeader>
+              <SortableHeader sortKey="potential" tooltipText="Potencial de uso econômico ou ecológico." className="w-[140px]">Potencial de Uso</SortableHeader>
+              <SortableHeader sortKey="domestication" tooltipText="Espécie domesticada para cultivo." className="w-[120px]">Domesticação</SortableHeader>
+              <SortableHeader sortKey="availability" tooltipText="Disponibilidade de sementes no mercado." className="w-[120px]">Disponibilidade</SortableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
