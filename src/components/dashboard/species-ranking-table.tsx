@@ -68,9 +68,9 @@ const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tool
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button type="button" className="text-muted-foreground" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+          <span className="text-muted-foreground" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
             <Info className="w-3.5 h-3.5" />
-          </button>
+          </span>
         </TooltipTrigger>
         <TooltipContent>
           <p>{tooltipText}</p>
