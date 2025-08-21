@@ -64,13 +64,13 @@ const resilienceOptions: ResilienceLevel[] = [
 ];
 
 const InfoHeader = ({ children, tooltipText }: { children: React.ReactNode, tooltipText: string }) => (
-  <div className="flex items-center gap-1.5">
+  <div className="flex items-center gap-1">
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="text-muted-foreground">
+          <button type="button" className="text-muted-foreground" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
             <Info className="w-3.5 h-3.5" />
-          </span>
+          </button>
         </TooltipTrigger>
         <TooltipContent>
           <p>{tooltipText}</p>
@@ -313,8 +313,8 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
   
   const SortableHeader = ({ sortKey, children, tooltipText, className }: { sortKey: SortKey, children: React.ReactNode, tooltipText: string, className?: string }) => (
     <TableHead className={className}>
-        <Button variant="ghost" onClick={() => requestSort(sortKey)} className="px-2 py-1 h-auto w-full justify-start">
-            <div className="flex items-center gap-1">
+        <Button variant="ghost" onClick={() => requestSort(sortKey)} className="px-2 py-1 h-auto w-full justify-start text-left">
+            <div className="flex items-center gap-2">
                 <InfoHeader tooltipText={tooltipText}>{children}</InfoHeader>
                 <ArrowUpDown className="h-4 w-4 ml-auto shrink-0" />
             </div>
@@ -365,7 +365,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
                     <Filter className="h-4 w-4" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
+            <PopoverContent className="w-80" align="start" sideOffset={5}>
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Filtros Avançados</h4>
@@ -433,10 +433,10 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
           <TableHeader className="bg-muted/50 sticky top-0">
             <TableRow>
               <SortableHeader sortKey="name" tooltipText="Nome científico da espécie.">Espécie</SortableHeader>
-              <SortableHeader sortKey="resilience" tooltipText="Nível de resiliência da espécie às mudanças climáticas." className="w-[150px]">Resiliência Climática</SortableHeader>
-              <SortableHeader sortKey="potential" tooltipText="Potencial de uso econômico ou ecológico." className="w-[140px]">Potencial de Uso</SortableHeader>
-              <SortableHeader sortKey="domestication" tooltipText="Espécie domesticada para cultivo." className="w-[120px]">Domesticação</SortableHeader>
-              <SortableHeader sortKey="availability" tooltipText="Disponibilidade de sementes no mercado." className="w-[120px]">Disponibilidade</SortableHeader>
+              <SortableHeader sortKey="resilience" tooltipText="Nível de resiliência da espécie às mudanças climáticas." className="w-[180px]">Resiliência Climática</SortableHeader>
+              <SortableHeader sortKey="potential" tooltipText="Potencial de uso econômico ou ecológico." className="w-[160px]">Potencial de Uso</SortableHeader>
+              <SortableHeader sortKey="domestication" tooltipText="Espécie domesticada para cultivo." className="w-[140px]">Domesticação</SortableHeader>
+              <SortableHeader sortKey="availability" tooltipText="Disponibilidade de sementes no mercado." className="w-[140px]">Disponibilidade</SortableHeader>
             </TableRow>
           </TableHeader>
           <TableBody>
