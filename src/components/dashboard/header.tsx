@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut } from 'lucide-react';
-import Link from 'next/link';
 import { ThemeSwitcher } from '../shared/theme-switcher';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
+import { AboutDialog } from './about-dialog';
 
 export default function DashboardHeader() {
   const { t } = useI18n();
@@ -51,9 +51,9 @@ export default function DashboardHeader() {
         <Logo />
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="hidden items-center space-x-4 sm:flex">
-            <Button variant="ghost" asChild>
-                <Link href="#">{t('about')}</Link>
-            </Button>
+            <AboutDialog>
+              <Button variant="ghost">{t('about')}</Button>
+            </AboutDialog>
           </nav>
           <LanguageSwitcher />
           <ThemeSwitcher />
