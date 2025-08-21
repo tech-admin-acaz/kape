@@ -115,14 +115,16 @@ const CarbonValuationBarChart: React.FC<CarbonValuationBarChartProps> = ({ data,
                 y: 15
             }
         },
-        menuItemStyle: { fontFamily: 'Inter, sans-serif', color: 'hsl(var(--foreground))' },
+        menuItemStyle: { fontFamily: 'Inter, sans-serif', color: 'hsl(var(--popover-foreground))', padding: '0.5rem 1rem' },
         menuItemHoverStyle: { background: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' },
     },
     navigation: {
         menuStyle: {
-            background: 'hsl(var(--background))',
+            background: 'hsl(var(--popover))',
             border: '1px solid hsl(var(--border))',
             boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+            borderRadius: 'var(--radius)',
+            padding: '0.25rem'
         }
     },
   };
