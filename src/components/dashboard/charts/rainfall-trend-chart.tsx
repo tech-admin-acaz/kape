@@ -179,7 +179,8 @@ const RainfallTrendChart: React.FC<RainfallTrendChartProps> = ({ id, type }) => 
                             fill: 'hsl(var(--muted))',
                         }
                     }
-                }
+                },
+                y: 15
             }
         },
         menuItemStyle: {

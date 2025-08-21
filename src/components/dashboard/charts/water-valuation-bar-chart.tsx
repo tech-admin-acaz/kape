@@ -111,7 +111,8 @@ const WaterValuationBarChart: React.FC<WaterValuationBarChartProps> = ({ data, i
                 theme: {
                     fill: 'transparent',
                     states: { hover: { fill: 'hsl(var(--muted))' }, select: { fill: 'hsl(var(--muted))' } }
-                }
+                },
+                y: 15
             }
         },
         menuItemStyle: { fontFamily: 'Inter, sans-serif', color: 'hsl(var(--foreground))' },

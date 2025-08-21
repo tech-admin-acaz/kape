@@ -147,7 +147,8 @@ const LandCoverChart: React.FC<LandCoverChartProps> = ({ id, type }) => {
                             fill: 'hsl(var(--muted))',
                         }
                     }
-                }
+                },
+                y: 15
             }
         },
         menuItemStyle: {

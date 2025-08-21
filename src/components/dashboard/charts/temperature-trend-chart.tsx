@@ -238,7 +238,8 @@ const TemperatureTrendChart: React.FC<TemperatureTrendChartProps> = ({ id, type 
                             fill: 'hsl(var(--muted))',
                         }
                     }
-                }
+                },
+                y: 15
             }
         },
         menuItemStyle: {
