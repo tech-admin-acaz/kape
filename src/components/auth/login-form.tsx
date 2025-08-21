@@ -25,12 +25,9 @@ export function LoginForm() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
-        // User is signed in, redirect to dashboard.
         router.push('/dashboard');
       }
     });
-
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [router]);
 
@@ -38,7 +35,7 @@ export function LoginForm() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      // Redirection is handled by onAuthStateChanged
+      router.push('/dashboard');
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         setError(error.message);
@@ -51,7 +48,6 @@ export function LoginForm() {
     setError('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
         if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
             setError('E-mail ou senha inválidos. Por favor, tente novamente.');

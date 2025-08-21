@@ -27,12 +27,9 @@ export function SignupForm() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
-        // User is signed in, redirect to dashboard.
         router.push('/dashboard');
       }
     });
-
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [router]);
 
@@ -40,7 +37,7 @@ export function SignupForm() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      // Redirection is handled by onAuthStateChanged
+      router.push('/dashboard');
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         setError(error.message);
@@ -54,7 +51,6 @@ export function SignupForm() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
-      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
       setError(error.message);
     }
