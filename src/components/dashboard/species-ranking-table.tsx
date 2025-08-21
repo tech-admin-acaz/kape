@@ -365,7 +365,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
                     <Filter className="h-4 w-4" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" align="start" sideOffset={5}>
+            <PopoverContent className="w-80" side="left" sideOffset={5}>
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Filtros Avançados</h4>
