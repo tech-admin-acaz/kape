@@ -32,7 +32,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Search, Download, Info, ChevronDown, Check, X, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter } from 'lucide-react';
+import { Search, Download, Info, ChevronDown, Check, X, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter, Trash2 } from 'lucide-react';
 import type { SpeciesData } from './stats-panel';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
@@ -54,6 +54,13 @@ interface AdvancedFilters {
     domestication: BooleanFilter;
     availability: BooleanFilter;
 }
+
+const initialFilters: AdvancedFilters = {
+    resilience: [],
+    potential: 'any',
+    domestication: 'any',
+    availability: 'any',
+};
 
 const resilienceOptions: ResilienceLevel[] = [
     '1 - Muito Baixa',
@@ -86,12 +93,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' } | null>(null);
-  const [filters, setFilters] = useState<AdvancedFilters>({
-    resilience: [],
-    potential: 'any',
-    domestication: 'any',
-    availability: 'any',
-  });
+  const [filters, setFilters] = useState<AdvancedFilters>(initialFilters);
 
   const isFilterActive = useMemo(() => {
     return (
@@ -112,6 +114,11 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
       ? [...filters.resilience, level]
       : filters.resilience.filter(l => l !== level);
     handleFilterChange('resilience', newResilience);
+  };
+  
+  const handleClearFilters = () => {
+    setFilters(initialFilters);
+    setCurrentPage(1);
   };
 
   const filteredSpecies = useMemo(() => {
@@ -368,7 +375,20 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
             <PopoverContent className="w-80" side="left" align="start" sideOffset={5}>
                 <div className="grid gap-4">
                     <div className="space-y-2">
-                        <h4 className="font-medium leading-none">Filtros Avançados</h4>
+                        <div className="flex justify-between items-center">
+                            <h4 className="font-medium leading-none">Filtros Avançados</h4>
+                            {isFilterActive && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleClearFilters}
+                                    className="text-xs text-blue-600 hover:text-blue-700"
+                                >
+                                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                                    Limpar Filtros
+                                </Button>
+                            )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
                             Refine a sua busca de espécies.
                         </p>
@@ -491,4 +511,5 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
       </div>
     </div>
   );
-}
+
+    
