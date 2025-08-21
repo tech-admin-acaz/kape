@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
@@ -24,6 +24,7 @@ interface CarbonStackedBarChartProps {
 }
 
 const formatNumber = (value: number): string => {
+    if (value === null || typeof value === 'undefined') return '';
     if (value === 0) return "0";
     if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
     if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
@@ -32,10 +33,10 @@ const formatNumber = (value: number): string => {
 };
 
 const CarbonStackedBarChart: React.FC<CarbonStackedBarChartProps> = ({ data, isLoading }) => {
-  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+  const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
   const { t, locale } = useI18n();
 
-  useEffect(() => {
+  React.useEffect(() => {
     Highcharts.setOptions({
         lang: {
             viewFullscreen: t('viewFullscreen' as any),
