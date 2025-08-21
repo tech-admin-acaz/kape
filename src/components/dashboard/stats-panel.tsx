@@ -283,7 +283,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <CardFooter>
             <div className="w-full flex items-center gap-2">
                 <AICorrelator>
-                    <Button variant="outline" className="w-full justify-start text-muted-foreground bg-white hover:bg-gray-50 border-gray-300 shadow-sm hover:text-foreground">
+                    <Button variant="outline" className="w-full justify-start text-muted-foreground hover:text-foreground">
                         <span className="p-1 rounded-full bg-gradient-to-br from-sparkle-from to-sparkle-to mr-2">
                             <SparkleIcon className="w-4 h-4 text-white" />
                         </span>
@@ -296,7 +296,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             <Button 
                                 variant="outline" 
                                 size="icon" 
-                                className="flex-shrink-0 bg-white hover:bg-gray-50 border-gray-300 shadow-sm" 
+                                className="flex-shrink-0" 
                                 onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}`, '_blank')}
                             >
                                 <FileText className="w-5 h-5 text-primary" />
