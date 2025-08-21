@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { useI18n } from '@/hooks/use-i18n';
 import { Chrome, TriangleAlert, Eye, EyeOff } from 'lucide-react';
 import { Logo } from '../shared/logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 export function LoginForm() {
@@ -22,13 +22,27 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+      if (user) {
+        // User is signed in, redirect to dashboard.
+        router.push('/dashboard');
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [router]);
+
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
-      setError(error.message);
+      if (error.code !== 'auth/popup-closed-by-user') {
+        setError(error.message);
+      }
     }
   };
 
@@ -37,7 +51,7 @@ export function LoginForm() {
     setError('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
+      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
         if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
             setError('E-mail ou senha inválidos. Por favor, tente novamente.');

@@ -8,10 +8,10 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/use-i18n';
 import { Chrome } from 'lucide-react';
 import { Logo } from '../shared/logo';
-import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TriangleAlert } from 'lucide-react';
 
@@ -24,13 +24,27 @@ export function SignupForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+      if (user) {
+        // User is signed in, redirect to dashboard.
+        router.push('/dashboard');
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [router]);
+
   const handleGoogleSignup = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
-      setError(error.message);
+      if (error.code !== 'auth/popup-closed-by-user') {
+        setError(error.message);
+      }
     }
   };
 
@@ -40,7 +54,7 @@ export function SignupForm() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
-      router.push('/dashboard');
+      // Redirection is handled by onAuthStateChanged
     } catch (error: any) {
       setError(error.message);
     }
