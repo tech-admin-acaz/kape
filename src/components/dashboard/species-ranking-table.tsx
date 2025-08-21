@@ -330,7 +330,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
             onValueChange={onValueChange}
             className="flex items-center gap-4"
         >
-            <div className="flex items-center space-x-2"><RadioGroupItem value="any" id={`${label}-any`} /><Label htmlFor={`${label}-any`} className="font-normal">Qualquer</Label></div>
+            <div className="flex items-center space-x-2"><RadioGroupItem value="any" id={`${label}-any`} /><Label htmlFor={`${label}-any`} className="font-normal">Todos</Label></div>
             <div className="flex items-center space-x-2"><RadioGroupItem value="yes" id={`${label}-yes`} /><Label htmlFor={`${label}-yes`} className="font-normal">Sim</Label></div>
             <div className="flex items-center space-x-2"><RadioGroupItem value="no" id={`${label}-no`} /><Label htmlFor={`${label}-no`} className="font-normal">Não</Label></div>
         </RadioGroup>
@@ -365,7 +365,7 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
                     <Filter className="h-4 w-4" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" side="left" sideOffset={5}>
+            <PopoverContent className="w-80" side="left" align="start" sideOffset={5}>
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Filtros Avançados</h4>
