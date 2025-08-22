@@ -4,14 +4,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from '../ui/button';
-import { FileText } from 'lucide-react';
+import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
 import { AICorrelator } from './ai-correlator';
-import { SparkleIcon } from '../shared/sparkle-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
 import { useToast } from '@/hooks/use-toast';
@@ -283,10 +282,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
         <CardFooter>
             <div className="w-full flex items-center gap-2">
                 <AICorrelator>
-                    <Button variant="outline" className="w-full justify-start text-muted-foreground hover:text-foreground">
-                        <span className="p-1 rounded-full bg-gradient-to-br from-sparkle-from to-sparkle-to mr-2">
-                            <SparkleIcon className="w-4 h-4 text-white" />
-                        </span>
+                    <Button variant="default" className="w-full justify-start">
+                        <Wand2 className="w-4 h-4 text-primary-foreground" />
                         {t('aiCorrelatorTrigger')}
                     </Button>
                 </AICorrelator>
