@@ -49,6 +49,7 @@ interface InteractiveMapProps {
   panelGroupRef: React.RefObject<PanelGroup>;
   initialLayerData: InitialLayerData;
   statesGeoJSON: FeatureCollection<Geometry> | null;
+  initialLocations: Record<string, Location[]>;
 }
 
 interface PopupInfo {
@@ -57,7 +58,7 @@ interface PopupInfo {
     message: string;
 }
 
-export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef, initialLayerData, statesGeoJSON }: InteractiveMapProps) {
+export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelCollapsed, togglePanel, panelGroupRef, initialLayerData, statesGeoJSON, initialLocations }: InteractiveMapProps) {
   const [currentStyleKey, setCurrentStyleKey] = useState(defaultBasemapKey);
   const [is3D, setIs3D] = useState(false);
   const [bearing, setBearing] = useState(0);
@@ -232,7 +233,10 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   return (
     <div className="relative w-full h-full">
         <div className="absolute top-4 left-4 z-10">
-            <SearchControl onLocationSelect={handleLocationSelect} />
+            <SearchControl 
+              onLocationSelect={handleLocationSelect} 
+              initialLocations={initialLocations}
+            />
         </div>
         
         <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2">

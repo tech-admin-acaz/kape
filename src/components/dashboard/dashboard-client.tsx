@@ -10,6 +10,8 @@ import StatsPanel from "@/components/dashboard/stats-panel";
 import WelcomeDialog from '@/components/dashboard/welcome-dialog';
 import { useI18n } from '@/hooks/use-i18n';
 import type { FeatureCollection, Geometry } from 'geojson';
+import type { Location } from '@/models/location.model';
+
 
 interface InitialLayerData {
     indicator: string | null;
@@ -23,9 +25,10 @@ interface InitialLayerData {
 interface DashboardClientProps {
    initialLayerData: InitialLayerData;
    statesGeoJSON: FeatureCollection<Geometry> | null;
+   initialLocations: Record<string, Location[]>;
 }
 
-export default function DashboardClient({ initialLayerData, statesGeoJSON }: DashboardClientProps) {
+export default function DashboardClient({ initialLayerData, statesGeoJSON, initialLocations }: DashboardClientProps) {
     const [selectedArea, setSelectedArea] = React.useState<StatsData | null>(null);
     const [isCollapsed, setIsCollapsed] = React.useState(true);
     const [isClient, setIsClient] = React.useState(false);
@@ -77,6 +80,7 @@ export default function DashboardClient({ initialLayerData, statesGeoJSON }: Das
                           panelGroupRef={panelGroupRef}
                           initialLayerData={initialLayerData}
                           statesGeoJSON={statesGeoJSON}
+                          initialLocations={initialLocations}
                       />
                     </div>
                 </ResizablePanel>

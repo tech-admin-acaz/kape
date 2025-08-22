@@ -30,6 +30,7 @@ import { useI18n } from "@/hooks/use-i18n"
 
 interface SearchControlProps {
     onLocationSelect: (location: Location | null, type: TerritoryTypeKey | null) => void;
+    initialLocations: Record<string, Location[]>;
 }
 
 const InfoTooltip = ({ text }: { text: string }) => (
@@ -48,13 +49,21 @@ const InfoTooltip = ({ text }: { text: string }) => (
 );
 
 
-export default function SearchControl({ onLocationSelect }: SearchControlProps) {
+export default function SearchControl({ onLocationSelect, initialLocations }: SearchControlProps) {
   const [selectedType, setSelectedType] = React.useState<TerritoryTypeKey | null>(null);
   const [availableLocations, setAvailableLocations] = React.useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const { t } = useI18n();
+
+  React.useEffect(() => {
+    // Pre-populate with states if available
+    if(initialLocations && initialLocations['estado']) {
+        setAvailableLocations(initialLocations['estado']);
+        setSelectedType('estado');
+    }
+  }, [initialLocations]);
 
   const handleTypeChange = async (value: string) => {
     const typeKey = value as TerritoryTypeKey;
@@ -64,6 +73,12 @@ export default function SearchControl({ onLocationSelect }: SearchControlProps) 
     setAvailableLocations([]);
     
     if (typeKey) {
+        // Use pre-loaded data if available
+        if (initialLocations[typeKey]) {
+            setAvailableLocations(initialLocations[typeKey]);
+            return;
+        }
+
         setIsLoading(true);
         try {
             const locations = await getLocationsByType(typeKey);
