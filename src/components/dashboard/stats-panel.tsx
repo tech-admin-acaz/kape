@@ -297,7 +297,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                 variant="outline" 
                                 size="icon" 
                                 className="flex-shrink-0" 
-                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}`, '_blank')}
+                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}&areaName=${encodeURIComponent(data.name)}`, '_blank')}
                             >
                                 <FileText className="w-5 h-5 text-primary" />
                             </Button>

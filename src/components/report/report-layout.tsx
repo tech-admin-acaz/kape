@@ -9,34 +9,44 @@ import { Button } from '../ui/button';
 import { Download, FilePlus2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TerritoryTypeKey } from '@/models/location.model';
-import type { StatsData, GeneralInfo } from '../dashboard/stats-panel';
+import type { StatsData, GeneralInfo, BiodiversityData, CarbonData, WaterData, SpeciesData } from '../dashboard/stats-panel';
 import { Skeleton } from '../ui/skeleton';
+import { useI18n } from '@/hooks/use-i18n';
 
-const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string): Promise<[GeneralInfo | null, Partial<StatsData> | null]> => {
+const fetchReportData = async (typeKey: TerritoryTypeKey, areaId: string, areaName: string): Promise<[GeneralInfo | null, Partial<StatsData> | null, BiodiversityData | null, CarbonData | null, WaterData | null, SpeciesData[] | null]> => {
      try {
-          const response = await fetch(`/api/metadata/${typeKey}/${areaId}`);
-          if(!response.ok) {
-              const errorText = await response.text();
-              console.error("Failed to fetch metadata:", errorText)
-              throw new Error('Failed to fetch metadata');
-          }
-          const info = await response.json();
-          let name = `Área ${areaId}`;
-          if (info) {
-              name = info.conservationUnit || info.territoryName || info.municipality || info.state || `Área ${areaId}`
+          const fetchPromises = [
+               typeKey === 'ti' || typeKey === 'uc' ? fetch(`/api/metadata/${typeKey}/${areaId}`) : Promise.resolve(null),
+               fetch(`/api/stats/biodiversity/${typeKey}/${areaId}`),
+               fetch(`/api/stats/carbon/${typeKey}/${areaId}`),
+               fetch(`/api/stats/water/${typeKey}/${areaId}`),
+               fetch(`/api/stats/species/${typeKey}/${areaId}`)
+          ];
+
+          const [infoRes, bioRes, carbonRes, waterRes, speciesRes] = await Promise.all(fetchPromises);
+
+          let info: GeneralInfo | null = null;
+          if (infoRes && infoRes.ok) {
+              info = await infoRes.json();
           }
 
+          const biodiversity = bioRes.ok ? await bioRes.json() : null;
+          const carbonData = carbonRes.ok ? await carbonRes.json() : null;
+          const waterData = waterRes.ok ? await waterRes.json() : null;
+          const speciesData = speciesRes.ok ? await speciesRes.json() : [];
+          
           const tempData: Partial<StatsData> = {
             id: areaId,
             typeKey: typeKey,
-            name: name,
+            name: areaName,
             type: 'Relatório'
           };
-          document.title = `Relatório - ${tempData.name}`;
-          return [info, tempData];
+          
+          return [info, tempData, biodiversity, carbonData, waterData, speciesData];
+
      } catch (error) {
          console.error("Failed to fetch report data:", error);
-         return [null, null];
+         return [null, null, null, null, null, null];
      }
 }
 
@@ -44,26 +54,40 @@ export default function ReportLayout() {
   const searchParams = useSearchParams();
   const areaId = searchParams.get('areaId');
   const typeKey = searchParams.get('typeKey') as TerritoryTypeKey | null;
+  const areaName = searchParams.get('areaName');
+  const { t } = useI18n();
 
   const [data, setData] = useState<StatsData | null>(null);
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
+  const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
+  const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
+  const [waterData, setWaterData] = useState<WaterData | null>(null);
+  const [species, setSpecies] = useState<SpeciesData[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [includeSpecies, setIncludeSpecies] = useState(false);
 
   useEffect(() => {
-    if (areaId && typeKey) {
+    if (areaId && typeKey && areaName) {
       const loadData = async () => {
         setIsLoading(true);
-        const [info, tempData] = await fetchReportData(typeKey, areaId);
+        const [info, tempData, bioData, carbData, watData, specData] = await fetchReportData(typeKey, areaId, areaName);
         setGeneralInfo(info);
         setData(tempData as StatsData);
+        setBiodiversity(bioData);
+        setCarbonData(carbData);
+        setWaterData(watData);
+        setSpecies(specData ?? []);
+        if (tempData?.name) {
+          document.title = `${t('reportTitle')} - ${tempData.name}`;
+        }
         setIsLoading(false);
       };
       loadData();
     } else {
       setIsLoading(false);
     }
-  }, [areaId, typeKey]);
+  }, [areaId, typeKey, areaName, t]);
 
 
   if (isLoading) {
@@ -89,15 +113,13 @@ export default function ReportLayout() {
   if (!data || !areaId || !typeKey) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Selecione uma área no painel para ver o relatório.</p>
+        <p>{t('reportSelectArea')}</p>
       </div>
     );
   }
 
   const handleDownloadPDF = (includeSpeciesData: boolean) => {
     setIncludeSpecies(includeSpeciesData);
-    // This is a placeholder for the print functionality
-    // A short delay ensures state is set before printing
     setTimeout(() => {
         window.print();
     }, 100);
@@ -111,16 +133,16 @@ export default function ReportLayout() {
             <div className="flex justify-between items-center py-4">
                 <div>
                     <h1 className="text-2xl font-bold font-headline">{data.name}</h1>
-                    <p className="text-sm text-muted-foreground">Relatório de Análise Ambiental</p>
+                    <p className="text-sm text-muted-foreground">{t('reportSubtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" onClick={() => handleDownloadPDF(false)}>
                         <Download className="mr-2 h-4 w-4" />
-                        Baixar PDF
+                        {t('reportDownloadPdf')}
                     </Button>
                     <Button onClick={() => handleDownloadPDF(true)}>
                         <FilePlus2 className="mr-2 h-4 w-4" />
-                        Baixar Relatório Completo
+                        {t('reportDownloadFull')}
                     </Button>
                 </div>
             </div>
@@ -130,23 +152,31 @@ export default function ReportLayout() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="divide-y divide-border/50 space-y-8">
             <div id="characterization-section">
-                <h2 className="text-2xl font-bold font-headline mb-4">1. Caracterização</h2>
+                <h2 className="text-2xl font-bold font-headline mb-4">1. {t('characterizationTab')}</h2>
                 <CharacterizationTab data={data} generalInfo={generalInfo} isLoadingInfo={isLoading} />
             </div>
             
             <div id="services-section" className="pt-8">
-                 <h2 className="text-2xl font-bold font-headline mb-4">2. Serviços Ambientais</h2>
+                 <h2 className="text-2xl font-bold font-headline mb-4">2. {t('servicesTab')}</h2>
                 <ServicesTab 
-                  id={areaId} 
-                  typeKey={typeKey}
+                  data={data}
+                  biodiversity={biodiversity}
+                  carbonData={carbonData}
+                  waterData={waterData}
+                  isBiodiversityLoading={isLoading}
+                  isCarbonLoading={isLoading}
+                  isWaterLoading={isLoading}
                 />
             </div>
 
             {includeSpecies && (
                  <div id="species-section" className="pt-8">
-                    <h2 className="text-2xl font-bold font-headline mb-4">3. Ranking de Espécies</h2>
+                    <h2 className="text-2xl font-bold font-headline mb-4">3. {t('rankingTab')}</h2>
                     <div className="bg-card rounded-lg border">
-                        <SpeciesTab id={areaId} typeKey={typeKey} />
+                         <SpeciesTab 
+                            species={species}
+                            isLoading={isLoading}
+                         />
                     </div>
                 </div>
             )}
