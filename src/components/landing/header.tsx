@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <Logo />
+        <Logo className="ml-8" />
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="hidden items-center space-x-4 sm:flex">
             <a href="#hero" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t('navIntro')}</a>
