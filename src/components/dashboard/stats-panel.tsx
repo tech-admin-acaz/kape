@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '../ui/button';
-import { FileText, Wand2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
