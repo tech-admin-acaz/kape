@@ -65,6 +65,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [selectedShape, setSelectedShape] = useState<any>(null);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
   const [projection, setProjection] = useState<'mercator' | 'globe'>('mercator');
+  const [firstSymbolLayerId, setFirstSymbolLayerId] = useState<string | undefined>(undefined);
   const mapRef = useRef<MapRef>(null);
   const { t } = useI18n();
 
@@ -91,6 +92,23 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
   const [fillOpacity, setFillOpacity] = useState(0);
   const [strokeOpacity, setStrokeOpacity] = useState(1);
   const [terrainExaggeration, setTerrainExaggeration] = useState(1.5);
+
+  const onMapLoad = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+
+    const layers = map.getStyle().layers;
+    // Find the ID of the first symbol layer in the map style.
+    let firstSymbolId;
+    for (const layer of layers) {
+        if (layer.type === 'symbol') {
+            firstSymbolId = layer.id;
+            break;
+        }
+    }
+    setFirstSymbolLayerId(firstSymbolId);
+  }, []);
+
 
   useEffect(() => {
     if (mapRef.current) {
@@ -218,11 +236,11 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
 
   const mapStyle = basemaps[currentStyleKey as keyof typeof basemaps];
 
-  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number) => {
+  const renderRasterLayer = (id: string, xyzUrl: string | null, opacity: number, beforeId?: string) => {
     if (!xyzUrl) return null;
     return (
       <Source id={`${id}-source`} type="raster" tiles={[xyzUrl]} tileSize={256}>
-        <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} />
+        <Layer id={id} type={'raster'} paint={{'raster-opacity': opacity}} beforeId={beforeId} />
       </Source>
     );
   };
@@ -267,6 +285,8 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
             onClick={handleMapClick}
             interactiveLayerIds={['states-fill']}
             cursor="pointer"
+            onLoad={onMapLoad}
+            onStyleDataLoad={onMapLoad}
         >
             <Source
                 id="mapbox-dem"
@@ -288,12 +308,12 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 </Source>
             )}
 
-            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
-            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
-            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
-            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
-            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
-            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
+            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity, firstSymbolLayerId)}
+            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1, firstSymbolLayerId)}
+            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1, firstSymbolLayerId)}
+            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1, firstSymbolLayerId)}
+            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1, firstSymbolLayerId)}
+            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1, firstSymbolLayerId)}
 
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
@@ -304,6 +324,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     'fill-color': '#007bff',
                     'fill-opacity': fillOpacity,
                   }}
+                  beforeId={firstSymbolLayerId}
                 />
                 <Layer
                   id="selected-shape-layer-line"
@@ -313,6 +334,7 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                     'line-width': 1.5,
                     'line-opacity': strokeOpacity,
                   }}
+                  beforeId={firstSymbolLayerId}
                 />
               </Source>
             )}
