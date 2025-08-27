@@ -288,14 +288,6 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 </Source>
             )}
 
-            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
-            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
-            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
-            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
-            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
-            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
-
-
             {selectedShape && (
               <Source id="selected-shape-source" type="geojson" data={selectedShape}>
                  <Layer
@@ -317,6 +309,13 @@ export default function InteractiveMap({ onAreaUpdate, selectedArea, isPanelColl
                 />
               </Source>
             )}
+
+            {layers.indicator && indicatorXYZ && renderRasterLayer('indicator', indicatorXYZ, indicatorOpacity)}
+            {layers.restoredCarbon && restoredCarbonXYZ && renderRasterLayer('restored-carbon', restoredCarbonXYZ, 1)}
+            {layers.currentCarbon && currentCarbonXYZ && renderRasterLayer('current-carbon', currentCarbonXYZ, 1)}
+            {layers.opportunityCost && opportunityCostXYZ && renderRasterLayer('opportunity-cost', opportunityCostXYZ, 1)}
+            {layers.restorationCost && restorationCostXYZ && renderRasterLayer('restoration-cost', restorationCostXYZ, 1)}
+            {layers.mapbiomas && mapbiomasXYZ && renderRasterLayer('mapbiomas', mapbiomasXYZ, 1)}
 
             {popupInfo && (
                 <Popup
