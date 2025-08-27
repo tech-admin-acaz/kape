@@ -1,14 +1,14 @@
+
 "use client"
 
 import React, { useState, useTransition, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { runAIChat } from '@/actions/ai';
-import { Loader2, Send, Bot } from 'lucide-react';
+import { Loader2, Send, WandSparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/hooks/use-i18n';
 import type { StatsData } from '../stats-panel';
-import { SparkleIcon } from '@/components/shared/sparkle-icon';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactMarkdown from 'react-markdown';
 
@@ -88,7 +88,7 @@ export default function AIChatTab({ selectedArea, areaStats }: AIChatTabProps) {
                     {/* Initial Message */}
                     <div className="flex items-start gap-3">
                         <div className="p-2 rounded-full bg-primary/20 text-primary">
-                            <SparkleIcon className="w-5 h-5"/>
+                            <WandSparkles className="w-5 h-5"/>
                         </div>
                         <div className="bg-muted rounded-lg p-3 max-w-lg">
                            <p className="text-sm">
@@ -102,7 +102,7 @@ export default function AIChatTab({ selectedArea, areaStats }: AIChatTabProps) {
                         <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                              {message.role === 'assistant' && (
                                  <div className="p-2 rounded-full bg-primary/20 text-primary">
-                                    <SparkleIcon className="w-5 h-5"/>
+                                    <WandSparkles className="w-5 h-5"/>
                                 </div>
                             )}
                              <div className={`rounded-lg p-3 max-w-lg text-sm ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
@@ -122,7 +122,7 @@ export default function AIChatTab({ selectedArea, areaStats }: AIChatTabProps) {
                     {isPending && (
                          <div className="flex items-start gap-3">
                             <div className="p-2 rounded-full bg-primary/20 text-primary">
-                                <SparkleIcon className="w-5 h-5"/>
+                                <WandSparkles className="w-5 h-5"/>
                             </div>
                             <div className="bg-muted rounded-lg p-3 max-w-lg flex items-center">
                                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
