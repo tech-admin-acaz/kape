@@ -147,4 +147,10 @@
   .btn-map-control:hover, .btn-map-control:focus {
       @apply bg-accent text-accent-foreground;
   }
+  
+  @media (min-width: 1536px) {
+    .container {
+      max-width: 100%;
+    }
+  }
 }
