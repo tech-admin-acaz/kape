@@ -92,9 +92,8 @@ export default function AIChatTab({ selectedArea, areaStats }: AIChatTabProps) {
                         </div>
                         <div className="bg-muted rounded-lg p-3 max-w-lg">
                            <p className="text-sm">
-                            Este é o primeiro módulo de IA para apoiar a compreensão dos métodos e dados da **Coleção 10 do MapBiomas Brasil** e facilitar a navegação na plataforma. Apesar de treinada para fornecer respostas úteis, a IA pode **apresentar imprecisões**. As informações não substituem a análise direta dos dados. Recomendamos sempre conferir os resultados na plataforma, usando mapas, estatísticas e documentos disponíveis. **O uso implica ciência dessas limitações e concordância em utilizá-lo apenas como apoio**, não como fonte única para decisões.
+                            Descreva um novo conjunto de dados ambientais para ver como ele se correlaciona com os dados existentes e obter sugestões de atualizações.
                            </p>
-                           <p className="text-sm mt-2">Envie sua pergunta no campo de texto abaixo.</p>
                         </div>
                     </div>
                     
