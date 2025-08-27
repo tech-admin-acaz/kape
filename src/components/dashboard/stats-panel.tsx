@@ -1,9 +1,10 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '../ui/button';
-import { FileText } from 'lucide-react';
+import { FileText, WandSparkles } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
@@ -14,7 +15,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import { TerritoryTypeKey } from '@/models/location.model';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/hooks/use-i18n';
-import { SparkleIcon } from '../shared/sparkle-icon';
 
 interface LandCoverData {
   name: string;
@@ -242,7 +242,7 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                                     className="flex-shrink-0" 
                                     onClick={() => setActiveTab('ai')}
                                 >
-                                    <SparkleIcon className="w-4 h-4 mr-2 text-primary" />
+                                    <WandSparkles className="w-4 h-4 mr-2 text-primary" />
                                     Kapé IA
                                 </Button>
                             </TooltipTrigger>
