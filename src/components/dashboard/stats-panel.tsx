@@ -238,7 +238,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             <TooltipTrigger asChild>
                                 <Button 
                                     variant="outline"
-                                    size="sm"
                                     className="flex-shrink-0" 
                                     onClick={() => setActiveTab('ai')}
                                 >
