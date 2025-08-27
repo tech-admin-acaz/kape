@@ -48,75 +48,16 @@ const TemperatureTrendChart: React.FC<TemperatureTrendChartProps> = ({ id, type 
       setIsLoading(true);
       setChartData(null);
       
-      let apiTypePath = type;
-      if (type === 'estado') {
-          apiTypePath = 'estados';
-      } else if (type === 'municipio') {
-          apiTypePath = 'municipios';
-      }
-      
-      const model = 'CESM2';
-      const scenario = 'ssp245';
-      const territoryId = id;
-
-      const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
-      if (!API_BIO_URL) {
-          console.error("API URL not configured");
-          setIsLoading(false);
-          return;
-      }
-      
-      const apiPath = `${API_BIO_URL}/graph/tas/${apiTypePath}/${territoryId}/${model}/${scenario}`;
-      
       try {
-        const response = await fetch(apiPath);
+        const response = await fetch(`/api/stats/temperature/${type}/${id}`);
         if (!response.ok) {
             console.error(`Error fetching temperature stats: ${response.statusText}`);
             setChartData([]);
             return;
         }
         
-        const apiData = await response.json();
-        
-        const timeSeries = (Array.isArray(apiData) && Array.isArray(apiData[0])) ? apiData[0] : (Array.isArray(apiData) ? apiData : []);
-
-        if (!Array.isArray(timeSeries) || timeSeries.length === 0) {
-            setChartData([]);
-            return;
-        }
-
-        const processedData = timeSeries.map((d: any) => ({
-            year: new Date(d.time).getFullYear().toString(),
-            value: parseFloat(d.value.toFixed(2))
-        }));
-        
-        const calculateTrendLine = (data: { year: string; value: number }[]): number[] => {
-            const values = data.map(d => d.value);
-            const n = values.length;
-            if (n < 2) return values;
-
-            const sumX = values.reduce((acc, _, i) => acc + i, 0);
-            const sumY = values.reduce((acc, curr) => acc + curr, 0);
-            const sumXY = values.reduce((acc, curr, i) => acc + i * curr, 0);
-            const sumXX = values.reduce((acc, _, i) => acc + i * i, 0);
-
-            const denominator = n * sumXX - sumX * sumX;
-            if (denominator === 0) return values;
-
-            const slope = (n * sumXY - sumX * sumY) / denominator;
-            const intercept = (sumY - slope * sumX) / n;
-
-            return values.map((_, i) => parseFloat((slope * i + intercept).toFixed(2)));
-        };
-        const trendLine = calculateTrendLine(processedData);
-
-        const finalData = processedData.map((d, index) => ({
-            year: d.year,
-            value: d.value,
-            trend: trendLine[index]
-        }));
-
-        setChartData(finalData);
+        const data = await response.json();
+        setChartData(data);
 
       } catch (error) {
         console.error("Failed to fetch or process temperature stats:", error);
