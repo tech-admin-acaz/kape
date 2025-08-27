@@ -25,7 +25,7 @@ export function BiodiversitySection() {
             </h2>
             <div className="mt-8 max-w-2xl">
                 <p 
-                  className="text-lg text-muted-foreground md:text-xl"
+                  className="text-lg text-[#fafafa] md:text-xl"
                   style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
                 >
                     {t('biodiversityDesc')}
