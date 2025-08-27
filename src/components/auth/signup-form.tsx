@@ -27,7 +27,7 @@ export function SignupForm() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
-        router.push('/dashboard');
+        router.push('/plataforma.kape');
       }
     });
     return () => unsubscribe();

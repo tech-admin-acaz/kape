@@ -21,7 +21,7 @@ export function HeroSection() {
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <Button size="lg" asChild className="w-full sm:w-auto">
-                      <Link href="/dashboard">Acessar o Painel <ArrowRight className="ml-2"/></Link>
+                      <Link href="/plataforma.kape">Acessar o Painel <ArrowRight className="ml-2"/></Link>
                   </Button>
                   <Button size="lg" variant="outline" className="w-full border-muted-foreground/50 hover:bg-accent sm:w-auto" asChild>
                       <Link href="/signup">Cadastre-se</Link>
