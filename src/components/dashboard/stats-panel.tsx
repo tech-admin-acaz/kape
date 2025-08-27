@@ -15,7 +15,6 @@ import { TerritoryTypeKey } from '@/models/location.model';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/hooks/use-i18n';
 import { SparkleIcon } from '../shared/sparkle-icon';
-import { Badge } from '../ui/badge';
 
 interface LandCoverData {
   name: string;
@@ -105,6 +104,8 @@ export default function StatsPanel({ data }: StatsPanelProps) {
   const { toast } = useToast();
   const { t } = useI18n();
   
+  const [activeTab, setActiveTab] = useState('characterization');
+
   const [generalInfo, setGeneralInfo] = useState<GeneralInfo | null>(null);
   const [biodiversity, setBiodiversity] = useState<BiodiversityData | null>(null);
   const [carbonData, setCarbonData] = useState<CarbonData | null>(null);
@@ -210,7 +211,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     characterization: t('characterizationTab'),
     services: t('servicesTab'),
     ranking: t('rankingTab'),
-    aiChat: 'Kapé IA',
   }
 
   const servicesLabel = shouldAbbreviate ? t('servicesTabAbbr') : TABS.services;
@@ -221,41 +221,61 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     biodiversity,
     carbonData,
     waterData,
-    // species data is too large, we can summarize if needed
   }
 
 
   return (
     <div ref={panelRef} className="h-full flex flex-col">
         <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
+            <div className="flex justify-between items-start">
+              <div className="flex-1 mr-4">
                 <CardDescription>{data.type}</CardDescription>
                 <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
               </div>
-               <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="flex-shrink-0" 
-                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}&areaName=${encodeURIComponent(data.name)}`, '_blank')}
-                            >
-                                <FileText className="w-5 h-5 text-primary" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('viewPdf')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+               <div className="flex items-center gap-2">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button 
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-shrink-0" 
+                                    onClick={() => setActiveTab('ai')}
+                                >
+                                    <SparkleIcon className="w-4 h-4 mr-2 text-primary" />
+                                    Kapé IA
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Aprofundar Análise com IA</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="flex-shrink-0" 
+                                    onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}&areaName=${encodeURIComponent(data.name)}`, '_blank')}
+                                >
+                                    <FileText className="w-5 h-5 text-primary" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{t('viewPdf')}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
             </div>
         </CardHeader>
       
-        <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                 <TabsList className="w-full grid grid-cols-4">
+                 <TabsList className="w-full grid grid-cols-3">
                     <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                         {TABS.characterization}
                     </TabsTrigger>
@@ -287,11 +307,6 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             )}
                         </Tooltip>
                     </TooltipProvider>
-                     <TabsTrigger value="ai" className="flex-1 text-xs md:text-sm gap-1.5">
-                        <SparkleIcon className="w-4 h-4 text-primary" />
-                        {TABS.aiChat}
-                        <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">Beta</Badge>
-                     </TabsTrigger>
                 </TabsList>
             </div>
             
