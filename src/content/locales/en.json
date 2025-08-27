@@ -1,5 +1,6 @@
+
 {
-  "appName": "BioDiversity2",
+  "appName": "Kapé",
   "navIntro": "Introduction",
   "navFeatures": "Features",
   "getStarted": "Get Started",
@@ -155,7 +156,7 @@
   "territoryType": "Territory Type",
   "mapPopupSelectTerritory": "Please select a territory where the layers are active.",
   "mapPopupError": "Error fetching location data. Please try again.",
-  "welcomeTitle": "Welcome to the Biodiversity Platform",
+  "welcomeTitle": "Welcome to the Kapé Platform",
   "welcomeDescription": "This platform presents the quantification of environmental services and the detection of priority areas for restoration in the Amazon based on three pillars: (i) valuation of environmental services of terra firme forests related to carbon, biodiversity, and water; (ii) suggestion of key species to be used in restoration, which can increase the resilience of forests to future climate changes and provide economic benefits for local communities; and (iii) integration of traditional knowledge with western science.",
   "publicAccessTitle": "Public Access",
   "publicAccessSubtitle": "Explore public resources",

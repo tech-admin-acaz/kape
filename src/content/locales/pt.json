@@ -1,11 +1,12 @@
+
 {
-  "appName": "BioDiversidade2",
+  "appName": "Kapé",
   "navIntro": "Introdução",
   "navFeatures": "Funcionalidades",
   "getStarted": "Começar",
   "login": "Entrar",
   "signup": "Cadastrar",
-  "heroTitle": "Explore, Analise e Entenda Dados Ambientais com a Plataforma Biodiversidade.",
+  "heroTitle": "Explore, Analise e Entenda Dados Ambientais com a Plataforma Kapé.",
   "heroSubtitle": "Nossa plataforma oferece ferramentas avançadas para visualizar e correlacionar conjuntos de dados de biodiversidade, impulsionando a pesquisa e os esforços de conservação.",
   "featuresTitle": "Funcionalidades da Plataforma",
   "feature1Title": "Mapa Interativo",
@@ -156,7 +157,7 @@
   "territoryType": "Tipo de Território",
   "mapPopupSelectTerritory": "Por favor, selecione um território onde as camadas atuam.",
   "mapPopupError": "Erro ao buscar dados do local. Tente novamente.",
-  "welcomeTitle": "Bem-vindo à Plataforma de Biodiversidade",
+  "welcomeTitle": "Bem-vindo à Plataforma Kapé",
   "welcomeDescription": "Esta plataforma apresenta a quantificação de serviços ambientais e a detecção de áreas prioritárias para a restauração na Amazônia com base em três pilares: (i) valoração dos serviços ambientais de florestas de terra firme relacionados ao carbono, biodiversidade e água; (ii) sugestão de espécies-chave a serem usadas na restauração, que possam aumentar a resiliência das florestas frente às mudanças climáticas futuras e proporcionar benefícios econômicos para as comunidades locais; e (iii) integração do conhecimento tradicional com a ciência ocidental.",
   "publicAccessTitle": "Acesso Livre",
   "publicAccessSubtitle": "Explore os recursos públicos",

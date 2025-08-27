@@ -1,12 +1,12 @@
 
-# Detalhamento Técnico da Plataforma BioDiversidade2
+# Detalhamento Técnico da Plataforma Kapé
 
 **Versão do Documento:** 1.0
 **Data:** 25 de Julho de 2024
 
 ## 1. Visão Geral da Arquitetura
 
-A plataforma BioDiversidade2 é uma aplicação web moderna construída com uma arquitetura robusta e escalável para análise de dados ambientais. Ela combina uma interface de usuário interativa e responsiva no front-end com um back-end poderoso para processamento de dados geoespaciais e integração com inteligência artificial generativa.
+A plataforma Kapé é uma aplicação web moderna construída com uma arquitetura robusta e escalável para análise de dados ambientais. Ela combina uma interface de usuário interativa e responsiva no front-end com um back-end poderoso para processamento de dados geoespaciais e integração com inteligência artificial generativa.
 
 A arquitetura foi projetada com os seguintes princípios em mente:
 
@@ -98,4 +98,5 @@ Este design desacoplado oferece várias vantagens:
 -   **Segurança:** Chaves de API e a lógica do prompt nunca são expostas ao navegador.
 -   **Performance:** A lógica pesada é executada no servidor, liberando o cliente.
 -   **Organização:** A separação de responsabilidades (UI, Ação, Fluxo de IA) torna o código mais limpo e fácil de manter.
+
 
