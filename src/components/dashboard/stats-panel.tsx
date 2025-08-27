@@ -1,8 +1,7 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '../ui/button';
 import { FileText, Wand2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
@@ -10,11 +9,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import CharacterizationTab from './stats-panel-tabs/characterization-tab';
 import ServicesTab from './stats-panel-tabs/services-tab';
 import SpeciesTab from './stats-panel-tabs/species-tab';
-import { AICorrelator } from './ai-correlator';
+import AIChatTab from './stats-panel-tabs/ai-chat-tab';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TerritoryTypeKey } from '@/models/location.model';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/hooks/use-i18n';
+import { SparkleIcon } from '../shared/sparkle-icon';
+import { Badge } from '../ui/badge';
 
 interface LandCoverData {
   name: string;
@@ -209,22 +210,52 @@ export default function StatsPanel({ data }: StatsPanelProps) {
     characterization: t('characterizationTab'),
     services: t('servicesTab'),
     ranking: t('rankingTab'),
+    aiChat: 'Kapé IA',
   }
 
   const servicesLabel = shouldAbbreviate ? t('servicesTabAbbr') : TABS.services;
   const rankingLabel = shouldAbbreviate ? t('rankingTabAbbr') : TABS.ranking;
 
+  const allStats = {
+    generalInfo,
+    biodiversity,
+    carbonData,
+    waterData,
+    // species data is too large, we can summarize if needed
+  }
+
 
   return (
     <div ref={panelRef} className="h-full flex flex-col">
         <CardHeader>
-            <CardDescription>{data.type}</CardDescription>
-            <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardDescription>{data.type}</CardDescription>
+                <CardTitle className="font-headline text-lg">{data.name}</CardTitle>
+              </div>
+               <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="flex-shrink-0" 
+                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}&areaName=${encodeURIComponent(data.name)}`, '_blank')}
+                            >
+                                <FileText className="w-5 h-5 text-primary" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{t('viewPdf')}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
         </CardHeader>
       
         <Tabs defaultValue="characterization" className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6">
-                 <TabsList className="w-full grid grid-cols-3">
+                 <TabsList className="w-full grid grid-cols-4">
                     <TabsTrigger value="characterization" className="flex-1 text-xs md:text-sm">
                         {TABS.characterization}
                     </TabsTrigger>
@@ -256,6 +287,11 @@ export default function StatsPanel({ data }: StatsPanelProps) {
                             )}
                         </Tooltip>
                     </TooltipProvider>
+                     <TabsTrigger value="ai" className="flex-1 text-xs md:text-sm gap-1.5">
+                        <SparkleIcon className="w-4 h-4 text-primary" />
+                        {TABS.aiChat}
+                        <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">Beta</Badge>
+                     </TabsTrigger>
                 </TabsList>
             </div>
             
@@ -277,35 +313,11 @@ export default function StatsPanel({ data }: StatsPanelProps) {
               <TabsContent value="ranking" className="mt-0 h-full">
                   <SpeciesTab species={species} isLoading={isSpeciesLoading} />
               </TabsContent>
+              <TabsContent value="ai" className="mt-0 h-full">
+                  <AIChatTab selectedArea={data} areaStats={allStats} />
+              </TabsContent>
             </div>
         </Tabs>
-        <CardFooter>
-            <div className="w-full flex items-center gap-2">
-                <AICorrelator>
-                    <Button variant="default" className="w-full justify-start">
-                        <Wand2 className="w-4 h-4 text-primary-foreground" />
-                        {t('aiCorrelatorTrigger')}
-                    </Button>
-                </AICorrelator>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="flex-shrink-0" 
-                                onClick={() => window.open(`/report?areaId=${data.id}&typeKey=${data.typeKey}&areaName=${encodeURIComponent(data.name)}`, '_blank')}
-                            >
-                                <FileText className="w-5 h-5 text-primary" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('viewPdf')}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
-        </CardFooter>
     </div>
   );
 }

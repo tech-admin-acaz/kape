@@ -1,73 +1,64 @@
 'use server';
 
 /**
- * @fileOverview This file contains the Genkit flow for correlating new environmental datasets
- * with existing visualizations and statistical insights.
+ * @fileOverview This file contains the Genkit flow for the conversational AI chat
+ * that analyzes the currently selected environmental area.
  *
- * - correlateDatasets - A function that handles the dataset correlation process.
- * - CorrelateDatasetsInput - The input type for the correlateDatasets function.
- * - CorrelateDatasetsOutput - The return type for the correlateDatasets function.
+ * - runChat - A function that handles the chat interaction.
+ * - AIChatInput - The input type for the runChat function.
+ * - AIChatOutput - The return type for the runChat function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const CorrelateDatasetsInputSchema = z.object({
-  newDatasetDescription: z
-    .string()
-    .describe('Descrição do novo conjunto de dados ambiental adicionado.'),
-  existingVisualizationsDescription: z
-    .string()
-    .describe('Descrição das visualizações existentes.'),
-  existingStatisticalInsightsDescription: z
-    .string()
-    .describe('Descrição dos insights estatísticos existentes.'),
+const AIChatInputSchema = z.object({
+  question: z.string().describe('A pergunta do usuário sobre a área selecionada.'),
+  areaName: z.string().describe('O nome da área (ex: estado, município) selecionada.'),
+  statistics: z.string().describe('Um resumo em JSON dos dados estatísticos da área (cobertura do solo, carbono, biodiversidade, etc).'),
 });
-export type CorrelateDatasetsInput = z.infer<typeof CorrelateDatasetsInputSchema>;
+export type AIChatInput = z.infer<typeof AIChatInputSchema>;
 
-const CorrelateDatasetsOutputSchema = z.object({
-  insights: z
+const AIChatOutputSchema = z.object({
+  answer: z
     .string()
     .describe(
-      'Insights sobre como o novo conjunto de dados se correlaciona com as visualizações e insights estatísticos existentes.'
-    ),
-  suggestedUpdates: z
-    .string()
-    .describe(
-      'Atualizações sugeridas para as visualizações e insights estatísticos com base no novo conjunto de dados.'
+      'A resposta da IA para a pergunta do usuário, baseada no contexto fornecido.'
     ),
 });
-export type CorrelateDatasetsOutput = z.infer<typeof CorrelateDatasetsOutputSchema>;
+export type AIChatOutput = z.infer<typeof AIChatOutputSchema>;
 
-export async function correlateDatasets(input: CorrelateDatasetsInput): Promise<CorrelateDatasetsOutput> {
-  return correlateDatasetsFlow(input);
+export async function runChat(input: AIChatInput): Promise<AIChatOutput> {
+  return aiChatFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'correlateDatasetsPrompt',
-  input: {schema: CorrelateDatasetsInputSchema},
-  output: {schema: CorrelateDatasetsOutputSchema},
-  prompt: `Você é um assistente de IA ajudando cientistas de dados a entender o impacto de novos conjuntos de dados ambientais.
+  name: 'aiChatPrompt',
+  input: {schema: AIChatInputSchema},
+  output: {schema: AIChatOutputSchema},
+  prompt: `Você é Kapé, um assistente de IA especialista em análise de dados ambientais. Sua função é responder a perguntas sobre uma área geográfica específica, utilizando os dados fornecidos.
 
-Você receberá a descrição de um novo conjunto de dados ambiental, bem como descrições de visualizações e insights estatísticos existentes.
+Seja conciso, amigável e informativo. Responda em Markdown.
 
-Sua tarefa é analisar como o novo conjunto de dados se correlaciona com as visualizações e insights estatísticos existentes e sugerir atualizações para as visualizações e insights de acordo.
+**Contexto da Análise:**
 
-Descrição do Novo Conjunto de Dados: {{{newDatasetDescription}}}
+*   **Área de Foco:** {{{areaName}}}
+*   **Dados Disponíveis (resumo):**
+    \`\`\`json
+    {{{statistics}}}
+    \`\`\`
 
-Descrição das Visualizações Existentes: {{{existingVisualizationsDescription}}}
+**Pergunta do Usuário:**
+"{{{question}}}"
 
-Descrição dos Insights Estatísticos Existentes: {{{existingStatisticalInsightsDescription}}}
-
-Insights de Correlação:
-Atualizações Sugeridas: `,
+Com base no contexto acima, por favor, forneça uma resposta clara e direta para a pergunta do usuário.`,
 });
 
-const correlateDatasetsFlow = ai.defineFlow(
+const aiChatFlow = ai.defineFlow(
   {
-    name: 'correlateDatasetsFlow',
-    inputSchema: CorrelateDatasetsInputSchema,
-    outputSchema: CorrelateDatasetsOutputSchema,
+    name: 'aiChatFlow',
+    inputSchema: AIChatInputSchema,
+    outputSchema: AIChatOutputSchema,
   },
   async input => {
     const {output} = await prompt(input);
