@@ -4,7 +4,7 @@ import type { PanelGroup } from "react-resizable-panels";
 import DashboardClient from "@/components/dashboard/dashboard-client";
 import type { StatsData } from '@/components/dashboard/stats-panel';
 import WelcomeDialog from '@/components/dashboard/welcome-dialog';
-import { getIndicatorXYZ, getRestoredCarbonXYZ, getCurrentCarbonXYZ, getOpportunityCostXYZ, getRestorationCostXYZ, getMapbiomasXYZ, getLocationsByType, getLocationDetails } from '@/services/map.service';
+import { fetchIndicatorXYZ, fetchRestoredCarbonXYZ, fetchCurrentCarbonXYZ, fetchOpportunityCostXYZ, fetchRestorationCostXYZ, fetchMapbiomasXYZ, getLocationsByType, getLocationDetails } from '@/services/map.service';
 import type { FeatureCollection, Geometry } from 'geojson';
 import type { Location } from '@/models/location.model';
 
@@ -22,12 +22,12 @@ export default async function DashboardPage() {
         states,
         statesGeoJSON,
     ] = await Promise.all([
-        getIndicatorXYZ(),
-        getRestoredCarbonXYZ(),
-        getCurrentCarbonXYZ(),
-        getOpportunityCostXYZ(),
-        getRestorationCostXYZ(),
-        getMapbiomasXYZ(),
+        fetchIndicatorXYZ(),
+        fetchRestoredCarbonXYZ(),
+        fetchCurrentCarbonXYZ(),
+        fetchOpportunityCostXYZ(),
+        fetchRestorationCostXYZ(),
+        fetchMapbiomasXYZ(),
         getLocationsByType('estado').catch(err => { 
             console.error("Failed to fetch states list:", err); 
             return []; // Return empty array on error
