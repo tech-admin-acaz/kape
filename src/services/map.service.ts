@@ -4,12 +4,13 @@ import type { Location, TerritoryTypeKey } from "@/models/location.model";
 // Function to get the base URL, works on both server and client
 const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
-        // client-side
+        // client-side, relative path
         return '';
     }
     // server-side
-    // Try VERCEL_URL, then localhost for development
-    return process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+    // Use NEXT_PUBLIC_SITE_URL which is automatically set by Firebase App Hosting.
+    // Fallback to localhost for local development.
+    return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 };
 
 
@@ -28,50 +29,55 @@ const fetchWithTiming = async (endpoint: string) => {
 };
 
 
-const fetchXYZ = async (endpoint: string): Promise<string> => {
-    const data = await fetchWithTiming(endpoint);
-    return data.xyz;
+const fetchXYZ = async (endpoint: string): Promise<string | null> => {
+    try {
+        const data = await fetchWithTiming(endpoint);
+        return data.xyz;
+    } catch (error) {
+        console.error(`Failed to fetch XYZ from ${endpoint}:`, error);
+        return null; // Return null on error to avoid breaking the page
+    }
 };
 
 /**
  * Fetches the XYZ tile URL for the indicator layer.
  */
-export async function getIndicatorXYZ(): Promise<string> {
+export async function getIndicatorXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/indicator');
 }
 
 /**
  * Fetches the XYZ tile URL for the restored carbon layer.
  */
-export async function getRestoredCarbonXYZ(): Promise<string> {
+export async function getRestoredCarbonXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/restored-carbon');
 }
 
 /**
  * Fetches the XYZ tile URL for the current carbon layer.
  */
-export async function getCurrentCarbonXYZ(): Promise<string> {
+export async function getCurrentCarbonXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/current-carbon');
 }
 
 /**
  * Fetches the XYZ tile URL for the opportunity cost layer.
  */
-export async function getOpportunityCostXYZ(): Promise<string> {
+export async function getOpportunityCostXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/opportunity-cost');
 }
 
 /**
  * Fetches the XYZ tile URL for the restoration cost layer.
  */
-export async function getRestorationCostXYZ(): Promise<string> {
+export async function getRestorationCostXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/restoration-cost');
 }
 
 /**
  * Fetches the XYZ tile URL for the mapbiomas layer.
  */
-export async function getMapbiomasXYZ(): Promise<string> {
+export async function getMapbiomasXYZ(): Promise<string | null> {
     return fetchXYZ('/api/map/mapbiomas');
 }
 
@@ -87,16 +93,21 @@ const titleCase = (str: string) => {
  * Fetches locations based on the territory type.
  */
 export async function getLocationsByType(type: TerritoryTypeKey): Promise<Location[]> {
-    const data = await fetchWithTiming(`/api/locations/${type}`);
-    
-    const locations = data.map((item: any) => ({
-        value: String(item.id), 
-        label: type === 'uc' ? titleCase(item.name) : item.name,
-    }));
+    try {
+        const data = await fetchWithTiming(`/api/locations/${type}`);
+        
+        const locations = data.map((item: any) => ({
+            value: String(item.id), 
+            label: type === 'uc' ? titleCase(item.name) : item.name,
+        }));
 
-    locations.sort((a: Location, b: Location) => a.label.localeCompare(b.label));
+        locations.sort((a: Location, b: Location) => a.label.localeCompare(b.label));
 
-    return locations;
+        return locations;
+    } catch (error) {
+        console.error(`Failed to get locations for type ${type}:`, error);
+        return []; // Return empty array on error
+    }
 }
 
 /**

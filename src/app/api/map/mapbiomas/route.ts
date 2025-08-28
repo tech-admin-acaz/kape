@@ -27,3 +27,4 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch mapbiomas data' }, { status: 500 });
     }
 }
+
