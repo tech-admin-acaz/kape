@@ -39,4 +39,4 @@ export default function SpeciesTab({ species, isLoading }: SpeciesTabProps) {
     return (
         <SpeciesRankingTable species={species} />
     );
-}
+};

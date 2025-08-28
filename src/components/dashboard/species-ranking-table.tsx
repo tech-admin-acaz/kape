@@ -511,5 +511,4 @@ export default function SpeciesRankingTable({ species }: SpeciesRankingTableProp
       </div>
     </div>
   );
-
-    
+}
