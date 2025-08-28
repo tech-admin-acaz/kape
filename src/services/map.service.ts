@@ -1,85 +1,88 @@
 
 import type { Location, TerritoryTypeKey } from "@/models/location.model";
 
-// Function to get the base URL, works on both server and client
-const getBaseUrl = () => {
-    if (typeof window !== 'undefined') {
-        // client-side, relative path
-        return '';
+const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
+
+// Base fetch function
+const fetchFromExternalAPI = async (path: string) => {
+    if (!API_BIO_URL) {
+        console.error('API URL not configured');
+        throw new Error('API URL not configured');
     }
-    // server-side
-    // Use NEXT_PUBLIC_SITE_URL which is automatically set by Firebase App Hosting.
-    // Fallback to localhost for local development.
-    return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
-};
-
-
-const fetchWithTiming = async (endpoint: string) => {
-    const baseUrl = getBaseUrl();
-    const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
-    
-    const response = await fetch(fullUrl);
+    const fullUrl = `${API_BIO_URL}/${path}`;
+    const response = await fetch(fullUrl, { cache: 'no-store' }); // Use no-store to prevent caching issues
 
     if (!response.ok) {
         const errorText = await response.text();
         console.error(`Error fetching from ${fullUrl}:`, response.status, errorText);
-        throw new Error(`Network response was not ok for ${fullUrl}`);
+        throw new Error(`Failed to fetch from external API: ${fullUrl}`);
     }
     return response.json();
 };
 
 
-const fetchXYZ = async (endpoint: string): Promise<string | null> => {
+// --- Functions to fetch XYZ tile URLs ---
+
+export async function fetchIndicatorXYZ(): Promise<string | null> {
     try {
-        const data = await fetchWithTiming(endpoint);
+        const data = await fetchFromExternalAPI('xyz/indicador');
         return data.xyz;
     } catch (error) {
-        console.error(`Failed to fetch XYZ from ${endpoint}:`, error);
-        return null; // Return null on error to avoid breaking the page
+        console.error('Failed to fetch IndicatorXYZ:', error);
+        return null;
     }
-};
-
-/**
- * Fetches the XYZ tile URL for the indicator layer.
- */
-export async function getIndicatorXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/indicator');
 }
 
-/**
- * Fetches the XYZ tile URL for the restored carbon layer.
- */
-export async function getRestoredCarbonXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/restored-carbon');
+export async function fetchRestoredCarbonXYZ(): Promise<string | null> {
+    try {
+        const data = await fetchFromExternalAPI('xyz/carbonoRestauracao');
+        return data.xyz;
+    } catch (error) {
+        console.error('Failed to fetch RestoredCarbonXYZ:', error);
+        return null;
+    }
 }
 
-/**
- * Fetches the XYZ tile URL for the current carbon layer.
- */
-export async function getCurrentCarbonXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/current-carbon');
+export async function fetchCurrentCarbonXYZ(): Promise<string | null> {
+    try {
+        const data = await fetchFromExternalAPI('xyz/carbonoAtual');
+        return data.xyz;
+    } catch (error) {
+        console.error('Failed to fetch CurrentCarbonXYZ:', error);
+        return null;
+    }
 }
 
-/**
- * Fetches the XYZ tile URL for the opportunity cost layer.
- */
-export async function getOpportunityCostXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/opportunity-cost');
+export async function fetchOpportunityCostXYZ(): Promise<string | null> {
+    try {
+        const data = await fetchFromExternalAPI('xyz/oportunidade');
+        return data.xyz;
+    } catch (error) {
+        console.error('Failed to fetch OpportunityCostXYZ:', error);
+        return null;
+    }
 }
 
-/**
- * Fetches the XYZ tile URL for the restoration cost layer.
- */
-export async function getRestorationCostXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/restoration-cost');
+export async function fetchRestorationCostXYZ(): Promise<string | null> {
+    try {
+        const data = await fetchFromExternalAPI('xyz/restauracao');
+        return data.xyz;
+    } catch (error) {
+        console.error('Failed to fetch RestorationCostXYZ:', error);
+        return null;
+    }
 }
 
-/**
- * Fetches the XYZ tile URL for the mapbiomas layer.
- */
-export async function getMapbiomasXYZ(): Promise<string | null> {
-    return fetchXYZ('/api/map/mapbiomas');
+export async function fetchMapbiomasXYZ(): Promise<string | null> {
+    try {
+        const data = await fetchFromExternalAPI('xyz/mapbiomas');
+        return data.xyz;
+    } catch (error) {
+        console.error('Failed to fetch MapbiomasXYZ:', error);
+        return null;
+    }
 }
+
 
 const titleCase = (str: string) => {
     if (!str) return '';
@@ -89,12 +92,21 @@ const titleCase = (str: string) => {
 }
 
 
+// --- Functions to fetch Location Data ---
+
 /**
- * Fetches locations based on the territory type.
+ * Fetches locations list by territory type from the external API.
  */
 export async function getLocationsByType(type: TerritoryTypeKey): Promise<Location[]> {
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados' as any;
+    } else if (type === 'municipio') {
+        fetchType = 'municipios' as any;
+    }
+
     try {
-        const data = await fetchWithTiming(`/api/locations/${type}`);
+        const data = await fetchFromExternalAPI(fetchType);
         
         const locations = data.map((item: any) => ({
             value: String(item.id), 
@@ -106,18 +118,31 @@ export async function getLocationsByType(type: TerritoryTypeKey): Promise<Locati
         return locations;
     } catch (error) {
         console.error(`Failed to get locations for type ${type}:`, error);
-        return []; // Return empty array on error
+        return [];
     }
 }
 
 /**
- * Fetches a single location's details, including its GeoJSON geometry.
+ * Fetches a single location's details from the external API.
  */
 export async function getLocationDetails(type: TerritoryTypeKey, id: string): Promise<any> {
-    const data = await fetchWithTiming(`/api/locations/${type}/${id}`);
+    let fetchType = type;
+    if (type === 'estado') {
+        fetchType = 'estados' as any;
+    } else if (type === 'municipio') {
+        fetchType = 'municipios' as any;
+    }
     
-    if (data && data.length > 0) {
-        const details = data[0];
+    const data = await fetchFromExternalAPI(`${fetchType}/${id}`);
+    
+    if (data) {
+        // The API returns an array for estado/municipio, but a direct object for ti/uc
+        const details = Array.isArray(data) ? data[0] : data;
+        
+        if (details.geom && details.geom.geom) {
+            details.geom = details.geom.geom;
+        }
+
         if (type === 'uc' && details.name) {
             details.name = titleCase(details.name);
         }
@@ -127,19 +152,16 @@ export async function getLocationDetails(type: TerritoryTypeKey, id: string): Pr
 }
 
 /**
- * Fetches a location based on geographic coordinates.
+ * Fetches a location based on geographic coordinates from the external API.
+ * This function will be called by the internal API route.
  */
 export async function getLocationByCoords(lat: number, lng: number): Promise<any> {
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/locations/by-coords?lat=${lat}&lng=${lng}`);
-     if (!response.ok) {
-        if (response.status === 404) {
-            console.log(`Location not found for coords ${lat},${lng}`);
-            return null; // Return null specifically for 404
-        }
-        const errorText = await response.text();
-        console.error(`Error fetching location by coords:`, response.status, errorText);
-        throw new Error(`Failed to fetch location by coords`);
+     // Defaults to searching for 'estados' as a fallback
+    const data = await fetchFromExternalAPI(`action/estados/${lng}/${lat}`);
+    
+    // The API returns an array, we are interested in the first element.
+    if (data && data.length > 0) {
+        return data[0];
     }
-    return await response.json();
+    return null;
 }

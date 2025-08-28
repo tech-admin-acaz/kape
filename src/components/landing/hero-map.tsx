@@ -1,10 +1,9 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
 import Map, { MapRef, Source, Layer } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { getIndicatorXYZ } from '@/services/map.service';
+import { fetchIndicatorXYZ } from '@/services/map.service';
 import { useTheme } from 'next-themes';
 
 
@@ -21,7 +20,7 @@ export default function HeroMap() {
     useEffect(() => {
         async function fetchIndicatorLayer() {
             try {
-                const indicator = await getIndicatorXYZ();
+                const indicator = await fetchIndicatorXYZ();
                 if (indicator) setIndicatorXYZ(indicator);
             } catch (error) {
                 console.error('Failed to fetch indicator layer:', error);
