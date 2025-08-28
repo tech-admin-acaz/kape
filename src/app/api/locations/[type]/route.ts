@@ -1,7 +1,7 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 
-const API_BIO_URL = process.env.API_BIO_URL;
+const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
 
 /**
  * API route to fetch locations based on their type (e.g., municipio, estado).

@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 
-const API_BIO_URL = process.env.API_BIO_URL;
+const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
 
 /**
  * API route to fetch the restoration cost layer XYZ tile URL.

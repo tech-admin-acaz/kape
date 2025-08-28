@@ -2,7 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import type { CarbonData } from '@/components/dashboard/stats-panel';
 
-const API_BIO_URL = process.env.API_BIO_URL;
+const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
 
 const labelMapping: { [key: string]: { name: string; type: 'current' | 'restorable' } } = {
     'Vegetacao_Primaria': { name: 'Vegetação Primária', type: 'current' },

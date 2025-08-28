@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 
-const API_BIO_URL = process.env.API_BIO_URL;
+const API_BIO_URL = process.env.NEXT_PUBLIC_API_BIO_URL;
 
 /**
  * API route to fetch the restored carbon layer XYZ tile URL.
@@ -17,7 +17,7 @@ export async function GET() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Error fetching restored carbon from external API:', response.status, errorText);
-            return NextResponse.json({ error: 'Failed to fetch restored carbon data from source' }, { status: response.status });
+            return NextResponse.json({ error: `Failed to fetch restored carbon data from source` }, { status: response.status });
         }
         const data = await response.json();
         return NextResponse.json({ xyz: data.xyz });
